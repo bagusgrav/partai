@@ -6,3 +6,4 @@
 - INVARIANT (DB): File di /var/data/partai/, dilarang di /var/www/.
 - INVARIANT (API): Wajib idempoten menggunakan request_id (UUID).
 - INVARIANT (Frontend): Wajib fetchWithRetry (2 retry, 1.5s).
+- **INVARIANT (Roadmap):** Pengembangan fitur wajib mengacu pada `ROADMAP.md`. Fitur yang belum ada di roadmap tidak boleh diimplementasikan tanpa persetujuan eksplisit.
