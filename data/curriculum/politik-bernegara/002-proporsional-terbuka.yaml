@@ -1,0 +1,16 @@
+id: POL-KENALI-002
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Dalam sistem proporsional terbuka untuk pemilihan anggota DPR, bagaimana pemilih dapat memberikan suaranya?
+options:
+  - Memilih calon anggota legislatif dalam daftar calon partai peserta pemilu
+  - Hanya memilih Presiden dan Wakil Presiden
+  - Memilih hakim yang akan mengadili perkara
+  - Menunjuk anggota DPRD secara tidak langsung melalui Presiden
+answer: 0
+explanation: Sistem proporsional terbuka memberi pemilih pilihan untuk memberikan suara kepada calon anggota legislatif yang tercantum dalam daftar calon partai peserta pemilu. Mahkamah Konstitusi dalam Putusan Nomor 114/PUU-XX/2022 menolak permohonan yang mempersoalkan sistem tersebut.
+sources:
+  - citation: "UU Nomor 7 Tahun 2017 tentang Pemilihan Umum, Pasal 168 ayat (2)."
+  - citation: "Putusan Mahkamah Konstitusi Nomor 114/PUU-XX/2022."
+

@@ -1,0 +1,15 @@
+id: HUK-KENALI-007
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Manakah yang termasuk tugas Komisi Pemberantasan Korupsi menurut undang-undang?
+options:
+  - Melakukan koordinasi dan supervisi terhadap instansi yang berwenang memberantas korupsi
+  - Menguji undang-undang terhadap UUD 1945
+  - Menetapkan anggaran pendapatan dan belanja negara
+  - Mengadili semua perkara pidana pada tingkat banding
+answer: 0
+explanation: UU tentang KPK mencantumkan tugas koordinasi dan supervisi, selain pencegahan, pemantauan, penyelidikan, penyidikan, dan penuntutan tindak pidana korupsi. KPK bukan lembaga peradilan dan tidak menguji konstitusionalitas undang-undang.
+sources:
+  - citation: "UU Nomor 30 Tahun 2002 tentang Komisi Pemberantasan Tindak Pidana Korupsi, Pasal 6, sebagaimana diubah dengan UU Nomor 19 Tahun 2019."
+

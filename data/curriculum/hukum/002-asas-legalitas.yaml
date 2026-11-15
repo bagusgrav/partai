@@ -1,0 +1,15 @@
+id: HUK-KENALI-002
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Apa inti asas legalitas dalam hukum pidana menurut KUHP nasional?
+options:
+  - Seseorang hanya dapat dipidana berdasarkan ketentuan pidana yang telah ada sebelum perbuatannya dilakukan
+  - Setiap perbuatan yang merugikan orang lain otomatis merupakan tindak pidana
+  - Hakim dapat menciptakan tindak pidana baru melalui analogi
+  - Hukuman pidana hanya dapat dijatuhkan jika korban menyetujuinya
+answer: 0
+explanation: Pasal 1 ayat (1) UU Nomor 1 Tahun 2023 menyatakan bahwa suatu perbuatan tidak dapat dikenai sanksi pidana atau tindakan kecuali berdasarkan peraturan pidana yang telah ada sebelum perbuatan dilakukan. Ketentuan berikutnya juga melarang penggunaan analogi untuk menetapkan tindak pidana.
+sources:
+  - citation: "UU Nomor 1 Tahun 2023 tentang Kitab Undang-Undang Hukum Pidana, Pasal 1."
+

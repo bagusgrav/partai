@@ -1,0 +1,15 @@
+id: HUK-KENALI-008
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Menurut UUD 1945, kekuasaan kehakiman merupakan kekuasaan yang bagaimana?
+options:
+  - Merdeka untuk menyelenggarakan peradilan guna menegakkan hukum dan keadilan
+  - Berada di bawah pengawasan langsung Presiden dalam memutus perkara
+  - Dijalankan bersama oleh DPR dan pemerintah
+  - Hanya bertugas menyelesaikan sengketa antar lembaga negara
+answer: 0
+explanation: Pasal 24 ayat (1) UUD 1945 menegaskan bahwa kekuasaan kehakiman adalah kekuasaan yang merdeka untuk menyelenggarakan peradilan guna menegakkan hukum dan keadilan. Kemerdekaan ini merupakan prinsip penting agar perkara diputus menurut hukum.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24 ayat (1)."
+

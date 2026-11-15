@@ -1,0 +1,16 @@
+id: POL-KENALI-003
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Apa pengaruh ambang batas parlemen yang diatur dalam UU Pemilu terhadap partai politik peserta pemilu?
+options:
+  - Menjadi syarat perolehan suara untuk diikutkan dalam penentuan kursi DPR
+  - Menentukan siapa yang dapat menjadi calon Presiden
+  - Menentukan jumlah anggota DPD dari setiap provinsi
+  - Mengatur batas maksimal masa jabatan anggota DPR
+answer: 0
+explanation: Pasal 414 ayat (1) UU Nomor 7 Tahun 2017 mengatur ambang batas perolehan suara sah nasional bagi partai politik untuk diikutkan dalam penentuan perolehan kursi DPR. Ketentuan ini berkaitan dengan DPR, bukan pemilihan anggota DPD.
+sources:
+  - citation: "UU Nomor 7 Tahun 2017 tentang Pemilihan Umum, Pasal 414 ayat (1)."
+  - citation: "Putusan Mahkamah Konstitusi Nomor 116/PUU-XXI/2023."
+

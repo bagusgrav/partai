@@ -1,0 +1,15 @@
+id: POL-KENALI-005
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Bagaimana Rancangan Undang-Undang dibahas menurut Pasal 20 ayat (2) UUD 1945?
+options:
+  - Dibahas oleh DPR dan Presiden untuk mendapat persetujuan bersama
+  - Diputuskan sepihak oleh Mahkamah Agung
+  - Disahkan terlebih dahulu oleh Komisi Pemilihan Umum
+  - Ditetapkan oleh DPR tanpa pembahasan bersama Presiden
+answer: 0
+explanation: UUD 1945 menetapkan bahwa setiap rancangan undang-undang dibahas oleh DPR dan Presiden untuk mendapat persetujuan bersama. Ini merupakan bagian dari proses pembentukan undang-undang dan kerja sama antarcabang kekuasaan.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 20 ayat (2)."
+

@@ -1,0 +1,15 @@
+id: POL-KENALI-009
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Dalam praktik politik, apa yang umumnya dimaksud dengan koalisi partai?
+options:
+  - Kerja sama beberapa partai untuk mendukung agenda atau pemerintahan
+  - Lembaga peradilan yang menguji undang-undang
+  - Badan penyelenggara pemilu yang bersifat mandiri
+  - Kelompok yang menggantikan fungsi seluruh lembaga negara
+answer: 0
+explanation: Koalisi adalah kerja sama politik di antara partai-partai, misalnya untuk mendukung pasangan calon atau agenda pemerintahan. Istilah koalisi menggambarkan praktik politik; istilah tersebut bukan lembaga negara yang kewenangannya ditetapkan tersendiri dalam UUD 1945.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 6A dan Pasal 20A; keduanya mengatur pemilihan Presiden serta fungsi DPR dalam tata negara."
+

@@ -1,0 +1,15 @@
+id: HUK-KENALI-001
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Menurut Pasal 7 UU Nomor 12 Tahun 2011, jenis peraturan yang berada tepat di bawah UUD Negara Republik Indonesia Tahun 1945 dalam hierarki peraturan perundang-undangan adalah apa?
+options:
+  - Ketetapan Majelis Permusyawaratan Rakyat
+  - Undang-Undang atau Peraturan Pemerintah Pengganti Undang-Undang
+  - Peraturan Pemerintah
+  - Peraturan Presiden
+answer: 0
+explanation: Pasal 7 ayat (1) UU Nomor 12 Tahun 2011 menempatkan Ketetapan MPR tepat setelah UUD 1945. Urutan selanjutnya adalah UU/Perppu, PP, Perpres, Perda Provinsi, dan Perda Kabupaten/Kota.
+sources:
+  - citation: "UU Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan, Pasal 7 ayat (1), sebagaimana diubah terakhir dengan UU Nomor 13 Tahun 2022."
+

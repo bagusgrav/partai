@@ -1,0 +1,15 @@
+id: HUK-KENALI-010
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Bagaimana sifat putusan Mahkamah Konstitusi dalam perkara yang termasuk kewenangannya menurut Pasal 24C ayat (1) UUD 1945?
+options:
+  - Final
+  - Harus selalu mendapat persetujuan Mahkamah Agung
+  - Dapat dibatalkan oleh Presiden
+  - Hanya berlaku setelah disahkan DPR
+answer: 0
+explanation: Pasal 24C ayat (1) UUD 1945 secara tegas menyatakan bahwa Mahkamah Konstitusi mengadili pada tingkat pertama dan terakhir serta putusannya bersifat final. Artinya, tidak tersedia upaya hukum biasa untuk mengajukan banding atas putusan tersebut.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24C ayat (1)."
+

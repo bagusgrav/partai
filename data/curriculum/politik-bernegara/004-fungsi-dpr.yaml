@@ -1,0 +1,15 @@
+id: POL-KENALI-004
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Apa tiga fungsi Dewan Perwakilan Rakyat menurut UUD 1945?
+options:
+  - Legislasi, anggaran, dan pengawasan
+  - Peradilan, diplomasi, dan audit
+  - Eksekusi, penyidikan, dan penuntutan
+  - Pendidikan, kesehatan, dan pertahanan
+answer: 0
+explanation: Pasal 20A ayat (1) UUD 1945 menetapkan bahwa DPR memiliki fungsi legislasi, anggaran, dan pengawasan. Fungsi-fungsi ini memungkinkan DPR membentuk undang-undang bersama Presiden, membahas anggaran, serta mengawasi jalannya pemerintahan.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 20A ayat (1)."
+

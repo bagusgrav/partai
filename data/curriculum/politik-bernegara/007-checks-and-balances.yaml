@@ -1,0 +1,15 @@
+id: POL-KENALI-007
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Larangan bagi Presiden untuk membekukan atau membubarkan DPR merupakan contoh prinsip apa?
+options:
+  - Checks and balances antarlembaga negara
+  - Kekuasaan tanpa batas dari cabang eksekutif
+  - Pemisahan Indonesia menjadi negara federal
+  - Penggantian pemilihan umum oleh penunjukan
+answer: 0
+explanation: Pasal 7C UUD 1945 menyatakan bahwa Presiden tidak dapat membekukan dan/atau membubarkan DPR. Batas konstitusional ini menggambarkan mekanisme checks and balances, yaitu kekuasaan lembaga negara dibatasi dan diseimbangkan oleh aturan serta lembaga lain.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 7C."
+

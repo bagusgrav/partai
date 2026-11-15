@@ -1,0 +1,15 @@
+id: POL-KENALI-001
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Menurut UUD 1945, pemilihan umum di Indonesia diselenggarakan secara berkala setiap berapa tahun?
+options:
+  - Lima tahun
+  - Tiga tahun
+  - Empat tahun
+  - Enam tahun
+answer: 0
+explanation: Pasal 22E ayat (1) UUD 1945 menetapkan bahwa pemilihan umum dilaksanakan setiap lima tahun sekali. Pemilu diselenggarakan untuk memilih anggota DPR, DPD, Presiden dan Wakil Presiden, serta DPRD.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 22E ayat (1) dan ayat (2)."
+

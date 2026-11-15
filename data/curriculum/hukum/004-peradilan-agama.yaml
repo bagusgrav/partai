@@ -1,0 +1,15 @@
+id: HUK-KENALI-004
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Salah satu kelompok perkara yang menjadi kewenangan Pengadilan Agama bagi orang-orang beragama Islam adalah perkara apa?
+options:
+  - Perkawinan dan ekonomi syariah
+  - Pengujian undang-undang terhadap UUD 1945
+  - Perselisihan hasil pemilihan umum
+  - Sengketa tata usaha negara
+answer: 0
+explanation: Pasal 49 UU Peradilan Agama memberikan kewenangan kepada Pengadilan Agama untuk memeriksa perkara tertentu antara orang-orang beragama Islam, termasuk perkawinan dan ekonomi syariah. Kewenangan lainnya antara lain waris, wakaf, zakat, infak, dan sedekah.
+sources:
+  - citation: "UU Nomor 7 Tahun 1989 tentang Peradilan Agama, Pasal 49, sebagaimana diubah dengan UU Nomor 3 Tahun 2006 dan UU Nomor 50 Tahun 2009."
+

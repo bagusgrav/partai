@@ -1,0 +1,16 @@
+id: HUK-KENALI-009
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Dalam hierarki Pasal 7 UU Nomor 12 Tahun 2011, Peraturan Pemerintah Pengganti Undang-Undang (Perppu) berada pada jenjang yang setara dengan apa?
+options:
+  - Undang-Undang
+  - Peraturan Pemerintah
+  - Peraturan Presiden
+  - Peraturan Daerah Provinsi
+answer: 0
+explanation: Pasal 7 ayat (1) UU Nomor 12 Tahun 2011 mencantumkan Undang-Undang dan Perppu dalam satu jenjang hierarki. UUD 1945 Pasal 22 mengatur kewenangan Presiden menetapkan Perppu dalam hal ihwal kegentingan yang memaksa serta kewajiban mengajukannya kepada DPR.
+sources:
+  - citation: "UU Nomor 12 Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan, Pasal 7 ayat (1), sebagaimana diubah terakhir dengan UU Nomor 13 Tahun 2022."
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 22."
+

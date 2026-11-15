@@ -1,0 +1,15 @@
+id: HUK-KENALI-005
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Lembaga manakah yang berwenang menguji undang-undang terhadap Undang-Undang Dasar 1945?
+options:
+  - Mahkamah Konstitusi
+  - Mahkamah Agung
+  - Komisi Yudisial
+  - Dewan Perwakilan Rakyat
+answer: 0
+explanation: Pasal 24C ayat (1) UUD 1945 memberi Mahkamah Konstitusi kewenangan mengadili pada tingkat pertama dan terakhir, dengan putusan yang bersifat final, untuk menguji undang-undang terhadap UUD.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24C ayat (1)."
+

@@ -1,0 +1,14 @@
+id: POL-KENALI-010
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Dalam demokrasi, apa peran utama partai atau anggota parlemen yang berada di luar koalisi pemerintah?
+options:
+  - Mengawasi kebijakan pemerintah dan menyampaikan kritik serta alternatif
+  - Mengambil alih kewenangan pengadilan
+  - Membatalkan undang-undang tanpa proses hukum
+  - Menghentikan pemilihan umum
+answer: 0
+explanation: Oposisi merupakan peran politik bagi pihak yang tidak mendukung pemerintah dan berfungsi mengawasi kebijakan, mengkritisi, serta menawarkan alternatif. Pengawasan formal DPR sebagai lembaga diatur dalam UUD 1945, termasuk Pasal 20A.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 20A ayat (1), tentang fungsi pengawasan DPR."

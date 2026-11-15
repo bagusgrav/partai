@@ -1,0 +1,15 @@
+id: HUK-KENALI-006
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Dalam sistem peradilan Indonesia, kewenangan manakah yang dimiliki Mahkamah Agung menurut UUD 1945?
+options:
+  - Menguji peraturan di bawah undang-undang terhadap undang-undang
+  - Menguji undang-undang terhadap UUD 1945
+  - Memutus perselisihan hasil pemilihan umum
+  - Membubarkan partai politik
+answer: 0
+explanation: Pasal 24A ayat (1) UUD 1945 memberikan Mahkamah Agung kewenangan untuk menguji peraturan perundang-undangan di bawah undang-undang terhadap undang-undang. Pengujian undang-undang terhadap UUD merupakan kewenangan Mahkamah Konstitusi.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24A ayat (1)."
+
