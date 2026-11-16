@@ -10,7 +10,7 @@ const commitments = [
     number: "01",
     title: "Hadir dalam Kapasitas",
     description:
-      "Belajar melalui Civic Duolingo untuk membangun pengetahuan dan kemampuan berpikir kritis.",
+      "Belajar melalui Modul Belajar Interaktif untuk membangun pengetahuan dan kemampuan berpikir kritis.",
   },
   {
     number: "02",

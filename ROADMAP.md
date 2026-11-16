@@ -9,10 +9,10 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 - [x] Database SQLite WAL (Zero-RAM) + Indeks Majemuk.
 - [x] API Idempoten (`request_id`) & SM-2 Algorithm.
 - [x] Pendaftaran anggota resmi dengan token Sanctum dan halaman profil.
-- [x] UI Kuis Dasar (Duolingo-style) + `fetchWithRetry`.
+- [x] UI Kuis Dasar + `fetchWithRetry`.
 - [x] Panel Admin Filament (Kelola Soal & User).
 
-## 🟡 FASE 1: PENDIDIKAN KEWARGAAN (CIVIC DUOLINGO)
+## 🟡 FASE 1: PENDIDIKAN KEWARGAAN (MODUL BELAJAR INTERAKTIF)
 *Tujuan: Memastikan setiap anggota memiliki kapasitas intelektual yang terukur.*
 - [ ] **Kurikulum Penuh:** Bank soal 5 domain (Hak, Alasan Bernegara, Keuangan, Hukum, Politik) hingga Level 4 (Kritisi).
 - [x] **Sistem Esai & Peer-Review:** Untuk soal Level 3 & 4, anggota menjawab esai pendek yang dinilai oleh panel (bukan pilihan ganda).

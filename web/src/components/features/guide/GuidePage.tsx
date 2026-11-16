@@ -12,7 +12,7 @@ const steps = [
     menu: "Belajar",
     title: "Bangun kapasitas dan bagikan gagasan",
     description:
-      "Ikuti materi dan kuis Civic Duolingo untuk memperdalam pengetahuan kewargaan. Untuk topik yang memerlukan penalaran lebih lanjut, tulis esai sebagai ruang menyampaikan argumen.",
+      "Ikuti materi dan Kuis Kewargaan untuk memperdalam pengetahuan kewargaan. Untuk topik yang memerlukan penalaran lebih lanjut, tulis esai sebagai ruang menyampaikan argumen.",
     href: "/belajar",
   },
   {
