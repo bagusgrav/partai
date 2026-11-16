@@ -18,6 +18,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## End-to-end tests
+
+Playwright tests run against the local Next.js development server and stub API responses, so they do not require a Laravel database or VPS:
+
+```bash
+npm run test:e2e
+```
+
+The Chromium browser can be installed with `npx playwright install chromium`.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
