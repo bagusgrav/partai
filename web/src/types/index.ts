@@ -75,6 +75,31 @@ export interface ActiveEventsResponse {
   events: ActiveEvent[];
 }
 
+export interface VoteOption {
+  id: number;
+  option_text: string;
+}
+
+export interface ActiveVote {
+  id: number;
+  title: string;
+  description: string;
+  starts_at: string;
+  ends_at: string;
+  vote_options: VoteOption[];
+}
+
+export interface ActiveVotesResponse {
+  votes: ActiveVote[];
+}
+
+export interface VoteSubmissionResponse {
+  status: "processed" | "already_processed";
+  data: {
+    submission_id: number;
+  };
+}
+
 export interface AttendanceClaimResult {
   status: "processed" | "already_processed" | "rejected";
   claim_id?: string;

@@ -6,6 +6,7 @@ const links = [
   { href: "/review", label: "Juri Warga" },
   { href: "/events", label: "Aksi Lapangan" },
   { href: "/data", label: "Data Publik" },
+  { href: "/voting", label: "Voting" },
 ];
 
 export default function Navbar() {

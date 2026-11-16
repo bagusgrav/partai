@@ -1,5 +1,6 @@
 import type {
   AnswerResponse,
+  ActiveVotesResponse,
   ActiveEventsResponse,
   AttendanceAttestationResult,
   AttendanceClaimResult,
@@ -10,6 +11,7 @@ import type {
   ReviewResponse,
   WelfareRegionsResponse,
   WelfareSummaryResponse,
+  VoteSubmissionResponse,
 } from "@/types";
 
 const API_BASE_URL =
@@ -211,6 +213,35 @@ export async function getActiveEvents(): Promise<ActiveEventsResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/events/active`, {
     method: "GET",
     headers: await getHeaders(),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getActiveVotes(): Promise<ActiveVotesResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/votes/active`, {
+    method: "GET",
+    headers: await getHeaders(),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function submitVote(
+  voteId: number,
+  voteOptionId: number,
+  requestId: string,
+): Promise<VoteSubmissionResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/votes/submit`, {
+    method: "POST",
+    headers: await getHeaders(true),
+    body: JSON.stringify({
+      vote_id: voteId,
+      vote_option_id: voteOptionId,
+      request_id: requestId,
+    }),
   });
 
   await ensureSuccessfulResponse(response);

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/essay/submit', [EssayController::class, 'submit']);
     Route::get('/essay/review', [EssayController::class, 'pending']);
     Route::post('/essay/review', [EssayController::class, 'review']);
+    Route::get('/votes/active', [VoteController::class, 'active']);
+    Route::post('/votes/submit', [VoteController::class, 'submit']);
 });
