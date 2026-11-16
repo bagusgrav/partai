@@ -55,7 +55,7 @@ export default function ProfileDashboard() {
           </p>
         ) : error ? (
           <div
-            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800"
+            className="mt-8 rounded-2xl border border-slate-300 bg-slate-100 p-5 text-sm text-slate-800"
             role="alert"
           >
             Profil gagal dimuat: {error}

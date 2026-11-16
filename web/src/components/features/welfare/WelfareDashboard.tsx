@@ -75,7 +75,7 @@ export default function WelfareDashboard() {
 
       {error && (
         <div
-          className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800"
+          className="mb-6 rounded-2xl border border-slate-300 bg-slate-100 px-5 py-4 text-sm text-slate-800"
           role="alert"
         >
           Gagal memuat data: {error}
@@ -84,7 +84,7 @@ export default function WelfareDashboard() {
 
       <section
         aria-label="Ringkasan nasional"
-        className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <article className="rounded-2xl border border-slate-200 bg-surface p-6 shadow-sm">
           <p className="text-sm font-semibold text-text-muted">

@@ -40,7 +40,7 @@ export default function VoteCard({
       </p>
 
       {isSubmitted ? (
-        <p className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 font-semibold text-emerald-800">
+        <p className="mt-6 rounded-2xl border border-slate-300 bg-slate-100 p-5 font-semibold text-slate-800">
           Terima kasih, suara Anda telah dicatat.
         </p>
       ) : (
@@ -51,12 +51,12 @@ export default function VoteCard({
             </legend>
             {vote.vote_options.map((option) => (
               <label
-                className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-800 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50"
+                className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-800 transition has-[:checked]:border-slate-900 has-[:checked]:bg-slate-100"
                 key={option.id}
               >
                 <input
                   checked={selectedOption === option.id}
-                  className="size-4 accent-emerald-600"
+                  className="size-4 accent-slate-900"
                   disabled={isSubmitting || isRequestLocked}
                   name={`vote-${vote.id}`}
                   onChange={() => onSelectOption(option.id)}
@@ -69,12 +69,12 @@ export default function VoteCard({
             ))}
           </fieldset>
           {submissionError && (
-            <p className="text-sm font-semibold text-red-700" role="alert">
+            <p className="text-sm font-semibold text-slate-700" role="alert">
               {submissionError}
             </p>
           )}
           <button
-            className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 font-extrabold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:bg-slate-300"
+            className="min-h-14 w-full rounded-2xl bg-slate-900 px-6 font-extrabold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-300"
             disabled={selectedOption === undefined || isSubmitting}
             type="submit"
           >

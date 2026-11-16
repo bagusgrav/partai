@@ -128,8 +128,8 @@ export default function LearningSession() {
   if (loadError) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <section className="w-full max-w-lg rounded-3xl border border-red-200 bg-surface p-8 text-center shadow-xl shadow-primary/5">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">
+        <section className="w-full max-w-lg rounded-3xl border border-slate-300 bg-surface p-8 text-center shadow-xl shadow-primary/5">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-700">
             Tidak dapat memuat sesi
           </p>
           <p className="mt-4 text-text-main" role="alert">
@@ -154,8 +154,8 @@ export default function LearningSession() {
     return (
       <main className="flex min-h-screen items-center justify-center px-6 py-12">
         <section className="w-full max-w-xl rounded-3xl border border-primary-light bg-surface p-8 text-center shadow-xl shadow-primary/5 sm:p-12">
-          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-primary-light text-4xl">
-            🎉
+          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-primary-light text-4xl font-black text-primary-hover">
+            ✓
           </div>
           <p className="mt-6 text-sm font-bold uppercase tracking-[0.22em] text-primary-hover">
             Sesi belajar
@@ -173,8 +173,8 @@ export default function LearningSession() {
               <p className="text-2xl font-black text-primary-hover">{stats.correct}</p>
               <p className="mt-1 text-xs font-semibold text-text-muted">Benar</p>
             </div>
-            <div className="rounded-2xl bg-rose-50 p-4">
-              <p className="text-2xl font-black text-rose-700">{stats.incorrect}</p>
+            <div className="rounded-2xl bg-slate-100 p-4">
+              <p className="text-2xl font-black text-slate-700">{stats.incorrect}</p>
               <p className="mt-1 text-xs font-semibold text-text-muted">Salah</p>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function LearningSession() {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-primary-hover">
               Partai

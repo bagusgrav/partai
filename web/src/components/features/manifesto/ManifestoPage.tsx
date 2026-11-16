@@ -40,7 +40,7 @@ export default function ManifestoContent() {
           <p className="text-sm font-black uppercase tracking-[0.2em] text-primary-hover">
             Manifesto PARTAI
           </p>
-          <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight text-text-main sm:text-6xl">
+          <h1 className="mt-6 text-3xl font-black leading-tight tracking-tight text-text-main sm:text-4xl lg:text-5xl">
             Politik Tidak Seharusnya Begitu Kotor. Saatnya Anda &apos;Aku Hadir.&apos;
           </h1>
           <p className="mt-8 text-xl leading-9 text-text-muted">

@@ -62,7 +62,7 @@ export default function QuizCard({
             </p>
           )}
           {submitError && (
-            <p className="mt-4 text-sm font-semibold text-red-700" role="alert">
+            <p className="mt-4 text-sm font-semibold text-slate-700" role="alert">
               Esai belum berhasil dikirim. {submitError}
             </p>
           )}
@@ -76,7 +76,7 @@ export default function QuizCard({
               ? isCorrect
                 ? "border-primary bg-primary-light text-primary-hover"
                 : isSelected
-                  ? "border-rose-400 bg-rose-50 text-rose-900"
+                  ? "border-slate-400 bg-slate-100 text-slate-900"
                   : "border-background bg-surface text-text-muted"
               : isSelected
                 ? "border-primary bg-primary-light text-primary-hover ring-2 ring-primary-light"
@@ -101,7 +101,7 @@ export default function QuizCard({
                   </span>
                 )}
                 {isRevealed && isSelected && !isCorrect && (
-                  <span aria-label="Jawaban salah" className="font-black text-rose-700">
+                  <span aria-label="Jawaban salah" className="font-black text-slate-700">
                     ✕
                   </span>
                 )}
@@ -117,14 +117,14 @@ export default function QuizCard({
           className={`mt-7 rounded-2xl border p-5 ${
             selectedOption === correctAnswer
               ? "border-primary-light bg-primary-light"
-              : "border-amber-200 bg-amber-50"
+              : "border-slate-300 bg-slate-100"
           }`}
         >
           <h2
             className={`font-extrabold ${
               selectedOption === correctAnswer
                 ? "text-primary-hover"
-                : "text-amber-900"
+                : "text-slate-800"
             }`}
           >
             {selectedOption === correctAnswer ? "Benar!" : "Belum tepat"}
@@ -153,7 +153,7 @@ export default function QuizCard({
             </ul>
           )}
           {submitError && (
-            <p className="mt-4 text-sm font-semibold text-red-700" role="alert">
+            <p className="mt-4 text-sm font-semibold text-slate-700" role="alert">
               {submitError}
             </p>
           )}

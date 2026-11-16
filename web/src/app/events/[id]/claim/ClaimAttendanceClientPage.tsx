@@ -80,15 +80,15 @@ export default function ClaimAttendanceClientPage({ eventId }: { eventId: string
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Aku Hadir
             </p>
             <h1 className="mt-1 text-2xl font-extrabold text-slate-900">Klaim Kehadiran</h1>
           </div>
           <Link
-            className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+            className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
             href="/events"
           >
             Kembali
@@ -98,7 +98,7 @@ export default function ClaimAttendanceClientPage({ eventId }: { eventId: string
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 sm:p-10">
           {result ? (
             <div className="text-center">
-              <h2 className="text-xl font-extrabold text-emerald-800">
+              <h2 className="text-xl font-extrabold text-slate-900">
                 {result.claim_status === "rejected" || result.status === "rejected"
                   ? "Klaim ditolak"
                   : "Klaim berhasil dikirim"}
@@ -119,7 +119,7 @@ export default function ClaimAttendanceClientPage({ eventId }: { eventId: string
               </label>
               <input
                 autoComplete="off"
-                className="mt-2 min-h-12 w-full rounded-xl border-2 border-slate-200 px-4 font-mono text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 min-h-12 w-full rounded-xl border-2 border-slate-200 px-4 font-mono text-sm text-slate-900 outline-none focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
                 id="qr-token"
                 onChange={(event) => setToken(event.target.value)}
                 placeholder="Tempel token QR di sini"
@@ -127,10 +127,10 @@ export default function ClaimAttendanceClientPage({ eventId }: { eventId: string
                 value={pendingClaim?.token ?? token}
               />
               {error && (
-                <p className="mt-4 text-sm font-semibold text-red-700" role="alert">{error}</p>
+                <p className="mt-4 text-sm font-semibold text-slate-700" role="alert">{error}</p>
               )}
               <button
-                className="mt-6 min-h-14 w-full rounded-2xl bg-emerald-600 px-6 font-extrabold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:bg-slate-300"
+                className="mt-6 min-h-14 w-full rounded-2xl bg-slate-900 px-6 font-extrabold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-300"
                 disabled={submitting}
                 onClick={handleClaim}
                 type="button"

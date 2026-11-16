@@ -71,7 +71,7 @@ export default function LandingPage() {
               <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
               Ruang belajar dan pengawasan warga
             </p>
-            <h1 className="mt-7 text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="mt-7 text-3xl font-black tracking-tight sm:text-5xl">
               Aku <span className="text-primary">Hadir.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-text-muted sm:text-xl">
@@ -81,20 +81,20 @@ export default function LandingPage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-md bg-primary px-4 py-4 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                className="inline-flex min-h-14 w-full items-center justify-center rounded-md bg-primary px-4 py-4 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
                 href="/belajar"
               >
                 Mulai Belajar Sekarang
                 <span aria-hidden="true" className="ml-2">→</span>
               </Link>
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                className="inline-flex min-h-14 w-full items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
                 href="/events"
               >
                 Jelajahi Aksi Lapangan
               </Link>
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                className="inline-flex min-h-14 w-full items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
                 href="/manifesto"
               >
                 Baca Manifesto
@@ -146,7 +146,7 @@ export default function LandingPage() {
             publik bersama.
           </p>
         </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {steps.map((step) => (
             <article
               className="group rounded-2xl border border-background bg-surface p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary-light hover:shadow-lg hover:shadow-primary/5 sm:p-7"
@@ -185,7 +185,7 @@ export default function LandingPage() {
               kehidupan publik.
             </p>
           </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
             {features.map((feature) => {
               const content = (
                 <>

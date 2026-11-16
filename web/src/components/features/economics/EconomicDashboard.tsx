@@ -121,7 +121,7 @@ function TrendChart({
                   dataKey="value"
                   dot={{ r: 3 }}
                   name={title}
-                  stroke="#059669"
+                  stroke="#0f172a"
                   strokeWidth={3}
                   type="monotone"
                 />
@@ -312,7 +312,7 @@ export default function EconomicDashboard() {
 
       {error && (
         <div
-          className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800"
+          className="mb-6 rounded-2xl border border-slate-300 bg-slate-100 px-5 py-4 text-sm text-slate-800"
           role="alert"
         >
           Gagal memuat data: {error}
@@ -326,7 +326,7 @@ export default function EconomicDashboard() {
           id="panel-ekonomi"
           role="tabpanel"
         >
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               indicator={indicatorsByType.get("debt")}
               loading={isLoading}

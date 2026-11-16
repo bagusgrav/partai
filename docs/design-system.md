@@ -23,10 +23,14 @@ sistem grid 8 poin. Contoh: `p-2`, `p-4`, `p-6`, `p-8`, `gap-4`, dan `gap-6`.
 
 Gunakan design token yang tersedia, bukan warna ad hoc:
 
-- Primary: `primary` (Emerald)
+- Primary: `primary` (hitam/abu-abu gelap)
 - Teks utama: `text-main`
 - Permukaan: `surface`
 - Latar: `background`
+
+Warna antarmuka dibatasi pada putih, hitam, dan abu-abu netral (Slate/Zinc).
+Gunakan token `primary` untuk aksen gelap dan hindari warna identitas sampai
+ditetapkan melalui voting anggota.
 
 ## Aksesibilitas
 

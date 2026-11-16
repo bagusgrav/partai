@@ -94,15 +94,15 @@ export default function ReviewDashboard() {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Partai
             </p>
             <h1 className="mt-1 text-xl font-extrabold text-slate-900">Juri Warga</h1>
           </div>
           <Link
-            className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+            className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
             href="/belajar"
           >
             Kembali ke belajar
@@ -114,9 +114,9 @@ export default function ReviewDashboard() {
             <p className="text-center font-semibold text-slate-600">Memuat esai untuk dinilai...</p>
           ) : error && !submission ? (
             <div className="text-center">
-              <p className="text-sm font-bold text-red-700" role="alert">{error}</p>
+              <p className="text-sm font-bold text-slate-700" role="alert">{error}</p>
               <button
-                className="mt-6 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white hover:bg-emerald-700"
+                className="mt-6 min-h-12 rounded-xl bg-slate-900 px-6 font-bold text-white hover:bg-slate-700"
                 onClick={loadSubmission}
                 type="button"
               >
@@ -130,7 +130,7 @@ export default function ReviewDashboard() {
                 Esai anggota lain yang masih menunggu penilaian akan muncul di sini.
               </p>
               <button
-                className="mt-6 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white hover:bg-emerald-700"
+                className="mt-6 min-h-12 rounded-xl bg-slate-900 px-6 font-bold text-white hover:bg-slate-700"
                 onClick={loadSubmission}
                 type="button"
               >
@@ -139,7 +139,7 @@ export default function ReviewDashboard() {
             </div>
           ) : (
             <>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-900">
                 Esai anggota
               </p>
               <h2 className="mt-4 text-2xl font-extrabold leading-snug text-slate-900">
@@ -151,11 +151,11 @@ export default function ReviewDashboard() {
 
               {reviewed ? (
                 <div className="mt-8">
-                  <p className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 font-semibold text-emerald-800">
+                  <p className="rounded-2xl border border-slate-300 bg-slate-100 p-5 font-semibold text-slate-800">
                     Penilaian berhasil dikirim. Terima kasih telah berkontribusi.
                   </p>
                   <button
-                    className="mt-6 min-h-14 w-full rounded-2xl bg-emerald-600 px-6 font-extrabold text-white hover:bg-emerald-700"
+                    className="mt-6 min-h-14 w-full rounded-2xl bg-slate-900 px-6 font-extrabold text-white hover:bg-slate-700"
                     onClick={loadSubmission}
                     type="button"
                   >
@@ -169,7 +169,7 @@ export default function ReviewDashboard() {
                       Nilai (0-100)
                     </label>
                     <input
-                      className="min-h-12 w-full rounded-xl border-2 border-slate-200 px-4 text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                      className="min-h-12 w-full rounded-xl border-2 border-slate-200 px-4 text-slate-900 outline-none focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
                       id="score"
                       max={100}
                       min={0}
@@ -184,7 +184,7 @@ export default function ReviewDashboard() {
                       Feedback
                     </label>
                     <textarea
-                      className="min-h-32 w-full rounded-xl border-2 border-slate-200 p-4 text-slate-800 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                      className="min-h-32 w-full rounded-xl border-2 border-slate-200 p-4 text-slate-800 outline-none focus:border-slate-700 focus:ring-2 focus:ring-slate-200"
                       id="feedback"
                       onChange={(event) => setFeedback(event.target.value)}
                       placeholder="Berikan catatan yang membangun..."
@@ -192,10 +192,10 @@ export default function ReviewDashboard() {
                     />
                   </div>
                   {error && (
-                    <p className="text-sm font-semibold text-red-700" role="alert">{error}</p>
+                    <p className="text-sm font-semibold text-slate-700" role="alert">{error}</p>
                   )}
                   <button
-                    className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 font-extrabold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:bg-slate-300"
+                    className="min-h-14 w-full rounded-2xl bg-slate-900 px-6 font-extrabold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-300"
                     disabled={submitting}
                     type="submit"
                   >

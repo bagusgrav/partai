@@ -282,6 +282,64 @@ test("navbar tidak menyebabkan overflow horizontal di layar laptop", async ({
   await expect(page.getByRole("link", { name: "Info Indonesia" })).toBeVisible();
 });
 
+test("menu navbar mobile memuat navigasi dan kedua CTA", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+
+  const menuButton = page.getByRole("button", { name: "Buka menu navigasi" });
+  await expect(menuButton).toBeVisible();
+  await menuButton.click();
+
+  const mobileNavigation = page.locator("#mobile-navigation");
+  await expect(mobileNavigation.getByRole("link", { name: "Data Publik" })).toBeVisible();
+  await expect(mobileNavigation.getByRole("link", { name: "Daftar Anggota" })).toBeVisible();
+  await expect(mobileNavigation.getByRole("link", { name: "Masuk Pengurus" })).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+  ).toBe(true);
+
+  await mobileNavigation.getByRole("link", { name: "Daftar Anggota" }).click();
+  await expect(page).toHaveURL(/\/daftar$/);
+  await expect(page.getByRole("button", { name: "Buka menu navigasi" })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
+});
+
+test("halaman frontend tidak overflow horizontal pada lebar ponsel", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const paths = [
+    "/",
+    "/belajar",
+    "/review",
+    "/events",
+    "/events/event-contoh/claim",
+    "/events/event-contoh/attest",
+    "/events/event-contoh/qr",
+    "/manifesto",
+    "/panduan",
+    "/data",
+    "/info",
+    "/voting",
+    "/recall",
+    "/daftar",
+    "/profil",
+  ];
+
+  for (const width of [375, 430]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of paths) {
+      await page.goto(path, { waitUntil: "domcontentloaded" });
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+        `${path} overflows at ${width}px`,
+      ).toBe(true);
+    }
+  }
+});
+
 test("pendaftaran berhasil dan mengarahkan anggota ke profil", async ({ page }) => {
   await page.goto("/daftar");
 

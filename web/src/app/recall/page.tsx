@@ -105,15 +105,15 @@ export default function RecallPage() {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Tata Kelola Partai
             </p>
             <h1 className="mt-1 text-2xl font-extrabold text-slate-900">Recall Anggota Dewan</h1>
           </div>
           <Link
-            className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+            className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
             href="/"
           >
             Kembali
@@ -121,7 +121,7 @@ export default function RecallPage() {
         </header>
 
         {notice && (
-          <p className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-800" role="status">
+          <p className="mb-6 rounded-2xl border border-slate-300 bg-slate-100 p-4 font-semibold text-slate-800" role="status">
             {notice}
           </p>
         )}
@@ -162,9 +162,9 @@ export default function RecallPage() {
                 type="url"
               />
             </label>
-            {formError && <p className="text-sm font-semibold text-red-700" role="alert">{formError}</p>}
+            {formError && <p className="text-sm font-semibold text-slate-700" role="alert">{formError}</p>}
             <button
-              className="min-h-12 w-full rounded-xl bg-emerald-600 px-6 font-extrabold text-white transition hover:bg-emerald-700 disabled:cursor-wait disabled:bg-slate-300"
+              className="min-h-12 w-full rounded-xl bg-slate-900 px-6 font-extrabold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-300"
               disabled={submittingRequest}
               type="submit"
             >
@@ -180,10 +180,10 @@ export default function RecallPage() {
               Memuat pengajuan recall...
             </p>
           ) : loadingError ? (
-            <div className="rounded-3xl border border-red-200 bg-white p-8 text-center">
-              <p className="text-sm font-bold text-red-700" role="alert">{loadingError}</p>
+            <div className="rounded-3xl border border-slate-300 bg-white p-8 text-center">
+              <p className="text-sm font-bold text-slate-700" role="alert">{loadingError}</p>
               <button
-                className="mt-5 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white hover:bg-emerald-700"
+                className="mt-5 min-h-12 rounded-xl bg-slate-900 px-6 font-bold text-white hover:bg-slate-700"
                 onClick={() => void loadRecalls()}
                 type="button"
               >
@@ -207,7 +207,7 @@ export default function RecallPage() {
                   <p className="mt-4 whitespace-pre-wrap leading-relaxed text-slate-700">{recall.reason}</p>
                   {recall.evidence_url && (
                     <a
-                      className="mt-3 inline-block font-semibold text-emerald-700 underline underline-offset-4"
+                      className="mt-3 inline-block font-semibold text-slate-900 underline underline-offset-4"
                       href={recall.evidence_url}
                       rel="noopener noreferrer"
                       target="_blank"
@@ -219,19 +219,19 @@ export default function RecallPage() {
                     Setuju: {recall.agree_count} · Tolak: {recall.reject_count} · Ambang persetujuan: {recall.votes_required} dari {recall.active_member_count} anggota aktif
                   </p>
                   {hasVoted ? (
-                    <p className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-800">
+                    <p className="mt-5 rounded-2xl border border-slate-300 bg-slate-100 p-4 font-semibold text-slate-800">
                       Anda sudah memberikan suara untuk pengajuan ini.
                     </p>
                   ) : (
                     <div className="mt-5">
                       {voteErrors[recall.id] && (
-                        <p className="mb-3 text-sm font-semibold text-red-700" role="alert">
+                        <p className="mb-3 text-sm font-semibold text-slate-700" role="alert">
                           {voteErrors[recall.id]}
                         </p>
                       )}
                       <div className="flex flex-col gap-3 sm:flex-row">
                         <button
-                          className="min-h-12 flex-1 rounded-xl bg-emerald-600 px-5 font-bold text-white hover:bg-emerald-700 disabled:bg-slate-300"
+                          className="min-h-12 flex-1 rounded-xl bg-slate-900 px-5 font-bold text-white hover:bg-slate-700 disabled:bg-slate-300"
                           disabled={isSubmitting || (pendingVote !== undefined && pendingVote.vote !== true)}
                           onClick={() => void handleVote(recall.id, true)}
                           type="button"

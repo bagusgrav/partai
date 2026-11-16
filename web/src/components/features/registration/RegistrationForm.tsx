@@ -106,7 +106,7 @@ export default function RegistrationForm() {
         <form className="space-y-5 p-6 sm:p-10" onSubmit={handleSubmit}>
           {error && (
             <div
-              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+              className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-800"
               role="alert"
             >
               {error}

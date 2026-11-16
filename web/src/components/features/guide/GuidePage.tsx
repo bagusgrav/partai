@@ -57,7 +57,7 @@ export default function GuideContent() {
           <p className="text-sm font-black uppercase tracking-[0.2em] text-primary-hover">
             Panduan penggunaan
           </p>
-          <h1 className="mt-5 text-4xl font-black tracking-tight text-text-main sm:text-5xl">
+          <h1 className="mt-5 text-3xl font-black tracking-tight text-text-main sm:text-4xl">
             Lima langkah untuk ikut hadir
           </h1>
           <p className="mt-5 text-lg leading-8 text-text-muted">

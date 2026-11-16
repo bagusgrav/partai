@@ -49,15 +49,15 @@ export default function EventQrClientPage({ eventId }: { eventId: string }) {
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Aku Hadir
             </p>
             <h1 className="mt-1 text-2xl font-extrabold text-slate-900">QR Kehadiran</h1>
           </div>
           <Link
-            className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+            className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
             href="/events"
           >
             Kembali ke acara
@@ -66,7 +66,7 @@ export default function EventQrClientPage({ eventId }: { eventId: string }) {
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-xl shadow-slate-200/50 sm:p-10">
           {error ? (
-            <p className="text-sm font-bold text-red-700" role="alert">{error}</p>
+            <p className="text-sm font-bold text-slate-700" role="alert">{error}</p>
           ) : token ? (
             <>
               <div className="inline-flex rounded-2xl border border-slate-100 bg-white p-4">

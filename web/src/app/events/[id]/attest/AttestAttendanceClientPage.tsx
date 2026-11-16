@@ -80,15 +80,15 @@ export default function AttestAttendanceClientPage({ eventId }: { eventId: strin
   return (
     <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
+        <header className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Aku Hadir
             </p>
             <h1 className="mt-1 text-2xl font-extrabold text-slate-900">Validasi Teman</h1>
           </div>
           <Link
-            className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+            className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
             href="/events"
           >
             Kembali
@@ -97,7 +97,7 @@ export default function AttestAttendanceClientPage({ eventId }: { eventId: strin
 
         <section className="space-y-4">
           {error && (
-            <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">
+            <p className="rounded-2xl border border-slate-300 bg-slate-100 p-4 text-sm font-semibold text-slate-700" role="alert">
               {error}
             </p>
           )}
@@ -109,7 +109,7 @@ export default function AttestAttendanceClientPage({ eventId }: { eventId: strin
             <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center">
               <p className="font-semibold text-slate-600">Tidak ada klaim yang menunggu validasi.</p>
               <button
-                className="mt-5 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white hover:bg-emerald-700"
+                className="mt-5 min-h-12 rounded-xl bg-slate-900 px-6 font-bold text-white hover:bg-slate-700"
                 onClick={loadClaims}
                 type="button"
               >
@@ -130,7 +130,7 @@ export default function AttestAttendanceClientPage({ eventId }: { eventId: strin
                   </p>
                 </div>
                 <button
-                  className="min-h-12 rounded-xl bg-emerald-600 px-6 font-extrabold text-white hover:bg-emerald-700 disabled:cursor-wait disabled:bg-slate-300"
+                  className="min-h-12 rounded-xl bg-slate-900 px-6 font-extrabold text-white hover:bg-slate-700 disabled:cursor-wait disabled:bg-slate-300"
                   disabled={submittingClaimId !== null}
                   onClick={() => handleAttest(claim.id)}
                   type="button"
