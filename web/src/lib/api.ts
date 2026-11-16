@@ -1,7 +1,11 @@
 import type {
   AnswerResponse,
+  ActiveEventsResponse,
+  AttendanceAttestationResult,
+  AttendanceClaimResult,
   EssayQuestionResponse,
   EssaySubmissionResponse,
+  PendingAttendanceClaimsResponse,
   PendingEssayResponse,
   ReviewResponse,
 } from "@/types";
@@ -129,6 +133,84 @@ export async function submitEssayReview(
       submission_id: submissionId,
       score,
       feedback,
+      request_id: requestId,
+    }),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getActiveEvents(): Promise<ActiveEventsResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/events/active`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getEventQrToken(eventId: string): Promise<string> {
+  const response = await fetchWithRetry(
+    `${API_BASE_URL}/events/${encodeURIComponent(eventId)}/qr`,
+    {
+      method: "GET",
+      headers: getHeaders(),
+    },
+  );
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function submitAttendanceClaim(
+  eventId: string,
+  token: string,
+  lat: number,
+  lng: number,
+  requestId: string,
+): Promise<AttendanceClaimResult> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/attendance/claim`, {
+    method: "POST",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      event_id: eventId,
+      token,
+      lat,
+      lng,
+      request_id: requestId,
+    }),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getPendingAttendanceClaims(
+  eventId: string,
+): Promise<PendingAttendanceClaimsResponse> {
+  const response = await fetchWithRetry(
+    `${API_BASE_URL}/attendance/pending?event_id=${encodeURIComponent(eventId)}`,
+    {
+      method: "GET",
+      headers: getHeaders(),
+    },
+  );
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function submitAttendanceAttestation(
+  claimId: string,
+  requestId: string,
+): Promise<AttendanceAttestationResult> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/attendance/attest`, {
+    method: "POST",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      claim_id: claimId,
       request_id: requestId,
     }),
   });

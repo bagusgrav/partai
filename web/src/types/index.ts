@@ -58,3 +58,44 @@ export interface EssaySubmissionResponse {
     submission_id: number;
   };
 }
+
+export interface ActiveEvent {
+  id: string;
+  title: string;
+  description: string;
+  location_lat: string;
+  location_lng: string;
+  radius_m: number;
+  starts_at: string;
+  ends_at: string;
+  coordinator_id: string;
+}
+
+export interface ActiveEventsResponse {
+  events: ActiveEvent[];
+}
+
+export interface AttendanceClaimResult {
+  status: "processed" | "already_processed" | "rejected";
+  claim_id?: string;
+  claim_status?: "pending" | "valid" | "rejected";
+  distance_m: number;
+}
+
+export interface PendingAttendanceClaim {
+  id: string;
+  event_id: string;
+  distance_m: number;
+  created_at: string;
+  member_name: string;
+}
+
+export interface PendingAttendanceClaimsResponse {
+  claims: PendingAttendanceClaim[];
+}
+
+export interface AttendanceAttestationResult {
+  status: "processed" | "already_processed";
+  claim_status: "pending" | "valid";
+  attestations?: number;
+}

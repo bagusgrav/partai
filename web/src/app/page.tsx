@@ -196,6 +196,12 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Link
               className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+              href="/events"
+            >
+              Aku Hadir
+            </Link>
+            <Link
+              className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
               href="/review"
             >
               Menu Juri Warga

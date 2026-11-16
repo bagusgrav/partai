@@ -20,8 +20,8 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 
 ## 🟠 FASE 2: AKSI LAPANGAN (MODUL "AKU HADIR")
 *Tujuan: Menggerakkan anggota di lapangan dengan validasi anti-kolusi.*
-- [ ] **Atestasi Aksi (QR & Geofencing):** Koordinator membuat QR berputar 90 detik di lokasi aksi. Anggota memindai untuk klaim kehadiran.
-- [ ] **Validasi Silang Lintas Cluster:** Klaim kehadiran wajib divalidasi oleh 2 anggota dari cluster (wilayah) berbeda.
+- [x] **Atestasi Aksi (QR & Geofencing):** Koordinator membuat QR berputar 90 detik di lokasi aksi. Anggota memindai untuk klaim kehadiran.
+- [x] **Validasi Silang Lintas Cluster:** Klaim kehadiran wajib divalidasi oleh 2 anggota dari cluster (wilayah) berbeda.
 - [ ] **Sistem Skor Reputasi:** Pemberian poin untuk kehadiran fisik, riset, bantuan hukum, dan logistik.
 - [ ] **Juri Warga (Sortisi):** Pemilihan acak anggota untuk mengaudit klaim kehadiran yang ditandai sistem (anti-kolusi).
 
