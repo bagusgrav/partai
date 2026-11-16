@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ReputationActivity;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -180,6 +181,14 @@ class AttendanceService
                     'updated_at' => $timestamp,
                 ]);
 
+                event(new ReputationActivity(
+                    $attesterId,
+                    ReputationService::CITIZEN_JURY,
+                    20,
+                    'Menjadi juri warga dengan mengatestasi klaim kehadiran.',
+                    $validated['request_id'],
+                ));
+
                 $distinctClusters = DB::table('attestations')
                     ->where('attestations.claim_id', $claim->id)
                     ->distinct()
@@ -187,10 +196,20 @@ class AttendanceService
                 $claimStatus = $distinctClusters >= 2 ? 'valid' : 'pending';
 
                 if ($claimStatus === 'valid') {
-                    DB::table('attendance_claims')
+                    $wasValidated = DB::table('attendance_claims')
                         ->where('id', $claim->id)
                         ->where('status', 'pending')
                         ->update(['status' => 'valid', 'updated_at' => $timestamp]);
+
+                    if ($wasValidated === 1) {
+                        event(new ReputationActivity(
+                            (string) $claim->user_id,
+                            ReputationService::ATTENDANCE_VALIDATED,
+                            100,
+                            'Klaim kehadiran aksi lapangan tervalidasi.',
+                            (string) $claim->id,
+                        ));
+                    }
                 }
 
                 return [

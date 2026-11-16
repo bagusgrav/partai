@@ -244,4 +244,20 @@ export interface RegisteredUser {
   cluster_name: string | null;
   role: "guest" | "member" | "admin";
   is_verified: boolean;
+  reputation_points: number;
+  reputation_level: string;
+}
+
+export interface ReputationLog {
+  id: string;
+  action: string;
+  points: number;
+  description: string;
+  created_at: string;
+}
+
+export interface UserReputation {
+  reputation_points: number;
+  reputation_level: string;
+  logs: ReputationLog[];
 }

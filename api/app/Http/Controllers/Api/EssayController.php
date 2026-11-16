@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ReputationActivity;
 use App\Http\Controllers\Controller;
+use App\Services\ReputationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -168,18 +170,32 @@ class EssayController extends Controller
         }
 
         try {
-            $updated = DB::table('essay_submissions')
-                ->where('id', $validated['submission_id'])
-                ->where('status', 'pending')
-                ->where('user_id', '!=', $userId)
-                ->update([
-                    'status' => 'reviewed',
-                    'score' => $validated['score'],
-                    'reviewer_id' => $userId,
-                    'feedback' => $validated['feedback'] ?? null,
-                    'review_request_id' => $validated['request_id'],
-                    'updated_at' => now(),
-                ]);
+            $updated = DB::transaction(function () use ($validated, $userId, $submission): int {
+                $updated = DB::table('essay_submissions')
+                    ->where('id', $validated['submission_id'])
+                    ->where('status', 'pending')
+                    ->where('user_id', '!=', $userId)
+                    ->update([
+                        'status' => 'reviewed',
+                        'score' => $validated['score'],
+                        'reviewer_id' => $userId,
+                        'feedback' => $validated['feedback'] ?? null,
+                        'review_request_id' => $validated['request_id'],
+                        'updated_at' => now(),
+                    ]);
+
+                if ($updated === 1 && $validated['score'] >= 70) {
+                    event(new ReputationActivity(
+                        (string) $submission->user_id,
+                        ReputationService::ESSAY_PASSED,
+                        50,
+                        'Lulus peer-review esai dengan nilai minimal 70.',
+                        $validated['request_id'],
+                    ));
+                }
+
+                return $updated;
+            });
         } catch (QueryException $exception) {
             $existingReview = DB::table('essay_submissions')
                 ->where('review_request_id', $validated['request_id'])

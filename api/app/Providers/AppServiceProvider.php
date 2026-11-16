@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\ReputationActivity;
+use App\Listeners\AwardReputationPoints;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(ReputationActivity::class, AwardReputationPoints::class);
+
         if (DB::connection()->getDriverName() === 'sqlite') {
             DB::statement('PRAGMA journal_mode=WAL;');
             DB::statement('PRAGMA synchronous=NORMAL;');

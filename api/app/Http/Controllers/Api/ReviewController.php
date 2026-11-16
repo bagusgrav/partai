@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ReputationActivity;
 use App\Http\Controllers\Controller;
+use App\Services\ReputationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -128,6 +130,16 @@ class ReviewController extends Controller
                     'created_at' => $reviewedAt,
                     'updated_at' => $reviewedAt,
                 ]);
+
+                if ($correct) {
+                    event(new ReputationActivity(
+                        (string) $userId,
+                        ReputationService::QUIZ_CORRECT,
+                        10,
+                        'Menjawab kuis dengan benar.',
+                        $validated['request_id'],
+                    ));
+                }
 
                 return $nextReview;
             });

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import NavbarRegistrationCTA from "@/components/NavbarRegistrationCTA";
+import { getCurrentUser } from "@/lib/api";
+import type { RegisteredUser } from "@/types";
 
 const links = [
   { href: "/", label: "Beranda" },
@@ -28,6 +30,32 @@ const groupedLinks = {
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    getCurrentUser()
+      .then((user) => {
+        if (active) {
+          setCurrentUser(user);
+        }
+      })
+      .catch((loadError: unknown) => {
+        if (active) {
+          setProfileError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Reputasi tidak dapat dimuat.",
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-background/80 bg-surface/95 shadow-sm shadow-primary/5 backdrop-blur">
@@ -85,6 +113,21 @@ export default function Navbar() {
           ))}
         </div>
         <div className="hidden flex-wrap items-center gap-2 md:flex">
+          {currentUser ? (
+            <Link
+              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-text-main hover:bg-primary-light"
+              href="/profil"
+            >
+              <span>{currentUser.name}</span>
+              <span className="rounded-full bg-primary-light px-2 py-1 text-xs font-bold text-primary">
+                {currentUser.reputation_level}
+              </span>
+            </Link>
+          ) : profileError ? (
+            <span className="text-xs text-text-muted" title={profileError}>
+              Reputasi tidak tersedia
+            </span>
+          ) : null}
           <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
           <a
             className="whitespace-nowrap rounded-md border border-primary bg-transparent px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
@@ -130,6 +173,22 @@ export default function Navbar() {
               ))}
             </div>
             <div className="mt-2 flex flex-col gap-2 border-t border-background pt-3">
+              {currentUser ? (
+                <Link
+                  className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
+                  href="/profil"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>{currentUser.name}</span>
+                  <span className="rounded-full bg-primary-light px-2 py-1 text-xs font-bold text-primary">
+                    {currentUser.reputation_level}
+                  </span>
+                </Link>
+              ) : profileError ? (
+                <p className="px-3 text-xs text-text-muted" title={profileError}>
+                  Reputasi tidak tersedia
+                </p>
+              ) : null}
               <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
               <a
                 className="rounded-md border border-primary px-4 py-3 text-center text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"

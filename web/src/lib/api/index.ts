@@ -7,6 +7,7 @@ export * from "./events";
 export * from "./economics";
 export * from "./quiz";
 export * from "./recall";
+export * from "./reputation";
 export * from "./rights";
 export * from "./voting";
 export * from "./welfare";

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\RecallController;
+use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SocialAssistanceController;
 use App\Http\Controllers\Api\SortitionController;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
     $user = $request->user();
+    $user->refresh();
 
     return response()->json([
         'id' => $user->id,
@@ -32,6 +34,8 @@ Route::get('/user', function (Request $request) {
                 ->value('region_name'),
         'role' => $user->role,
         'is_verified' => $user->is_verified,
+        'reputation_points' => (int) $user->reputation_points,
+        'reputation_level' => $user->reputation_level,
     ]);
 })->middleware('auth:sanctum');
 
@@ -55,6 +59,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/reputation', ReputationController::class);
     Route::post('/events', [EventController::class, 'store']);
     Route::get('/events/active', [EventController::class, 'active']);
     Route::get('/events/{id}/qr', [EventController::class, 'qr']);

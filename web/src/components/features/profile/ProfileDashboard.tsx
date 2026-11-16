@@ -2,21 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "@/lib/api";
-import type { RegisteredUser } from "@/types";
+import { getCurrentUser, getUserReputation } from "@/lib/api";
+import type { RegisteredUser, UserReputation } from "@/types";
+
+const reputationLevels = [
+  { name: "Warga Baru", start: 0, next: 100 },
+  { name: "Warga Aktif", start: 100, next: 500 },
+  { name: "Penggerak", start: 500, next: 1000 },
+] as const;
+
+const reputationActionLabels: Record<string, string> = {
+  quiz_correct: "Menjawab kuis dengan benar",
+  essay_passed: "Lulus peer-review esai",
+  attendance_validated: "Kehadiran aksi tervalidasi",
+  citizen_jury: "Atestasi sebagai juri warga",
+};
 
 export default function ProfileDashboard() {
   const [user, setUser] = useState<RegisteredUser | null>(null);
+  const [reputation, setReputation] = useState<UserReputation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    getCurrentUser()
-      .then((currentUser) => {
+    Promise.all([getCurrentUser(), getUserReputation()])
+      .then(([currentUser, currentReputation]) => {
         if (active) {
           setUser(currentUser);
+          setReputation(currentReputation);
         }
       })
       .catch((loadError: unknown) => {
@@ -60,11 +75,72 @@ export default function ProfileDashboard() {
           >
             Profil gagal dimuat: {error}
           </div>
-        ) : user ? (
-          <dl className="mt-8 divide-y divide-slate-100 rounded-2xl border border-slate-200 px-5">
+        ) : user && reputation ? (
+          <>
+            <section
+              aria-label="Kartu reputasi"
+              className="mt-8 rounded-2xl bg-primary p-6 text-white shadow-lg shadow-primary/20"
+            >
+              <p className="text-sm font-bold uppercase tracking-wide text-white/75">
+                Kartu Reputasi
+              </p>
+              <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-black">{reputation.reputation_level}</h2>
+                  <p className="mt-1 text-sm text-white/80">Level reputasi Anda</p>
+                </div>
+                <p className="text-3xl font-black">
+                  {reputation.reputation_points.toLocaleString("id-ID")}
+                  <span className="ml-2 text-sm font-semibold">poin</span>
+                </p>
+              </div>
+              {(() => {
+                const currentLevel = reputationLevels.find(
+                  ({ name }) => name === reputation.reputation_level,
+                );
+                const progress = currentLevel
+                  ? Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        ((reputation.reputation_points - currentLevel.start) /
+                          (currentLevel.next - currentLevel.start)) *
+                          100,
+                      ),
+                    )
+                  : 100;
+
+                return (
+                  <div className="mt-5">
+                    <div className="h-2 overflow-hidden rounded-full bg-white/25">
+                      <div
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={Math.floor(progress)}
+                        className="h-full rounded-full bg-white transition-all"
+                        role="progressbar"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-white/80">
+                      {currentLevel
+                        ? `${Math.max(0, currentLevel.next - reputation.reputation_points).toLocaleString("id-ID")} poin lagi menuju level berikutnya`
+                        : "Anda telah mencapai level tertinggi"}
+                    </p>
+                  </div>
+                );
+              })()}
+            </section>
+
+            <dl className="mt-6 divide-y divide-slate-100 rounded-2xl border border-slate-200 px-5">
             <div className="py-4">
               <dt className="text-sm font-semibold text-text-muted">Nama</dt>
-              <dd className="mt-1 font-bold text-text-main">{user.name}</dd>
+              <dd className="mt-1 flex flex-wrap items-center gap-2 font-bold text-text-main">
+                {user.name}
+                <span className="rounded-full bg-primary-light px-3 py-1 text-xs font-bold text-primary">
+                  {reputation.reputation_level}
+                </span>
+              </dd>
             </div>
             <div className="py-4">
               <dt className="text-sm font-semibold text-text-muted">Email</dt>
@@ -77,6 +153,47 @@ export default function ProfileDashboard() {
               </dd>
             </div>
           </dl>
+            <section className="mt-8" aria-labelledby="reputation-history-title">
+              <h2
+                className="text-lg font-extrabold text-text-main"
+                id="reputation-history-title"
+              >
+                Riwayat Reputasi
+              </h2>
+              {reputation.logs.length === 0 ? (
+                <p className="mt-3 rounded-xl bg-background p-4 text-sm text-text-muted">
+                  Belum ada aktivitas yang menghasilkan poin.
+                </p>
+              ) : (
+                <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full min-w-[32rem] text-left text-sm">
+                    <thead className="bg-background text-text-muted">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold" scope="col">Waktu</th>
+                        <th className="px-4 py-3 font-semibold" scope="col">Aksi</th>
+                        <th className="px-4 py-3 text-right font-semibold" scope="col">Poin</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {reputation.logs.map((log) => (
+                        <tr key={log.id}>
+                          <td className="whitespace-nowrap px-4 py-3 text-text-muted">
+                            {new Date(log.created_at).toLocaleString("id-ID")}
+                          </td>
+                          <td className="px-4 py-3 text-text-main">
+                            {reputationActionLabels[log.action] ?? log.description}
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-3 text-right font-bold text-primary">
+                            +{log.points.toLocaleString("id-ID")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          </>
         ) : null}
 
         <Link
