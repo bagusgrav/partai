@@ -22,17 +22,24 @@ class WelfareDataResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Kesejahteraan';
 
+    protected static ?string $modelLabel = 'Data Kesejahteraan';
+
+    protected static ?string $pluralModelLabel = 'Data Kesejahteraan';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('region_code')
+                    ->label('Kode Wilayah')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('region_name')
+                    ->label('Nama Wilayah')
                     ->required()
                     ->maxLength(255),
                 Select::make('indicator')
+                    ->label('Indikator')
                     ->options([
                         'kemiskinan' => 'Kemiskinan',
                         'stunting' => 'Stunting',
@@ -40,15 +47,19 @@ class WelfareDataResource extends Resource
                     ])
                     ->required(),
                 TextInput::make('value')
+                    ->label('Nilai')
                     ->numeric()
                     ->required(),
                 TextInput::make('unit')
+                    ->label('Satuan')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('year')
+                    ->label('Tahun')
                     ->integer()
                     ->required(),
                 Select::make('source')
+                    ->label('Sumber Data')
                     ->options([
                         'BPS' => 'BPS',
                         'BNPB' => 'BNPB',
@@ -70,11 +81,11 @@ class WelfareDataResource extends Resource
                 TextColumn::make('source')->label('Sumber')->badge()->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

@@ -19,30 +19,42 @@ class AttendanceClaimResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Klaim Kehadiran';
+
+    protected static ?string $modelLabel = 'Klaim Kehadiran';
+
+    protected static ?string $pluralModelLabel = 'Klaim Kehadiran';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Select::make('event_id')
+                    ->label('Aksi Lapangan')
                     ->relationship('event', 'title')
                     ->searchable()
                     ->preload()
                     ->required(),
                 Select::make('user_id')
+                    ->label('Anggota')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
                 TextInput::make('lat')
+                    ->label('Lintang')
                     ->numeric()
                     ->required(),
                 TextInput::make('lng')
+                    ->label('Bujur')
                     ->numeric()
                     ->required(),
                 TextInput::make('distance_m')
+                    ->label('Jarak (meter)')
                     ->numeric()
                     ->required(),
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'pending' => 'Menunggu',
                         'valid' => 'Valid',
@@ -51,6 +63,7 @@ class AttendanceClaimResource extends Resource
                     ->required()
                     ->default('pending'),
                 TextInput::make('request_id')
+                    ->label('ID Permintaan')
                     ->required()
                     ->default(fn (): string => (string) Str::uuid())
                     ->rule('uuid'),
@@ -61,18 +74,18 @@ class AttendanceClaimResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->searchable(),
-                TextColumn::make('event.title')->label('Kegiatan'),
-                TextColumn::make('user.name')->label('Pengguna'),
-                TextColumn::make('status')->badge(),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('id')->label('ID')->searchable(),
+                TextColumn::make('event.title')->label('Aksi Lapangan'),
+                TextColumn::make('user.name')->label('Anggota'),
+                TextColumn::make('status')->label('Status')->badge(),
+                TextColumn::make('created_at')->label('Diajukan Pada')->dateTime(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

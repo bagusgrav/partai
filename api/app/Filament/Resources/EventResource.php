@@ -21,36 +21,51 @@ class EventResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Aksi Lapangan';
+
+    protected static ?string $modelLabel = 'Aksi Lapangan';
+
+    protected static ?string $pluralModelLabel = 'Aksi Lapangan';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('title')
+                    ->label('Judul')
                     ->required()
                     ->maxLength(255),
                 Textarea::make('description')
+                    ->label('Deskripsi')
                     ->required()
                     ->columnSpanFull(),
                 TextInput::make('location_lat')
+                    ->label('Lintang')
                     ->numeric()
                     ->required(),
                 TextInput::make('location_lng')
+                    ->label('Bujur')
                     ->numeric()
                     ->required(),
                 TextInput::make('radius_m')
+                    ->label('Radius (meter)')
                     ->numeric()
                     ->required()
                     ->default(100),
                 DateTimePicker::make('starts_at')
+                    ->label('Waktu Mulai')
                     ->required(),
                 DateTimePicker::make('ends_at')
+                    ->label('Waktu Selesai')
                     ->required(),
                 Select::make('coordinator_id')
+                    ->label('Koordinator')
                     ->relationship('coordinator', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'active' => 'Aktif',
                         'completed' => 'Selesai',
@@ -58,6 +73,7 @@ class EventResource extends Resource
                     ->required()
                     ->default('active'),
                 TextInput::make('request_id')
+                    ->label('ID Permintaan')
                     ->required()
                     ->default(fn (): string => (string) Str::uuid())
                     ->rule('uuid'),
@@ -68,18 +84,18 @@ class EventResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->searchable(),
-                TextColumn::make('title')->searchable(),
-                TextColumn::make('status')->badge(),
-                TextColumn::make('starts_at')->dateTime(),
-                TextColumn::make('ends_at')->dateTime(),
+                TextColumn::make('id')->label('ID')->searchable(),
+                TextColumn::make('title')->label('Judul')->searchable(),
+                TextColumn::make('status')->label('Status')->badge(),
+                TextColumn::make('starts_at')->label('Waktu Mulai')->dateTime(),
+                TextColumn::make('ends_at')->label('Waktu Selesai')->dateTime(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

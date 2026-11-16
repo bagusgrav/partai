@@ -20,24 +20,34 @@ class EssaySubmissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Pengumpulan Esai';
+
+    protected static ?string $modelLabel = 'Pengumpulan Esai';
+
+    protected static ?string $pluralModelLabel = 'Pengumpulan Esai';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Select::make('user_id')
+                    ->label('Anggota')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
                 Select::make('item_id')
+                    ->label('Bank Soal')
                     ->relationship('item', 'id')
                     ->searchable()
                     ->preload()
                     ->required(),
                 Textarea::make('answer_text')
+                    ->label('Jawaban Esai')
                     ->required()
                     ->columnSpanFull(),
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'pending' => 'Menunggu',
                         'reviewed' => 'Ditinjau',
@@ -45,6 +55,7 @@ class EssaySubmissionResource extends Resource
                     ->required()
                     ->default('pending'),
                 TextInput::make('request_id')
+                    ->label('ID Permintaan')
                     ->required()
                     ->default(fn (): string => (string) Str::uuid())
                     ->rule('uuid'),
@@ -55,18 +66,18 @@ class EssaySubmissionResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id'),
+                TextColumn::make('id')->label('ID'),
                 TextColumn::make('user.name')->label('Pengguna'),
                 TextColumn::make('item_id')->label('ID Materi'),
-                TextColumn::make('status')->badge(),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('status')->label('Status')->badge(),
+                TextColumn::make('created_at')->label('Dikumpulkan Pada')->dateTime(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

@@ -17,14 +17,22 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Data Anggota';
+
+    protected static ?string $modelLabel = 'Data Anggota';
+
+    protected static ?string $pluralModelLabel = 'Data Anggota';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label('Alamat Email')
                     ->email()
                     ->required()
                     ->maxLength(255)
@@ -41,12 +49,12 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('created_at')->dateTime(),
+                TextColumn::make('name')->label('Nama'),
+                TextColumn::make('email')->label('Alamat Email'),
+                TextColumn::make('created_at')->label('Terdaftar Pada')->dateTime(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([]);
     }

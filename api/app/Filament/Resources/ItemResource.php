@@ -20,28 +20,37 @@ class ItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Bank Soal';
+
+    protected static ?string $modelLabel = 'Bank Soal';
+
+    protected static ?string $pluralModelLabel = 'Bank Soal';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('id')
+                    ->label('ID Soal')
                     ->required()
                     ->disabled(fn (string $operation): bool => $operation === 'edit'),
                 Select::make('domain')
+                    ->label('Ranah')
                     ->options([
-                        'hak-konstitusional' => 'hak-konstitusional',
-                        'alasan-bernegara' => 'alasan-bernegara',
-                        'keuangan-negara' => 'keuangan-negara',
+                        'hak-konstitusional' => 'Hak Konstitusional',
+                        'alasan-bernegara' => 'Alasan Bernegara',
+                        'keuangan-negara' => 'Keuangan Negara',
                         'hukum' => 'hukum',
-                        'politik-bernegara' => 'politik-bernegara',
+                        'politik-bernegara' => 'Politik Bernegara',
                     ])
                     ->required(),
                 Select::make('level')
+                    ->label('Tingkatan')
                     ->options([
-                        'kenali' => 'kenali',
-                        'pahami' => 'pahami',
-                        'terapkan' => 'terapkan',
-                        'kritisi' => 'kritisi',
+                        'kenali' => 'Kenali',
+                        'pahami' => 'Pahami',
+                        'terapkan' => 'Terapkan',
+                        'kritisi' => 'Kritisi',
                     ])
                     ->required(),
                 Select::make('payload.type')
@@ -63,8 +72,8 @@ class ItemResource extends Resource
                     ->label('Instruksi Esai')
                     ->columnSpanFull(),
                 Repeater::make('payload.options')
-                    ->label('Pilihan Ganda')
-                    ->simple(TextInput::make('option')->required())
+                    ->label('Pilihan Jawaban')
+                    ->simple(TextInput::make('option')->label('Pilihan')->required())
                     ->columnSpanFull(),
                 TextInput::make('payload.answer')
                     ->label('Kunci Jawaban'),
@@ -78,17 +87,17 @@ class ItemResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id'),
-                TextColumn::make('domain'),
-                TextColumn::make('level'),
-                TextColumn::make('updated_at')->dateTime(),
+                TextColumn::make('id')->label('ID Soal'),
+                TextColumn::make('domain')->label('Ranah'),
+                TextColumn::make('level')->label('Tingkatan'),
+                TextColumn::make('updated_at')->label('Diperbarui Pada')->dateTime(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

@@ -19,24 +19,34 @@ class AttestationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationLabel = 'Atestasi Silang';
+
+    protected static ?string $modelLabel = 'Atestasi Silang';
+
+    protected static ?string $pluralModelLabel = 'Atestasi Silang';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Select::make('claim_id')
+                    ->label('Klaim Kehadiran')
                     ->relationship('claim', 'id')
                     ->searchable()
                     ->preload()
                     ->required(),
                 Select::make('attester_id')
+                    ->label('Pemberi Atestasi')
                     ->relationship('attester', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
                 TextInput::make('cluster_id')
+                    ->label('ID Klaster')
                     ->required()
                     ->maxLength(255),
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'trusted' => 'Terpercaya',
                         'flagged' => 'Ditandai',
@@ -44,6 +54,7 @@ class AttestationResource extends Resource
                     ->required()
                     ->default('trusted'),
                 TextInput::make('request_id')
+                    ->label('ID Permintaan')
                     ->required()
                     ->default(fn (): string => (string) Str::uuid())
                     ->rule('uuid'),
@@ -54,18 +65,18 @@ class AttestationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id'),
-                TextColumn::make('claim_id'),
-                TextColumn::make('attester.name')->label('Pemberi Attestasi'),
-                TextColumn::make('cluster_id'),
-                TextColumn::make('status')->badge(),
+                TextColumn::make('id')->label('ID'),
+                TextColumn::make('claim_id')->label('ID Klaim Kehadiran'),
+                TextColumn::make('attester.name')->label('Pemberi Atestasi'),
+                TextColumn::make('cluster_id')->label('ID Klaster'),
+                TextColumn::make('status')->label('Status')->badge(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Ubah'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
                 ]),
             ]);
     }

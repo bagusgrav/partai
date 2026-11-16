@@ -2,6 +2,7 @@
 
 return [
     'paths' => [
+        'api/*',
         'api/user',
         'api/review',
         'api/answer',
