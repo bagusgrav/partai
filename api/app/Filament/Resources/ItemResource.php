@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ItemResource\Pages;
 use App\Models\Item;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -43,20 +44,33 @@ class ItemResource extends Resource
                         'kritisi' => 'kritisi',
                     ])
                     ->required(),
-                Textarea::make('payload')
+                Select::make('payload.type')
+                    ->label('Jenis Soal')
+                    ->options([
+                        'multiple-choice' => 'Pilihan Ganda',
+                        'essay' => 'Esai',
+                    ])
+                    ->required(),
+                TextInput::make('payload.question')
+                    ->label('Pertanyaan')
                     ->required()
-                    ->rows(20)
-                    ->rules(['json'])
-                    ->formatStateUsing(
-                        fn (mixed $state): string => $state === null
-                            ? ''
-                            : (is_string($state)
-                                ? $state
-                                : json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)),
-                    )
-                    ->dehydrateStateUsing(
-                        fn (string $state): mixed => json_decode($state, true, flags: JSON_THROW_ON_ERROR),
-                    ),
+                    ->columnSpanFull(),
+                Textarea::make('payload.explanation')
+                    ->label('Penjelasan')
+                    ->rows(4)
+                    ->columnSpanFull(),
+                TextInput::make('payload.instructions')
+                    ->label('Instruksi Esai')
+                    ->columnSpanFull(),
+                Repeater::make('payload.options')
+                    ->label('Pilihan Ganda')
+                    ->simple(TextInput::make('option')->required())
+                    ->columnSpanFull(),
+                TextInput::make('payload.answer')
+                    ->label('Kunci Jawaban'),
+                TextInput::make('payload.sources.0.citation')
+                    ->label('Sumber Hukum')
+                    ->columnSpanFull(),
             ]);
     }
 

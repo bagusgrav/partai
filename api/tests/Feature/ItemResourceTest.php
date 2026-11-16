@@ -25,33 +25,42 @@ class ItemResourceTest extends TestCase
         ]));
     }
 
-    public function test_item_creation_rejects_invalid_json_payload(): void
-    {
-        Livewire::test(CreateItem::class)
-            ->fillForm([
-                'id' => 'ITEM-INVALID-JSON',
-                'domain' => 'hukum',
-                'level' => 'kenali',
-                'payload' => '{"prompt":}',
-            ])
-            ->call('create')
-            ->assertHasFormErrors(['payload' => 'json']);
-    }
-
-    public function test_item_creation_stores_the_json_payload_as_an_array(): void
+    public function test_item_creation_stores_payload_from_the_structured_form(): void
     {
         Livewire::test(CreateItem::class)
             ->fillForm([
                 'id' => 'ITEM-VALID-JSON',
                 'domain' => 'hukum',
                 'level' => 'kenali',
-                'payload' => '{"prompt":"Question"}',
+                'payload' => [
+                    'type' => 'multiple-choice',
+                    'question' => 'Question',
+                    'explanation' => 'Explanation',
+                    'options' => [
+                        ['option' => 'First option'],
+                        ['option' => 'Second option'],
+                    ],
+                    'answer' => '0',
+                    'sources' => [
+                        ['citation' => 'UU Nomor 1 Tahun 2024'],
+                    ],
+                ],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertSame(
-            ['prompt' => 'Question'],
+            [
+                'type' => 'multiple-choice',
+                'question' => 'Question',
+                'explanation' => 'Explanation',
+                'instructions' => null,
+                'options' => ['First option', 'Second option'],
+                'answer' => '0',
+                'sources' => [
+                    ['citation' => 'UU Nomor 1 Tahun 2024'],
+                ],
+            ],
             Item::query()->findOrFail('ITEM-VALID-JSON')->payload,
         );
     }
@@ -70,7 +79,10 @@ class ItemResourceTest extends TestCase
                 'id' => 'ITEM-CHANGED',
                 'domain' => 'hukum',
                 'level' => 'kenali',
-                'payload' => '{"prompt":"Updated"}',
+                'payload' => [
+                    'type' => 'multiple-choice',
+                    'question' => 'Updated',
+                ],
             ])
             ->call('save')
             ->assertHasNoFormErrors();
