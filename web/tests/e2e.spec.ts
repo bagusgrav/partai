@@ -24,6 +24,121 @@ const mockApiResponses: Record<
       ],
     },
   },
+  "GET /api/economic/summary": {
+    body: {
+      indicators: [
+        {
+          id: 1,
+          indicator_type: "debt",
+          title: "Utang Pemerintah",
+          value: 39.5,
+          unit: "persen PDB",
+          period: "2026-11-17",
+          source: "Simulasi (bukan data resmi)",
+          trend: "stabil",
+          updated_at: "2026-11-17T00:00:00.000000Z",
+        },
+        {
+          id: 2,
+          indicator_type: "apbn",
+          title: "APBN",
+          value: 3850,
+          unit: "triliun rupiah",
+          period: "2026-11-17",
+          source: "Simulasi (bukan data resmi)",
+          trend: "stabil",
+          updated_at: "2026-11-17T00:00:00.000000Z",
+        },
+        {
+          id: 3,
+          indicator_type: "inflation",
+          title: "Inflasi",
+          value: 2.5,
+          unit: "persen",
+          period: "2026-11-17",
+          source: "Simulasi (bukan data resmi)",
+          trend: "stabil",
+          updated_at: "2026-11-17T00:00:00.000000Z",
+        },
+        {
+          id: 4,
+          indicator_type: "exchange_rate",
+          title: "Kurs USD/IDR",
+          value: 16325.75,
+          unit: "rupiah per USD",
+          period: "2026-11-17",
+          source: "https://open.er-api.com/v6/latest/USD",
+          trend: "stabil",
+          updated_at: "2026-11-17T00:00:00.000000Z",
+        },
+      ],
+      last_updated: "2026-11-17T00:00:00.000000Z",
+    },
+  },
+  "GET /api/economic/history/exchange_rate": {
+    body: {
+      type: "exchange_rate",
+      data: [
+        {
+          id: 1,
+          period: "2026-11-16",
+          value: 16250,
+        },
+        {
+          id: 2,
+          period: "2026-11-17",
+          value: 16325.75,
+        },
+      ],
+    },
+  },
+  "GET /api/economic/history/inflation": {
+    body: {
+      type: "inflation",
+      data: [
+        {
+          id: 3,
+          period: "2026-11-16",
+          value: 2.4,
+        },
+        {
+          id: 4,
+          period: "2026-11-17",
+          value: 2.5,
+        },
+      ],
+    },
+  },
+  "GET /api/insights/news": {
+    body: {
+      insights: [
+        {
+          id: 1,
+          category: "berita",
+          title: "Contoh berita terkini",
+          content: "Ringkasan berita.",
+          source_url: "https://example.test/berita",
+          image_url: null,
+          published_at: "2026-11-17T00:00:00.000000Z",
+        },
+      ],
+    },
+  },
+  "GET /api/insights/cabinet": {
+    body: {
+      insights: [
+        {
+          id: 2,
+          category: "kabinet",
+          title: "Menteri Contoh",
+          content: "Informasi kabinet.",
+          source_url: null,
+          image_url: null,
+          published_at: null,
+        },
+      ],
+    },
+  },
   "POST /api/auth/register": {
     status: 201,
     body: { token: "member-token" },
@@ -198,4 +313,19 @@ test("tata kelola menampilkan recall aktif dan menerima pengajuan serta suara", 
   ).toBeVisible();
   await page.getByRole("button", { name: "Setuju Recall" }).click();
   await expect(page.getByText("Terima kasih, suara Anda telah dicatat.")).toBeVisible();
+});
+
+test("info Indonesia menampilkan ringkasan ekonomi dan berita bersumber", async ({ page }) => {
+  await page.goto("/info");
+
+  await expect(
+    page.getByRole("heading", { name: "Ekonomi & Wawasan Indonesia" }),
+  ).toBeVisible();
+  await expect(page.getByText("16.325,75 rupiah per USD")).toBeVisible();
+
+  await page.getByRole("tab", { name: "Wawasan" }).click();
+  await expect(page.getByRole("heading", { name: "Menteri Contoh" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Contoh berita terkini" }),
+  ).toHaveAttribute("href", "https://example.test/berita");
 });

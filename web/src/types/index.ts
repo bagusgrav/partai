@@ -200,6 +200,42 @@ export interface WelfareRegionsResponse {
   regions: WelfareRegion[];
 }
 
+export interface EconomicIndicator {
+  id: number;
+  indicator_type: string;
+  title: string;
+  value: number;
+  unit: string;
+  period: string;
+  source: string;
+  trend: string | null;
+  updated_at: string;
+}
+
+export interface EconomicSummaryResponse {
+  indicators: EconomicIndicator[];
+  last_updated: string | null;
+}
+
+export interface EconomicHistoryResponse {
+  type: string;
+  data: EconomicIndicator[];
+}
+
+export interface GovernmentInsight {
+  id: number;
+  category: "kabinet" | "berita";
+  title: string;
+  content: string;
+  source_url: string | null;
+  image_url: string | null;
+  published_at: string | null;
+}
+
+export interface GovernmentInsightsResponse {
+  insights: GovernmentInsight[];
+}
+
 export interface RegisteredUser {
   id: string;
   name: string;

@@ -30,6 +30,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 *Tujuan: Menjemput hak rakyat dan mengawasi kebocoran anggaran.*
 - [x] **Fondasi Data Publik:** Skema data kesejahteraan, seeder simulasi BPS/BNPB, API ringkasan/wilayah, panel admin, dan dasbor publik provinsi.
 - [x] **Pipeline Data BPS & BNPB:** Penarikan terjadwal dengan Laravel Scheduler, integrasi BPS WebAPI dan BNPB ArcGIS, serta fallback data mock saat API key belum dikonfigurasi.
+- [x] **Dasbor Ekonomi & Wawasan:** Indikator ekonomi, kurs API publik, berita RSS ANTARA, API publik, dan pembaruan otomatis terjadwal.
 - [ ] **Indeks Kerentanan Kesejahteraan (IKK):** Dasbor publik per kabupaten/kota yang menggabungkan data BPS & BNPB; perhitungan IKK dan data kabupaten/kota belum tersedia.
 - [ ] **Modul "Jemput Hak" (Rights Tracker):** Anggota bisa mengecek status bansos (PKH, BPNT, PIP) berdasarkan NIK.
 - [ ] **Perisai Pendidikan:** Pelacak dana BOS per sekolah dan kanal pengaduan pungli anonim.

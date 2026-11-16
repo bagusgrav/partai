@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EconomicController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SortitionController;
@@ -37,6 +39,10 @@ Route::post('/auth/register', [AuthController::class, 'register'])->middleware('
 Route::get('/welfare/summary', [WelfareController::class, 'summary']);
 Route::get('/welfare/regions', [WelfareController::class, 'regions']);
 Route::get('/welfare/region/{code}', [WelfareController::class, 'region']);
+Route::get('/economic/summary', [EconomicController::class, 'summary']);
+Route::get('/economic/history/{type}', [EconomicController::class, 'history']);
+Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
+Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/events', [EventController::class, 'store']);

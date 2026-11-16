@@ -184,7 +184,21 @@ main`, instalasi dependency produksi, migrasi paksa, cache Laravel, dan reload
 PHP-FPM. Jalankan hanya setelah konfigurasi `.env`, database, dan akses sudo
 siap.
 
-## 5. Deploy frontend ke Vercel
+## 5. Aktifkan Laravel Scheduler
+
+Perintah terjadwal (termasuk pembaruan RSS berita setiap jam serta kurs dan
+ringkasan ekonomi setiap hari) berjalan hanya jika Laravel Scheduler dipanggil.
+Sebagai pengguna `deploy`, tambahkan satu entri cron:
+
+```cron
+* * * * * cd /var/www/thortech/partai/api && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
+```
+
+Sesuaikan path PHP jika `command -v php` menunjukkan lokasi berbeda. Verifikasi
+jadwal dengan `php artisan schedule:list` dan pastikan cron aktif melalui
+`systemctl status cron`.
+
+## 6. Deploy frontend ke Vercel
 
 1. Import repository GitHub di Vercel dan pilih **Root Directory** `web`.
    Gunakan framework preset Next.js.
