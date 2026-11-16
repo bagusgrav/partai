@@ -79,22 +79,22 @@ export default function LandingPage() {
               melalui edukasi kewargaan yang terbuka, aksi nyata, dan validasi
               bersama.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-xl bg-primary px-7 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex min-h-14 items-center justify-center rounded-md bg-primary px-4 py-4 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
                 href="/belajar"
               >
                 Mulai Belajar Sekarang
                 <span aria-hidden="true" className="ml-2">→</span>
               </Link>
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-xl border border-primary/20 px-7 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex min-h-14 items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
                 href="/events"
               >
                 Jelajahi Aksi Lapangan
               </Link>
               <Link
-                className="inline-flex min-h-14 items-center justify-center rounded-xl border border-primary/20 px-7 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex min-h-14 items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
                 href="/manifesto"
               >
                 Baca Manifesto

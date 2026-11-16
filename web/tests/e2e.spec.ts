@@ -266,6 +266,22 @@ test("landing page menampilkan judul dan ajakan belajar", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("navbar tidak menyebabkan overflow horizontal di layar laptop", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+
+  const pageWidth = await page.evaluate(
+    () => document.documentElement.scrollWidth <= window.innerWidth,
+  );
+  expect(pageWidth).toBe(true);
+
+  await page.getByText("Data & Info").click();
+  await expect(page.getByRole("link", { name: "Data Publik" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Info Indonesia" })).toBeVisible();
+});
+
 test("pendaftaran berhasil dan mengarahkan anggota ke profil", async ({ page }) => {
   await page.goto("/daftar");
 

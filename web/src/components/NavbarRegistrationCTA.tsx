@@ -12,7 +12,7 @@ export default function NavbarRegistrationCTA() {
 
   return (
     <Link
-      className="self-end whitespace-nowrap rounded-full bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:self-auto"
+      className="whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
       href="/daftar"
     >
       Daftar Anggota
