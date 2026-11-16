@@ -152,3 +152,13 @@ export interface WelfareRegion {
 export interface WelfareRegionsResponse {
   regions: WelfareRegion[];
 }
+
+export interface RegisteredUser {
+  id: string;
+  name: string;
+  email: string;
+  cluster_id: string | null;
+  cluster_name: string | null;
+  role: "guest" | "member" | "admin";
+  is_verified: boolean;
+}

@@ -8,6 +8,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 - [x] Arsitektur SSOT (4 Pilar Dokumen).
 - [x] Database SQLite WAL (Zero-RAM) + Indeks Majemuk.
 - [x] API Idempoten (`request_id`) & SM-2 Algorithm.
+- [x] Pendaftaran anggota resmi dengan token Sanctum dan halaman profil.
 - [x] UI Kuis Dasar (Duolingo-style) + `fetchWithRetry`.
 - [x] Panel Admin Filament (Kelola Soal & User).
 

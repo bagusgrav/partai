@@ -36,6 +36,12 @@ export default function Navbar() {
             </Link>
           ))}
         </div>
+        <Link
+          className="self-end rounded-full bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:self-auto"
+          href="/daftar"
+        >
+          Daftar Anggota
+        </Link>
         <a
           className="self-end rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:self-auto"
           href="https://api.akuhadir.my.id/admin"

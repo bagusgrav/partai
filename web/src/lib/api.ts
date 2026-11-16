@@ -8,6 +8,7 @@ import type {
   EssaySubmissionResponse,
   PendingAttendanceClaimsResponse,
   PendingEssayResponse,
+  RegisteredUser,
   ReviewResponse,
   WelfareRegionsResponse,
   WelfareSummaryResponse,
@@ -73,6 +74,42 @@ export async function getGuestToken(): Promise<string> {
   }
 }
 
+export async function registerMember(
+  input: {
+    name: string;
+    email: string;
+    password: string;
+    cluster_id: string;
+    nik?: string;
+  },
+  requestId: string,
+): Promise<void> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...input, request_id: requestId }),
+  });
+
+  await ensureSuccessfulResponse(response);
+
+  const payload: unknown = await response.json();
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("token" in payload) ||
+    typeof payload.token !== "string" ||
+    payload.token.length === 0
+  ) {
+    throw new Error("Respons pendaftaran tidak berisi token valid.");
+  }
+
+  localStorage.setItem(GUEST_TOKEN_KEY, payload.token);
+  localStorage.removeItem(GUEST_REQUEST_ID_KEY);
+}
+
 export async function fetchWithRetry(
   url: string,
   options: RequestInit,
@@ -115,6 +152,16 @@ export async function getWelfareRegions(): Promise<WelfareRegionsResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/welfare/regions`, {
     method: "GET",
     headers: { Accept: "application/json" },
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getCurrentUser(): Promise<RegisteredUser> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/user`, {
+    method: "GET",
+    headers: await getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
