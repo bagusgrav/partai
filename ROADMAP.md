@@ -38,9 +38,10 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 ## 🟣 FASE 4: TATA KELOLA PARTAI (GOVERNANCE & RECALL)
 *Tujuan: Mencegah dinasti, korupsi internal, dan membangun demokrasi partai.*
 - [ ] **Voting Parameter & Kebijakan:** Anggota bisa memilih perubahan parameter atau agenda partai.
-- [ ] **Sistem Panel (Sortisi):** Pemilihan acak untuk Panel Audit, Panel Etik, dan Panel Editorial.
+- [x] **Panel Audit (Sortisi):** Pemilihan acak hingga lima anggota terverifikasi dengan minimal tiga butir SM-2 pada `reps >= 3`.
+- [ ] **Panel Etik & Editorial:** Pemilihan acak anggota untuk Panel Etik dan Panel Editorial.
 - [ ] **Kontrak Faksi Anggota Dewan:** Dasbor publik yang melacak janji kampanye anggota dewan.
-- [ ] **Mekanisme Recall:** Fitur pengajuan recall jika gagal memenuhi Kontrak Faksi atau melanggar etik.
+- [x] **Mekanisme Recall:** Pengajuan recall berbukti, voting anggota, dan pencabutan role saat dukungan mencapai 2/3 anggota aktif.
 
 ## 🏁 DEFINISI "LENGKAP DAN TUNTAS"
 Aplikasi dinyatakan Tuntas jika: Fungsional (Fase 1-4 berjalan), Skalabel (10.000 anggota aktif di VPS Zero-RAM), Aman & Auditable (Open Source, terbackup), dan Berdampak Nyata (digunakan anggota dewan untuk menginterpelasi anggaran korup).

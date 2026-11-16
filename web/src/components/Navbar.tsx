@@ -7,6 +7,7 @@ const links = [
   { href: "/events", label: "Aksi Lapangan" },
   { href: "/data", label: "Data Publik" },
   { href: "/voting", label: "Voting" },
+  { href: "/recall", label: "Tata Kelola" },
   { href: "/manifesto", label: "Manifesto" },
   { href: "/panduan", label: "Panduan" },
 ];

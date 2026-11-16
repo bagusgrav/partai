@@ -100,6 +100,53 @@ export interface VoteSubmissionResponse {
   };
 }
 
+export interface ActiveRecall {
+  id: string;
+  target_user_id: string;
+  target_name: string;
+  reason: string;
+  evidence_url: string | null;
+  created_at: string;
+  status: "voting";
+  agree_count: number;
+  reject_count: number;
+  active_member_count: number;
+  votes_required: number;
+  has_voted: boolean;
+}
+
+export interface ActiveRecallsResponse {
+  recalls: ActiveRecall[];
+}
+
+export interface RecallRequestInput {
+  target_user_id: string;
+  reason: string;
+  evidence_url: string;
+  request_id: string;
+}
+
+export interface RecallRequestResponse {
+  status: "processed" | "already_processed";
+  recall: {
+    id: string;
+    target_user_id: string;
+    reason?: string;
+    evidence_url?: string | null;
+    status: "pending" | "voting" | "approved" | "rejected";
+  };
+}
+
+export interface RecallVoteResponse {
+  status: "processed" | "already_processed";
+  data: {
+    vote_id: string;
+    recall_status?: "voting" | "approved";
+    agree_count?: number;
+    votes_required?: number;
+  };
+}
+
 export interface AttendanceClaimResult {
   status: "processed" | "already_processed" | "rejected";
   claim_id?: string;

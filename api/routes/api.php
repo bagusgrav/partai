@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SortitionController;
 use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
 use App\Models\WelfareData;
@@ -51,4 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/essay/review', [EssayController::class, 'review']);
     Route::get('/votes/active', [VoteController::class, 'active']);
     Route::post('/votes/submit', [VoteController::class, 'submit']);
+    Route::post('/recall/request', [RecallController::class, 'store']);
+    Route::get('/recall/active', [RecallController::class, 'active']);
+    Route::post('/recall/vote', [RecallController::class, 'vote']);
+    Route::get('/sortition/panels', [SortitionController::class, 'panels']);
 });

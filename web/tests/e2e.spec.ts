@@ -85,6 +85,44 @@ const mockApiResponses: Record<
     status: 201,
     body: { status: "processed", data: { submission_id: 1 } },
   },
+  "GET /api/recall/active": {
+    body: {
+      recalls: [
+        {
+          id: "recall-1",
+          target_user_id: "target-user-id",
+          target_name: "Anggota Dewan Contoh",
+          reason: "Tidak memenuhi kontrak faksi.",
+          evidence_url: "https://example.test/bukti",
+          created_at: "2026-11-16T00:00:00.000000Z",
+          status: "voting",
+          agree_count: 1,
+          reject_count: 0,
+          active_member_count: 3,
+          votes_required: 2,
+          has_voted: false,
+        },
+      ],
+    },
+  },
+  "POST /api/recall/request": {
+    status: 201,
+    body: {
+      status: "processed",
+      recall: {
+        id: "recall-2",
+        target_user_id: "target-user-id",
+        status: "voting",
+      },
+    },
+  },
+  "POST /api/recall/vote": {
+    status: 201,
+    body: {
+      status: "processed",
+      data: { vote_id: "vote-1", recall_status: "voting" },
+    },
+  },
 };
 
 test.beforeEach(async ({ page }) => {
@@ -145,4 +183,19 @@ test("voting menampilkan konfirmasi setelah suara dikirim", async ({ page }) => 
   await expect(
     page.getByText("Terima kasih, suara Anda telah dicatat."),
   ).toBeVisible();
+});
+
+test("tata kelola menampilkan recall aktif dan menerima pengajuan serta suara", async ({ page }) => {
+  await page.goto("/recall");
+
+  await expect(page.getByRole("heading", { name: "Anggota Dewan Contoh" })).toBeVisible();
+  await page.getByLabel("ID Anggota yang Di-recall").fill("target-user-id");
+  await page.getByLabel("Alasan", { exact: true }).fill("Melanggar kontrak faksi.");
+  await page.getByRole("button", { name: "Ajukan Recall" }).click();
+
+  await expect(
+    page.getByText("Pengajuan recall berhasil dikirim dan sudah memasuki tahap voting."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Setuju Recall" }).click();
+  await expect(page.getByText("Terima kasih, suara Anda telah dicatat.")).toBeVisible();
 });
