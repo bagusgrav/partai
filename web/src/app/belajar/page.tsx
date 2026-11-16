@@ -120,7 +120,7 @@ export default function LearnPage() {
   if (loading && items.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <p className="text-lg font-semibold text-slate-600">Memuat sesi belajar...</p>
+        <p className="text-lg font-semibold text-text-muted">Memuat sesi belajar...</p>
       </main>
     );
   }
@@ -128,15 +128,15 @@ export default function LearnPage() {
   if (loadError) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <section className="w-full max-w-lg rounded-3xl border border-red-200 bg-white p-8 text-center shadow-xl shadow-slate-200/60">
+        <section className="w-full max-w-lg rounded-3xl border border-red-200 bg-surface p-8 text-center shadow-xl shadow-primary/5">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">
             Tidak dapat memuat sesi
           </p>
-          <p className="mt-4 text-slate-700" role="alert">
+          <p className="mt-4 text-text-main" role="alert">
             {loadError}
           </p>
           <button
-            className="mt-7 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            className="mt-7 min-h-12 rounded-xl bg-primary px-6 font-bold text-surface transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             onClick={() => window.location.reload()}
             type="button"
           >
@@ -153,29 +153,29 @@ export default function LearnPage() {
 
     return (
       <main className="flex min-h-screen items-center justify-center px-6 py-12">
-        <section className="w-full max-w-xl rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-xl shadow-emerald-900/5 sm:p-12">
-          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-emerald-100 text-4xl">
+        <section className="w-full max-w-xl rounded-3xl border border-primary-light bg-surface p-8 text-center shadow-xl shadow-primary/5 sm:p-12">
+          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-primary-light text-4xl">
             🎉
           </div>
-          <p className="mt-6 text-sm font-bold uppercase tracking-[0.22em] text-emerald-700">
+          <p className="mt-6 text-sm font-bold uppercase tracking-[0.22em] text-primary-hover">
             Sesi belajar
           </p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-900">
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-text-main">
             Sesi Selesai
           </h1>
-          <p className="mt-3 text-slate-600">Terima kasih sudah belajar hari ini.</p>
+          <p className="mt-3 text-text-muted">Terima kasih sudah belajar hari ini.</p>
           <div className="mt-9 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl bg-emerald-50 p-4">
-              <p className="text-2xl font-black text-emerald-700">{score}%</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Skor</p>
+            <div className="rounded-2xl bg-primary-light p-4">
+              <p className="text-2xl font-black text-primary-hover">{score}%</p>
+              <p className="mt-1 text-xs font-semibold text-text-muted">Skor</p>
             </div>
-            <div className="rounded-2xl bg-emerald-50 p-4">
-              <p className="text-2xl font-black text-emerald-700">{stats.correct}</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Benar</p>
+            <div className="rounded-2xl bg-primary-light p-4">
+              <p className="text-2xl font-black text-primary-hover">{stats.correct}</p>
+              <p className="mt-1 text-xs font-semibold text-text-muted">Benar</p>
             </div>
             <div className="rounded-2xl bg-rose-50 p-4">
               <p className="text-2xl font-black text-rose-700">{stats.incorrect}</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Salah</p>
+              <p className="mt-1 text-xs font-semibold text-text-muted">Salah</p>
             </div>
           </div>
         </section>
@@ -188,56 +188,56 @@ export default function LearnPage() {
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-10 flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-primary-hover">
               Partai
             </p>
-            <p className="mt-1 text-sm font-medium text-slate-500">Belajar satu langkah setiap hari</p>
+            <p className="mt-1 text-sm font-medium text-text-muted">Belajar satu langkah setiap hari</p>
           </div>
           <div className="flex items-center gap-4">
             <Link
-              className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
+              className="text-sm font-bold text-primary-hover underline decoration-primary underline-offset-4 hover:text-primary"
               href="/"
             >
               ← Kembali ke Beranda
             </Link>
-            <div className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">
-              {currentIndex + 1} <span className="text-slate-400">/ {items.length}</span>
+            <div className="rounded-full bg-surface px-4 py-2 text-sm font-bold text-text-muted shadow-sm ring-1 ring-background">
+              {currentIndex + 1} <span className="text-text-muted/70">/ {items.length}</span>
             </div>
           </div>
         </header>
 
         <div
           aria-label={`Progres ${currentIndex} dari ${items.length}`}
-          className="mb-8 h-3 overflow-hidden rounded-full bg-emerald-100"
+          className="mb-8 h-3 overflow-hidden rounded-full bg-primary-light"
           role="progressbar"
           aria-valuemax={items.length}
           aria-valuemin={0}
           aria-valuenow={currentIndex}
         >
           <div
-            className="h-full rounded-full bg-emerald-500 transition-[width] duration-500"
+            className="h-full rounded-full bg-primary transition-[width] duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 sm:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
+        <section className="rounded-3xl border border-background bg-surface p-6 shadow-xl shadow-primary/5 sm:p-10">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-hover">
             Pertanyaan {currentIndex + 1}
           </p>
-          <h1 className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-text-main sm:text-3xl">
             {item.payload.question}
           </h1>
 
           {item.payload.type === "essay" ? (
             <div className="mt-8">
               <label
-                className="mb-2 block text-sm font-bold text-slate-700"
+                className="mb-2 block text-sm font-bold text-text-main"
                 htmlFor="essay-answer"
               >
                 Jawaban esai
               </label>
               <textarea
-                className="min-h-48 w-full rounded-2xl border-2 border-slate-200 bg-white p-4 leading-relaxed text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-slate-50"
+                className="min-h-48 w-full rounded-2xl border-2 border-background bg-surface p-4 leading-relaxed text-text-main outline-none transition focus:border-primary focus:ring-2 focus:ring-primary-light disabled:bg-background"
                 disabled={isRevealed || loading}
                 id="essay-answer"
                 onChange={(event) => setEssayAnswer(event.target.value)}
@@ -245,7 +245,7 @@ export default function LearnPage() {
                 value={essayAnswer}
               />
               {isRevealed && (
-                <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-800">
+                <p className="mt-4 rounded-2xl border border-primary-light bg-primary-light p-4 font-semibold text-primary-hover">
                   Esai berhasil dikirim dan menunggu penilaian anggota lain.
                 </p>
               )}
@@ -262,29 +262,29 @@ export default function LearnPage() {
                 const isCorrect = correctAnswer === optionIndex;
                 const revealedStyle = isRevealed
                   ? isCorrect
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-900"
+                    ? "border-primary bg-primary-light text-primary-hover"
                     : isSelected
                       ? "border-rose-400 bg-rose-50 text-rose-900"
-                      : "border-slate-200 bg-white text-slate-500"
+                      : "border-background bg-surface text-text-muted"
                   : isSelected
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-100"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50";
+                    ? "border-primary bg-primary-light text-primary-hover ring-2 ring-primary-light"
+                    : "border-background bg-surface text-text-main hover:border-primary hover:bg-primary-light";
 
                 return (
                   <button
                     aria-pressed={isSelected}
-                    className={`flex min-h-16 w-full items-center gap-4 rounded-2xl border-2 px-4 py-3 text-left font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-default ${revealedStyle}`}
+                    className={`flex min-h-16 w-full items-center gap-4 rounded-2xl border-2 px-4 py-3 text-left font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default ${revealedStyle}`}
                     disabled={isRevealed || loading}
                     key={`${item.id}-${optionIndex}`}
                     onClick={() => setSelectedOption(optionIndex)}
                     type="button"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/80 text-sm font-black text-slate-500 ring-1 ring-slate-200">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface/80 text-sm font-black text-text-muted ring-1 ring-background">
                       {String.fromCharCode(65 + optionIndex)}
                     </span>
                     <span className="flex-1">{option}</span>
                     {isRevealed && isCorrect && (
-                      <span aria-label="Jawaban benar" className="font-black text-emerald-700">
+                      <span aria-label="Jawaban benar" className="font-black text-primary-hover">
                         ✓
                       </span>
                     )}
@@ -304,29 +304,29 @@ export default function LearnPage() {
               aria-live="polite"
               className={`mt-7 rounded-2xl border p-5 ${
                 selectedOption === correctAnswer
-                  ? "border-emerald-200 bg-emerald-50"
+                  ? "border-primary-light bg-primary-light"
                   : "border-amber-200 bg-amber-50"
               }`}
             >
               <h2
                 className={`font-extrabold ${
                   selectedOption === correctAnswer
-                    ? "text-emerald-800"
+                    ? "text-primary-hover"
                     : "text-amber-900"
                 }`}
               >
                 {selectedOption === correctAnswer ? "Benar!" : "Belum tepat"}
               </h2>
-              <p className="mt-2 leading-relaxed text-slate-700">
+              <p className="mt-2 leading-relaxed text-text-main">
                 {item.payload.explanation}
               </p>
               {item.payload.sources.length > 0 && (
-                <ul className="mt-4 space-y-2 border-t border-slate-200/80 pt-4 text-sm">
+                <ul className="mt-4 space-y-2 border-t border-background/80 pt-4 text-sm">
                   {item.payload.sources.map((source, sourceIndex) => (
                     <li key={`${source.citation}-${sourceIndex}`}>
                       {source.url ? (
                         <a
-                          className="font-semibold text-emerald-800 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-950"
+                          className="font-semibold text-primary-hover underline decoration-primary underline-offset-4 hover:text-primary"
                           href={source.url}
                           rel="noreferrer"
                           target="_blank"
@@ -334,7 +334,7 @@ export default function LearnPage() {
                           {source.citation}
                         </a>
                       ) : (
-                        <span className="text-slate-600">{source.citation}</span>
+                        <span className="text-text-muted">{source.citation}</span>
                       )}
                     </li>
                   ))}
@@ -348,10 +348,10 @@ export default function LearnPage() {
             </div>
           )}
 
-          <div className="mt-8 border-t border-slate-100 pt-6">
+          <div className="mt-8 border-t border-background pt-6">
             {!isRevealed ? (
               <button
-                className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 text-base font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+                className="min-h-14 w-full rounded-2xl bg-primary px-6 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-background disabled:shadow-none"
                 disabled={
                   loading
                   || (item.payload.type === "essay"
@@ -365,7 +365,7 @@ export default function LearnPage() {
               </button>
             ) : (
               <button
-                className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 text-base font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-wait disabled:bg-emerald-400"
+                className="min-h-14 w-full rounded-2xl bg-primary px-6 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-wait disabled:bg-primary-light"
                 disabled={loading}
                 onClick={handleNext}
                 type="button"
