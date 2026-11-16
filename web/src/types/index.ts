@@ -99,3 +99,31 @@ export interface AttendanceAttestationResult {
   claim_status: "pending" | "valid";
   attestations?: number;
 }
+
+export interface WelfareSummary {
+  average_poverty: number | null;
+  poverty_year: number | null;
+  average_stunting: number | null;
+  stunting_year: number | null;
+  disaster_events: number;
+  disaster_year: number;
+}
+
+export interface WelfareSummaryResponse {
+  summary: WelfareSummary;
+}
+
+export interface WelfareRegion {
+  region_code: string;
+  region_name: string;
+  poverty: number | null;
+  poverty_year: number | null;
+  stunting: number | null;
+  stunting_year: number | null;
+  disaster_events: number;
+  disaster_year: number | null;
+}
+
+export interface WelfareRegionsResponse {
+  regions: WelfareRegion[];
+}

@@ -8,6 +8,8 @@ import type {
   PendingAttendanceClaimsResponse,
   PendingEssayResponse,
   ReviewResponse,
+  WelfareRegionsResponse,
+  WelfareSummaryResponse,
 } from "@/types";
 
 const API_BASE_URL =
@@ -95,6 +97,26 @@ async function ensureSuccessfulResponse(response: Response): Promise<void> {
       `Permintaan API gagal (${response.status})${detail ? `: ${detail}` : ""}`,
     );
   }
+}
+
+export async function getWelfareSummary(): Promise<WelfareSummaryResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/welfare/summary`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getWelfareRegions(): Promise<WelfareRegionsResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/welfare/regions`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
 }
 
 export async function getReviewItems(): Promise<ReviewResponse> {

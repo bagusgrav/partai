@@ -5,6 +5,7 @@ const links = [
   { href: "/belajar", label: "Belajar" },
   { href: "/review", label: "Juri Warga" },
   { href: "/events", label: "Aksi Lapangan" },
+  { href: "/data", label: "Data Publik" },
 ];
 
 export default function Navbar() {

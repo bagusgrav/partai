@@ -27,8 +27,9 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 
 ## 🔵 FASE 3: PENGAWASAN DATA & KESEJAHTERAAN (OPEN DATA)
 *Tujuan: Menjemput hak rakyat dan mengawasi kebocoran anggaran.*
-- [ ] **Pipeline Data BPS & BNPB:** Scraper otomatis (via Laravel Scheduler) untuk data kemiskinan, stunting, dan kebencanaan.
-- [ ] **Indeks Kerentanan Kesejahteraan (IKK):** Dasbor publik per kabupaten/kota yang menggabungkan data BPS & BNPB.
+- [x] **Fondasi Data Publik:** Skema data kesejahteraan, seeder simulasi BPS/BNPB, API ringkasan/wilayah, panel admin, dan dasbor publik provinsi.
+- [ ] **Pipeline Data BPS & BNPB:** Scraper otomatis (via Laravel Scheduler) untuk data kemiskinan, stunting, dan kebencanaan; integrasi API resmi belum tersedia.
+- [ ] **Indeks Kerentanan Kesejahteraan (IKK):** Dasbor publik per kabupaten/kota yang menggabungkan data BPS & BNPB; perhitungan IKK dan data kabupaten/kota belum tersedia.
 - [ ] **Modul "Jemput Hak" (Rights Tracker):** Anggota bisa mengecek status bansos (PKH, BPNT, PIP) berdasarkan NIK.
 - [ ] **Perisai Pendidikan:** Pelacak dana BOS per sekolah dan kanal pengaduan pungli anonim.
 - [ ] **Pengawasan Birokrasi:** Dasbor "Rapor ASN" dan pelaporan penyalahgunaan fasilitas negara.
