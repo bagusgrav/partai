@@ -10,12 +10,12 @@ perintah. Perintah di bawah adalah panduan manual dan belum dijalankan.
    persyaratan aplikasi (`^8.3`); bila PHP 8.3 tidak tersedia, tambahkan
    repositori PHP yang Anda percayai mengikuti instruksi dan verifikasi kunci
    repositorinya sebelum memasang paket. Lalu pasang Nginx, Git, SQLite,
-   PHP 8.3-FPM/CLI, serta ekstensi PHP yang dibutuhkan Laravel:
+   PHP 8.3 CLI, PHP 8.4-FPM, serta ekstensi PHP yang dibutuhkan Laravel:
 
    ```bash
    sudo apt update
    sudo apt install -y nginx git sqlite3 unzip \
-     php8.3-cli php8.3-fpm php8.3-sqlite3 php8.3-mbstring \
+     php8.3-cli php8.4-fpm php8.3-sqlite3 php8.3-mbstring \
      php8.3-xml php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl
    ```
 
@@ -30,10 +30,10 @@ perintah. Perintah di bawah adalah panduan manual dan belum dijalankan.
    ```bash
    sudo adduser --disabled-password --gecos "" deploy
    sudo usermod -aG www-data deploy
-   sudo install -d -o deploy -g www-data -m 0755 /var/www/partai
+   sudo install -d -o deploy -g www-data -m 0755 /var/www/thortech/partai
    sudo -iu deploy
-   git clone <REPOSITORY_URL> /var/www/partai
-   cd /var/www/partai/api
+   git clone <REPOSITORY_URL> /var/www/thortech/partai
+   cd /var/www/thortech/partai/api
    composer install --no-dev --optimize-autoloader
    cp .env.example .env
    php artisan key:generate
@@ -58,7 +58,7 @@ PHP-FPM. Buat server block (misalnya
 server {
     listen 127.0.0.1:8000;
     server_name api.akuhadir.my.id;
-    root /var/www/partai/api/public;
+    root /var/www/thortech/partai/api/public;
     index index.php;
 
     location / {
@@ -67,7 +67,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
     }
 
     location ~ /\.(?!well-known).* {
@@ -84,11 +84,11 @@ memiliki akses baca ke source dan akses tulis ke `api/storage` serta
 dan pengguna deployment:
 
 ```bash
-sudo chown -R deploy:www-data /var/www/partai/api/storage \
-  /var/www/partai/api/bootstrap/cache
-sudo chmod -R g+rwX /var/www/partai/api/storage \
-  /var/www/partai/api/bootstrap/cache
-sudo find /var/www/partai/api/storage /var/www/partai/api/bootstrap/cache \
+sudo chown -R deploy:www-data /var/www/thortech/partai/api/storage \
+  /var/www/thortech/partai/api/bootstrap/cache
+sudo chmod -R g+rwX /var/www/thortech/partai/api/storage \
+  /var/www/thortech/partai/api/bootstrap/cache
+sudo find /var/www/thortech/partai/api/storage /var/www/thortech/partai/api/bootstrap/cache \
   -type d -exec chmod g+s {} +
 ```
 
@@ -166,20 +166,20 @@ Di repository GitHub, buka **Settings → Secrets and variables → Actions** da
 buat repository secrets berikut:
 
 - `SSH_HOST`: hostname atau alamat IP VPS.
-- `SSH_USER`: pengguna deployment, misalnya `deploy`.
+- `SSH_USER`: `root`.
 - `SSH_KEY`: private SSH key yang pasangannya sudah ada pada
-  `~deploy/.ssh/authorized_keys` di VPS.
+  `~root/.ssh/authorized_keys` di VPS.
 
 Batasi akses key untuk deployment, jangan menaruh private key di file
-repository, dan jangan mencetak nilainya ke log. Skrip
-[deploy.sh](../api/deploy.sh) adalah skrip deployment di server; secrets saja
-belum membuat workflow. Workflow GitHub Actions perlu mengonsumsi ketiga
-secrets tersebut dan memanggil skrip di VPS. Berikan pengguna deployment izin
-sudo minimum yang diperlukan untuk `systemctl reload php8.3-fpm`; jangan
-memberinya sudo tanpa batas hanya untuk menjalankan skrip.
+repository, dan jangan mencetak nilainya ke log. Workflow terhubung ke VPS
+sebagai `root`. Skrip
+[deploy.sh](../api/deploy.sh) adalah skrip deployment di server. Workflow
+[deploy-api.yml](../.github/workflows/deploy-api.yml) menggunakan ketiga
+secrets tersebut dan memanggil skrip di VPS. Lihat panduan
+[github-actions.md](./github-actions.md) untuk langkah pengaturan.
 
 Untuk deployment manual, masuk ke VPS sebagai pengguna deployment, masuk ke
-`/var/www/partai/api`, lalu jalankan `bash deploy.sh`. Skrip melakukan `git pull origin
+`/var/www/thortech/partai/api`, lalu jalankan `bash deploy.sh`. Skrip melakukan `git pull origin
 main`, instalasi dependency produksi, migrasi paksa, cache Laravel, dan reload
 PHP-FPM. Jalankan hanya setelah konfigurasi `.env`, database, dan akses sudo
 siap.

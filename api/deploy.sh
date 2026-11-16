@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+echo "🚀 Memulai deployment Partai API..."
 
+cd /var/www/thortech/partai
 git pull origin main
+
+cd api
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-sudo systemctl reload php8.3-fpm
+
+sudo systemctl reload php8.4-fpm
+
+echo "✅ Deployment selesai!"
