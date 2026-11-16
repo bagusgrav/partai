@@ -25,4 +25,13 @@ class AdminPanelAccessTest extends TestCase
 
         $this->assertFalse($user->canAccessPanel(Filament::getPanel('admin')));
     }
+
+    public function test_guest_user_cannot_access_admin_panel(): void
+    {
+        $user = User::factory()->make([
+            'email' => 'guest_c95aa24c-a7e5-4aae-b865-2cb2b5951fd5@partai.id',
+        ]);
+
+        $this->assertFalse($user->canAccessPanel(Filament::getPanel('admin')));
+    }
 }

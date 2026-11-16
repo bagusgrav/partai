@@ -13,16 +13,60 @@ import type {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api";
 
-function getAuthorizationHeader(): string {
-  const token = process.env.NEXT_PUBLIC_API_TOKEN;
+const GUEST_TOKEN_KEY = "partai_guest_token";
+const GUEST_REQUEST_ID_KEY = "partai_guest_request_id";
+let guestTokenPromise: Promise<string> | null = null;
 
-  if (!token || token === "replace-with-your-sanctum-token") {
-    throw new Error(
-      "NEXT_PUBLIC_API_TOKEN belum diisi dengan token Sanctum yang valid.",
-    );
+export async function getGuestToken(): Promise<string> {
+  if (typeof window === "undefined") {
+    throw new Error("Sesi tamu hanya dapat dibuat di browser.");
   }
 
-  return `Bearer ${token}`;
+  const cachedToken = localStorage.getItem(GUEST_TOKEN_KEY);
+  if (cachedToken) {
+    return cachedToken;
+  }
+
+  const tokenPromise = (guestTokenPromise ??= (async () => {
+    const requestId =
+      localStorage.getItem(GUEST_REQUEST_ID_KEY) ?? crypto.randomUUID();
+    localStorage.setItem(GUEST_REQUEST_ID_KEY, requestId);
+
+    const response = await fetchWithRetry(`${API_BASE_URL}/auth/guest`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ request_id: requestId }),
+    });
+
+    await ensureSuccessfulResponse(response);
+
+    const payload: unknown = await response.json();
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      !("token" in payload) ||
+      typeof payload.token !== "string" ||
+      payload.token.length === 0
+    ) {
+      throw new Error("Respons pembuatan sesi tamu tidak berisi token valid.");
+    }
+
+    localStorage.setItem(GUEST_TOKEN_KEY, payload.token);
+    localStorage.removeItem(GUEST_REQUEST_ID_KEY);
+
+    return payload.token;
+  })());
+
+  try {
+    return await tokenPromise;
+  } finally {
+    if (guestTokenPromise === tokenPromise) {
+      guestTokenPromise = null;
+    }
+  }
 }
 
 export async function fetchWithRetry(
@@ -56,7 +100,7 @@ async function ensureSuccessfulResponse(response: Response): Promise<void> {
 export async function getReviewItems(): Promise<ReviewResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/review`, {
     method: "GET",
-    headers: getHeaders(),
+    headers: await getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
@@ -69,7 +113,7 @@ export async function submitAnswer(
 ): Promise<AnswerResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/answer`, {
     method: "POST",
-    headers: getHeaders(true),
+    headers: await getHeaders(true),
     body: JSON.stringify({
       item_id: itemId,
       correct,
@@ -88,7 +132,7 @@ export async function submitEssay(
 ): Promise<EssaySubmissionResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/essay/submit`, {
     method: "POST",
-    headers: getHeaders(true),
+    headers: await getHeaders(true),
     body: JSON.stringify({
       item_id: itemId,
       answer_text: answerText,
@@ -103,7 +147,7 @@ export async function submitEssay(
 export async function getEssayQuestion(): Promise<EssayQuestionResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/essay/question`, {
     method: "GET",
-    headers: getHeaders(),
+    headers: await getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
@@ -113,7 +157,7 @@ export async function getEssayQuestion(): Promise<EssayQuestionResponse> {
 export async function getPendingEssay(): Promise<PendingEssayResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/essay/review`, {
     method: "GET",
-    headers: getHeaders(),
+    headers: await getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
@@ -128,7 +172,7 @@ export async function submitEssayReview(
 ): Promise<EssaySubmissionResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/essay/review`, {
     method: "POST",
-    headers: getHeaders(true),
+    headers: await getHeaders(true),
     body: JSON.stringify({
       submission_id: submissionId,
       score,
@@ -144,7 +188,7 @@ export async function submitEssayReview(
 export async function getActiveEvents(): Promise<ActiveEventsResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/events/active`, {
     method: "GET",
-    headers: getHeaders(),
+    headers: await getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
@@ -156,7 +200,7 @@ export async function getEventQrToken(eventId: string): Promise<string> {
     `${API_BASE_URL}/events/${encodeURIComponent(eventId)}/qr`,
     {
       method: "GET",
-      headers: getHeaders(),
+      headers: await getHeaders(),
     },
   );
 
@@ -173,7 +217,7 @@ export async function submitAttendanceClaim(
 ): Promise<AttendanceClaimResult> {
   const response = await fetchWithRetry(`${API_BASE_URL}/attendance/claim`, {
     method: "POST",
-    headers: getHeaders(true),
+    headers: await getHeaders(true),
     body: JSON.stringify({
       event_id: eventId,
       token,
@@ -194,7 +238,7 @@ export async function getPendingAttendanceClaims(
     `${API_BASE_URL}/attendance/pending?event_id=${encodeURIComponent(eventId)}`,
     {
       method: "GET",
-      headers: getHeaders(),
+      headers: await getHeaders(),
     },
   );
 
@@ -208,7 +252,7 @@ export async function submitAttendanceAttestation(
 ): Promise<AttendanceAttestationResult> {
   const response = await fetchWithRetry(`${API_BASE_URL}/attendance/attest`, {
     method: "POST",
-    headers: getHeaders(true),
+    headers: await getHeaders(true),
     body: JSON.stringify({
       claim_id: claimId,
       request_id: requestId,
@@ -219,9 +263,9 @@ export async function submitAttendanceAttestation(
   return response.json();
 }
 
-function getHeaders(json = false): Headers {
+async function getHeaders(json = false): Promise<Headers> {
   const headers = new Headers({ Accept: "application/json" });
-  headers.set("Authorization", getAuthorizationHeader());
+  headers.set("Authorization", `Bearer ${await getGuestToken()}`);
 
   if (json) {
     headers.set("Content-Type", "application/json");

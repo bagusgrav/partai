@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ReviewController;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/events', [EventController::class, 'store']);
