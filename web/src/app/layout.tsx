@@ -3,8 +3,9 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PARTAI | Aku Hadir",
-  description: "Edukasi kewargaan dan pengawasan publik dalam satu ruang.",
+  title: "Partai | Aku Hadir",
+  description:
+    "Platform edukasi kewargaan, pengawasan publik, dan tata kelola partai politik terbuka.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
