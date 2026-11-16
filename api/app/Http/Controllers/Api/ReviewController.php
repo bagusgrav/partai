@@ -23,6 +23,10 @@ class ReviewController extends Controller
                     ->where('user_item_states.user_id', '=', $userId);
             })
             ->where(function ($query) {
+                $query->whereRaw("json_extract(items.payload, '$.type') IS NULL")
+                    ->orWhereRaw("json_extract(items.payload, '$.type') != ?", ['essay']);
+            })
+            ->where(function ($query) {
                 $query->whereNull('user_item_states.next_review')
                     ->orWhere('user_item_states.next_review', '<=', now());
             })

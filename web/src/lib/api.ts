@@ -1,4 +1,10 @@
-import type { AnswerResponse, ReviewResponse } from "@/types";
+import type {
+  AnswerResponse,
+  EssayQuestionResponse,
+  EssaySubmissionResponse,
+  PendingEssayResponse,
+  ReviewResponse,
+} from "@/types";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api";
@@ -44,12 +50,9 @@ async function ensureSuccessfulResponse(response: Response): Promise<void> {
 }
 
 export async function getReviewItems(): Promise<ReviewResponse> {
-  const headers = new Headers({ Accept: "application/json" });
-  headers.set("Authorization", getAuthorizationHeader());
-
   const response = await fetchWithRetry(`${API_BASE_URL}/review`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   await ensureSuccessfulResponse(response);
@@ -60,15 +63,9 @@ export async function submitAnswer(
   itemId: string,
   correct: boolean,
 ): Promise<AnswerResponse> {
-  const headers = new Headers({
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  });
-  headers.set("Authorization", getAuthorizationHeader());
-
   const response = await fetchWithRetry(`${API_BASE_URL}/answer`, {
     method: "POST",
-    headers,
+    headers: getHeaders(true),
     body: JSON.stringify({
       item_id: itemId,
       correct,
@@ -78,4 +75,75 @@ export async function submitAnswer(
 
   await ensureSuccessfulResponse(response);
   return response.json();
+}
+
+export async function submitEssay(
+  itemId: string,
+  answerText: string,
+  requestId: string,
+): Promise<EssaySubmissionResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/essay/submit`, {
+    method: "POST",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      item_id: itemId,
+      answer_text: answerText,
+      request_id: requestId,
+    }),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getEssayQuestion(): Promise<EssayQuestionResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/essay/question`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function getPendingEssay(): Promise<PendingEssayResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/essay/review`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+export async function submitEssayReview(
+  submissionId: number,
+  score: number,
+  feedback: string | null,
+  requestId: string,
+): Promise<EssaySubmissionResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/essay/review`, {
+    method: "POST",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      submission_id: submissionId,
+      score,
+      feedback,
+      request_id: requestId,
+    }),
+  });
+
+  await ensureSuccessfulResponse(response);
+  return response.json();
+}
+
+function getHeaders(json = false): Headers {
+  const headers = new Headers({ Accept: "application/json" });
+  headers.set("Authorization", getAuthorizationHeader());
+
+  if (json) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  return headers;
 }

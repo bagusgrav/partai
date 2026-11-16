@@ -35,6 +35,8 @@ class ItemSeeder extends Seeder
                 || ! is_string($item['id'] ?? null)
                 || ! is_string($item['domain'] ?? null)
                 || ! is_string($item['level'] ?? null)
+                || (isset($item['type']) && ! in_array($item['type'], ['multiple-choice', 'essay'], true))
+                || (($item['type'] ?? null) === 'essay' && ! is_string($item['question'] ?? null))
             ) {
                 throw new RuntimeException("Invalid item YAML structure in [{$file->getPathname()}].");
             }

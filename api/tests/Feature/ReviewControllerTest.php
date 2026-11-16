@@ -34,6 +34,14 @@ class ReviewControllerTest extends TestCase
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'id' => 'ESSAY-001',
+                'domain' => 'civics',
+                'level' => 'apply',
+                'payload' => '{"type":"essay","question":"Essay"}',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
         DB::table('user_item_states')->insert([
             'user_id' => $user->id,
