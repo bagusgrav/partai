@@ -1,387 +1,238 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  getEssayQuestion,
-  getReviewItems,
-  submitAnswer,
-  submitEssay,
-} from "@/lib/api";
-import type { Item } from "@/types";
 
-interface QuizStats {
-  correct: number;
-  incorrect: number;
-}
+const steps = [
+  {
+    number: "01",
+    title: "Belajar Harian",
+    description: "Selesaikan kuis untuk membangun kapasitas dan pemahaman kewargaan.",
+    href: "/belajar",
+    linkLabel: "Mulai belajar",
+  },
+  {
+    number: "02",
+    title: "Aksi Lapangan",
+    description: "Klaim kehadiran Anda di lokasi aksi damai dan bergerak bersama.",
+    href: "/events",
+    linkLabel: "Lihat aksi",
+  },
+  {
+    number: "03",
+    title: "Validasi Silang",
+    description: "Awasi dan validasi klaim anggota lain dari wilayah berbeda.",
+    href: "/review",
+    linkLabel: "Buka Juri Warga",
+  },
+];
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Terjadi kesalahan yang tidak diketahui.";
-}
+const features = [
+  {
+    number: "01",
+    title: "Belajar",
+    description: "Asah wawasan kewargaan melalui kuis dan latihan esai.",
+    href: "/belajar",
+    linkLabel: "Jelajahi materi",
+  },
+  {
+    number: "02",
+    title: "Aksi",
+    description: "Temukan kegiatan dan catat partisipasi di lapangan.",
+    href: "/events",
+    linkLabel: "Lihat kegiatan",
+  },
+  {
+    number: "03",
+    title: "Juri Warga",
+    description: "Bantu menjaga kepercayaan melalui peninjauan bersama.",
+    href: "/review",
+    linkLabel: "Ikut meninjau",
+  },
+  {
+    number: "04",
+    title: "Pengawasan Data",
+    description: "Ruang untuk transparansi dan pengawasan data publik.",
+  },
+];
 
 export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [essayAnswer, setEssayAnswer] = useState("");
-  const [essayRequestId, setEssayRequestId] = useState<string | null>(null);
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<QuizStats>({ correct: 0, incorrect: 0 });
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    Promise.all([getReviewItems(), getEssayQuestion()])
-      .then(([{ items: reviewItems }, { item: essayItem }]) => {
-        if (active) {
-          setItems(essayItem ? [...reviewItems, essayItem] : reviewItems);
-        }
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          setLoadError(getErrorMessage(error));
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const item = items[currentIndex];
-  const correctAnswer = item?.payload.type === "essay" ? null : item?.payload.answer;
-  const progress = items.length
-    ? Math.min((currentIndex / items.length) * 100, 100)
-    : 0;
-
-  async function handleSubmit() {
-    if (!item || item.payload.type === "essay" || selectedOption === null || isRevealed) {
-      return;
-    }
-
-    const correct = selectedOption === item.payload.answer;
-    setIsRevealed(true);
-    setSubmitError(null);
-    setStats((currentStats) => ({
-      correct: currentStats.correct + (correct ? 1 : 0),
-      incorrect: currentStats.incorrect + (correct ? 0 : 1),
-    }));
-    setLoading(true);
-
-    try {
-      await submitAnswer(item.id, correct);
-    } catch (error) {
-      setSubmitError(
-        `Jawaban ditampilkan, tetapi gagal disimpan ke server. ${getErrorMessage(error)}`,
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleEssaySubmit() {
-    if (!item || item.payload.type !== "essay" || !essayAnswer.trim() || isRevealed) {
-      return;
-    }
-
-    const requestId = essayRequestId ?? crypto.randomUUID();
-    setEssayRequestId(requestId);
-    setSubmitError(null);
-    setLoading(true);
-
-    try {
-      await submitEssay(item.id, essayAnswer.trim(), requestId);
-      setIsRevealed(true);
-      setEssayRequestId(null);
-    } catch (error) {
-      setSubmitError(getErrorMessage(error));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleNext() {
-    setCurrentIndex((index) => index + 1);
-    setSelectedOption(null);
-    setEssayAnswer("");
-    setEssayRequestId(null);
-    setIsRevealed(false);
-    setSubmitError(null);
-  }
-
-  if (loading && items.length === 0) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <p className="text-lg font-semibold text-slate-600">Memuat sesi belajar...</p>
-      </main>
-    );
-  }
-
-  if (loadError) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <section className="w-full max-w-lg rounded-3xl border border-red-200 bg-white p-8 text-center shadow-xl shadow-slate-200/60">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-600">
-            Tidak dapat memuat sesi
-          </p>
-          <p className="mt-4 text-slate-700" role="alert">
-            {loadError}
-          </p>
-          <button
-            className="mt-7 min-h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-            onClick={() => window.location.reload()}
-            type="button"
-          >
-            Coba lagi
-          </button>
-        </section>
-      </main>
-    );
-  }
-
-  if (currentIndex >= items.length) {
-    const total = stats.correct + stats.incorrect;
-    const score = total ? Math.round((stats.correct / total) * 100) : 0;
-
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 py-12">
-        <section className="w-full max-w-xl rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-xl shadow-emerald-900/5 sm:p-12">
-          <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-emerald-100 text-4xl">
-            🎉
-          </div>
-          <p className="mt-6 text-sm font-bold uppercase tracking-[0.22em] text-emerald-700">
-            Sesi belajar
-          </p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-900">
-            Sesi Selesai
-          </h1>
-          <p className="mt-3 text-slate-600">Terima kasih sudah belajar hari ini.</p>
-          <div className="mt-9 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl bg-emerald-50 p-4">
-              <p className="text-2xl font-black text-emerald-700">{score}%</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Skor</p>
-            </div>
-            <div className="rounded-2xl bg-emerald-50 p-4">
-              <p className="text-2xl font-black text-emerald-700">{stats.correct}</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Benar</p>
-            </div>
-            <div className="rounded-2xl bg-rose-50 p-4">
-              <p className="text-2xl font-black text-rose-700">{stats.incorrect}</p>
-              <p className="mt-1 text-xs font-semibold text-slate-600">Salah</p>
-            </div>
-          </div>
-        </section>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-10 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-700">
-              Partai
-            </p>
-            <p className="mt-1 text-sm font-medium text-slate-500">Belajar satu langkah setiap hari</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
-              href="/events"
-            >
-              Aku Hadir
-            </Link>
-            <Link
-              className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
-              href="/review"
-            >
-              Menu Juri Warga
-            </Link>
-            <div className="rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">
-              {currentIndex + 1} <span className="text-slate-400">/ {items.length}</span>
-            </div>
-          </div>
-        </header>
-
+    <main className="flex-1">
+      <section className="relative isolate overflow-hidden bg-slate-950 text-white">
         <div
-          aria-label={`Progres ${currentIndex} dari ${items.length}`}
-          className="mb-8 h-3 overflow-hidden rounded-full bg-emerald-100"
-          role="progressbar"
-          aria-valuemax={items.length}
-          aria-valuemin={0}
-          aria-valuenow={currentIndex}
-        >
-          <div
-            className="h-full rounded-full bg-emerald-500 transition-[width] duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 sm:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
-            Pertanyaan {currentIndex + 1}
-          </p>
-          <h1 className="mt-4 text-2xl font-extrabold leading-snug tracking-tight text-slate-900 sm:text-3xl">
-            {item.payload.question}
-          </h1>
-
-          {item.payload.type === "essay" ? (
-            <div className="mt-8">
-              <label
-                className="mb-2 block text-sm font-bold text-slate-700"
-                htmlFor="essay-answer"
+          aria-hidden="true"
+          className="absolute -right-32 -top-40 -z-10 size-[30rem] rounded-full bg-emerald-500/20 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-48 -left-32 -z-10 size-[28rem] rounded-full bg-teal-400/10 blur-3xl"
+        />
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-32">
+          <div className="max-w-3xl">
+            <p className="inline-flex items-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-4 py-2 text-sm font-semibold text-emerald-200">
+              <span aria-hidden="true" className="size-2 rounded-full bg-emerald-400" />
+              Ruang belajar dan pengawasan warga
+            </p>
+            <h1 className="mt-7 text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
+              Aku <span className="text-emerald-400">Hadir.</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
+              Bersama membangun kapasitas warga dan mengawasi kepentingan publik
+              melalui edukasi kewargaan yang terbuka, aksi nyata, dan validasi
+              bersama.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link
+                className="inline-flex min-h-14 items-center justify-center rounded-xl bg-emerald-500 px-7 text-base font-extrabold text-slate-950 shadow-lg shadow-emerald-950/30 transition hover:bg-emerald-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+                href="/belajar"
               >
-                Jawaban esai
-              </label>
-              <textarea
-                className="min-h-48 w-full rounded-2xl border-2 border-slate-200 bg-white p-4 leading-relaxed text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-slate-50"
-                disabled={isRevealed || loading}
-                id="essay-answer"
-                onChange={(event) => setEssayAnswer(event.target.value)}
-                placeholder={item.payload.instructions ?? "Tuliskan jawaban Anda..."}
-                value={essayAnswer}
-              />
-              {isRevealed && (
-                <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-800">
-                  Esai berhasil dikirim dan menunggu penilaian anggota lain.
-                </p>
-              )}
-              {submitError && (
-                <p className="mt-4 text-sm font-semibold text-red-700" role="alert">
-                  Esai belum berhasil dikirim. {submitError}
-                </p>
-              )}
+                Mulai Belajar Sekarang
+                <span aria-hidden="true" className="ml-2">→</span>
+              </Link>
+              <Link
+                className="inline-flex min-h-14 items-center justify-center rounded-xl border border-white/20 px-7 text-base font-bold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                href="/events"
+              >
+                Jelajahi Aksi Lapangan
+              </Link>
             </div>
-          ) : (
-            <div className="mt-8 space-y-3">
-              {item.payload.options.map((option, optionIndex) => {
-                const isSelected = selectedOption === optionIndex;
-                const isCorrect = correctAnswer === optionIndex;
-                const revealedStyle = isRevealed
-                  ? isCorrect
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-900"
-                    : isSelected
-                      ? "border-rose-400 bg-rose-50 text-rose-900"
-                      : "border-slate-200 bg-white text-slate-500"
-                  : isSelected
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-100"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50";
-
-                return (
-                  <button
-                    aria-pressed={isSelected}
-                    className={`flex min-h-16 w-full items-center gap-4 rounded-2xl border-2 px-4 py-3 text-left font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-default ${revealedStyle}`}
-                    disabled={isRevealed || loading}
-                    key={`${item.id}-${optionIndex}`}
-                    onClick={() => setSelectedOption(optionIndex)}
-                    type="button"
-                  >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/80 text-sm font-black text-slate-500 ring-1 ring-slate-200">
-                      {String.fromCharCode(65 + optionIndex)}
-                    </span>
-                    <span className="flex-1">{option}</span>
-                    {isRevealed && isCorrect && (
-                      <span aria-label="Jawaban benar" className="font-black text-emerald-700">
-                        ✓
-                      </span>
-                    )}
-                    {isRevealed && isSelected && !isCorrect && (
-                      <span aria-label="Jawaban salah" className="font-black text-rose-700">
-                        ✕
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {isRevealed && item.payload.type !== "essay" && (
-            <div
-              aria-live="polite"
-              className={`mt-7 rounded-2xl border p-5 ${
-                selectedOption === correctAnswer
-                  ? "border-emerald-200 bg-emerald-50"
-                  : "border-amber-200 bg-amber-50"
-              }`}
-            >
-              <h2
-                className={`font-extrabold ${
-                  selectedOption === correctAnswer
-                    ? "text-emerald-800"
-                    : "text-amber-900"
-                }`}
-              >
-                {selectedOption === correctAnswer ? "Benar!" : "Belum tepat"}
-              </h2>
-              <p className="mt-2 leading-relaxed text-slate-700">
-                {item.payload.explanation}
-              </p>
-              {item.payload.sources.length > 0 && (
-                <ul className="mt-4 space-y-2 border-t border-slate-200/80 pt-4 text-sm">
-                  {item.payload.sources.map((source, sourceIndex) => (
-                    <li key={`${source.citation}-${sourceIndex}`}>
-                      {source.url ? (
-                        <a
-                          className="font-semibold text-emerald-800 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-950"
-                          href={source.url}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          {source.citation}
-                        </a>
-                      ) : (
-                        <span className="text-slate-600">{source.citation}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {submitError && (
-                <p className="mt-4 text-sm font-semibold text-red-700" role="alert">
-                  {submitError}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="mt-8 border-t border-slate-100 pt-6">
-            {!isRevealed ? (
-              <button
-                className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 text-base font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
-                disabled={
-                  loading
-                  || (item.payload.type === "essay"
-                    ? !essayAnswer.trim()
-                    : selectedOption === null)
-                }
-                onClick={item.payload.type === "essay" ? handleEssaySubmit : handleSubmit}
-                type="button"
-              >
-                {item.payload.type === "essay" ? "Kirim Esai" : "Kirim Jawaban"}
-              </button>
-            ) : (
-              <button
-                className="min-h-14 w-full rounded-2xl bg-emerald-600 px-6 text-base font-extrabold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-wait disabled:bg-emerald-400"
-                disabled={loading}
-                onClick={handleNext}
-                type="button"
-              >
-                {loading ? "Menyimpan jawaban..." : "Lanjut"}
-              </button>
-            )}
           </div>
-        </section>
-      </div>
+
+          <aside className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/20 backdrop-blur sm:p-8">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-300">
+              Bertumbuh bersama
+            </p>
+            <h2 className="mt-4 text-2xl font-extrabold leading-snug sm:text-3xl">
+              Warga berdaya. Ruang publik terjaga.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              Belajar, bergerak, dan saling mengawasi—dalam satu perjalanan
+              partisipasi yang transparan.
+            </p>
+            <div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6">
+              {[
+                { label: "Belajar", icon: "01" },
+                { label: "Bergerak", icon: "02" },
+                { label: "Mengawasi", icon: "03" },
+              ].map(({ label, icon }) => (
+                <div className="text-center" key={label}>
+                  <span className="mx-auto flex size-10 items-center justify-center rounded-xl bg-emerald-400/15 text-sm font-black text-emerald-300">
+                    {icon}
+                  </span>
+                  <p className="mt-2 text-xs font-semibold text-slate-300 sm:text-sm">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-20 sm:px-8 sm:py-24">
+        <div className="max-w-2xl">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">
+            Mulai dari sini
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+            Tiga langkah untuk ikut berperan
+          </h2>
+          <p className="mt-4 text-lg leading-7 text-slate-600">
+            Perjalanan sederhana untuk membangun kapasitas dan menjaga ruang
+            publik bersama.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {steps.map((step) => (
+            <article
+              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-950/5 sm:p-7"
+              key={step.number}
+            >
+              <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-sm font-black text-emerald-800">
+                {step.number}
+              </span>
+              <h3 className="mt-5 text-xl font-extrabold text-slate-950">{step.title}</h3>
+              <p className="mt-3 min-h-14 leading-6 text-slate-600">{step.description}</p>
+              <Link
+                className="mt-5 inline-flex items-center font-bold text-emerald-800 transition group-hover:text-emerald-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-600"
+                href={step.href}
+              >
+                {step.linkLabel}
+                <span aria-hidden="true" className="ml-2">→</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-8 sm:py-24">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">
+                Satu ruang, banyak cara berkontribusi
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                Kenali fitur PARTAI
+              </h2>
+            </div>
+            <p className="max-w-lg leading-6 text-slate-600">
+              Pilih langkah yang sesuai untuk mulai belajar dan terlibat dalam
+              kehidupan publik.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature) => {
+              const content = (
+                <>
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="inline-flex size-11 items-center justify-center rounded-xl bg-emerald-50 text-sm font-black text-emerald-800">
+                      {feature.number}
+                    </span>
+                    {!feature.href && (
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                        Segera hadir
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-5 text-lg font-extrabold text-slate-950">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 min-h-12 text-sm leading-6 text-slate-600">
+                    {feature.description}
+                  </p>
+                  {feature.href && feature.linkLabel && (
+                    <span className="mt-5 inline-flex items-center text-sm font-bold text-emerald-800">
+                      {feature.linkLabel}
+                      <span aria-hidden="true" className="ml-2">→</span>
+                    </span>
+                  )}
+                </>
+              );
+
+              return feature.href ? (
+                <Link
+                  className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-950/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                  href={feature.href}
+                  key={feature.number}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <article
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                  key={feature.number}
+                >
+                  {content}
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <footer className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <p className="font-bold tracking-[0.12em] text-emerald-800">PARTAI</p>
+        <p>Edukasi kewargaan dan pengawasan publik, bersama warga.</p>
+      </footer>
     </main>
   );
 }

@@ -103,9 +103,9 @@ export default function ReviewPage() {
           </div>
           <Link
             className="text-sm font-bold text-emerald-700 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-900"
-            href="/"
+            href="/belajar"
           >
-            Kembali ke kuis
+            Kembali ke belajar
           </Link>
         </header>
 
