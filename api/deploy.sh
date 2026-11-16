@@ -4,7 +4,8 @@ set -euo pipefail
 echo "🚀 Memulai deployment Partai API..."
 
 cd /var/www/thortech/partai
-git pull origin main
+git fetch origin
+git reset --hard origin/main
 
 cd api
 composer install --no-dev --optimize-autoloader
