@@ -93,6 +93,12 @@ export default function Home() {
               >
                 Jelajahi Aksi Lapangan
               </Link>
+              <Link
+                className="inline-flex min-h-14 items-center justify-center rounded-xl border border-primary/20 px-7 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                href="/manifesto"
+              >
+                Baca Manifesto
+              </Link>
             </div>
           </div>
 
