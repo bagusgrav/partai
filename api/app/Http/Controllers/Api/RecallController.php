@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\RecallRequest;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -83,31 +85,24 @@ class RecallController extends Controller
 
     public function active(Request $request): JsonResponse
     {
-        $recalls = DB::table('recall_requests')
-            ->join('users as targets', 'recall_requests.target_user_id', '=', 'targets.id')
-            ->where('recall_requests.status', 'voting')
-            ->orderBy('recall_requests.created_at')
+        $recalls = RecallRequest::query()
+            ->with('target:id,name')
+            ->withCount([
+                'votes as agree_count' => fn (Builder $query) => $query->where('vote', true),
+                'votes as reject_count' => fn (Builder $query) => $query->where('vote', false),
+            ])
+            ->where('status', 'voting')
+            ->orderBy('created_at')
             ->get([
-                'recall_requests.id',
-                'recall_requests.target_user_id',
-                'targets.name as target_name',
-                'recall_requests.reason',
-                'recall_requests.evidence_url',
-                'recall_requests.created_at',
+                'id',
+                'target_user_id',
+                'reason',
+                'evidence_url',
+                'created_at',
             ]);
 
         $recallIds = $recalls->pluck('id');
         $activeMemberCount = $this->activeMemberCount();
-        $voteCounts = DB::table('recall_votes')
-            ->select([
-                'recall_request_id',
-                DB::raw('SUM(CASE WHEN vote = 1 THEN 1 ELSE 0 END) as agree_count'),
-                DB::raw('SUM(CASE WHEN vote = 0 THEN 1 ELSE 0 END) as reject_count'),
-            ])
-            ->whereIn('recall_request_id', $recallIds)
-            ->groupBy('recall_request_id')
-            ->get()
-            ->keyBy('recall_request_id');
         $userVotes = DB::table('recall_votes')
             ->where('user_id', $request->user()->getAuthIdentifier())
             ->whereIn('recall_request_id', $recallIds)
@@ -117,21 +112,18 @@ class RecallController extends Controller
         return response()->json([
             'recalls' => $recalls->map(function (object $recall) use (
                 $activeMemberCount,
-                $voteCounts,
                 $userVotes,
             ): array {
-                $counts = $voteCounts->get($recall->id);
-
                 return [
                     'id' => $recall->id,
                     'target_user_id' => $recall->target_user_id,
-                    'target_name' => $recall->target_name,
+                    'target_name' => $recall->target->name,
                     'reason' => $recall->reason,
                     'evidence_url' => $recall->evidence_url,
                     'created_at' => $recall->created_at,
                     'status' => 'voting',
-                    'agree_count' => (int) ($counts->agree_count ?? 0),
-                    'reject_count' => (int) ($counts->reject_count ?? 0),
+                    'agree_count' => (int) $recall->agree_count,
+                    'reject_count' => (int) $recall->reject_count,
                     'active_member_count' => $activeMemberCount,
                     'votes_required' => $this->requiredVotes($activeMemberCount),
                     'has_voted' => in_array($recall->id, $userVotes, true),

@@ -1,19 +1,19 @@
 import Link from "next/link";
 
-const steps = [
+const pillars = [
   {
     number: "01",
     title: "Belajar Harian",
     description: "Selesaikan kuis untuk membangun kapasitas dan pemahaman kewargaan.",
     href: "/belajar",
-    linkLabel: "Mulai belajar",
+    linkLabel: "Mulai Kuis",
   },
   {
     number: "02",
-    title: "Aksi Lapangan",
-    description: "Klaim kehadiran Anda di lokasi aksi damai dan bergerak bersama.",
+    title: "Gerak Warga",
+    description: "Klaim kehadiran Anda di aksi kewargaan dan bergerak bersama.",
     href: "/events",
-    linkLabel: "Lihat aksi",
+    linkLabel: "Lihat Aksi",
   },
   {
     number: "03",
@@ -22,34 +22,13 @@ const steps = [
     href: "/review",
     linkLabel: "Buka Juri Warga",
   },
-];
-
-const features = [
-  {
-    number: "01",
-    title: "Belajar",
-    description: "Asah wawasan kewargaan melalui kuis dan latihan esai.",
-    href: "/belajar",
-    linkLabel: "Jelajahi materi",
-  },
-  {
-    number: "02",
-    title: "Aksi",
-    description: "Temukan kegiatan dan catat partisipasi di lapangan.",
-    href: "/events",
-    linkLabel: "Lihat kegiatan",
-  },
-  {
-    number: "03",
-    title: "Juri Warga",
-    description: "Bantu menjaga kepercayaan melalui peninjauan bersama.",
-    href: "/review",
-    linkLabel: "Ikut meninjau",
-  },
   {
     number: "04",
-    title: "Pengawasan Data",
-    description: "Ruang untuk transparansi dan pengawasan data publik.",
+    title: "Kawal Anggaran",
+    description:
+      "Pantau data kesejahteraan, jemput hak bansos, dan awasi kebocoran anggaran publik.",
+    href: "/data",
+    linkLabel: "Buka Data Publik",
   },
 ];
 
@@ -75,23 +54,23 @@ export default function LandingPage() {
               Aku <span className="text-primary">Hadir.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-text-muted sm:text-xl">
-              Bersama membangun kapasitas warga dan mengawasi kepentingan publik
-              melalui edukasi kewargaan yang terbuka, aksi nyata, dan validasi
-              bersama.
+              Bersama membangun kapasitas warga, mengawasi anggaran publik, dan
+              menjemput hak rakyat melalui edukasi kewargaan yang terbuka dan
+              validasi bersama.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 className="inline-flex min-h-14 w-full items-center justify-center rounded-md bg-primary px-4 py-4 text-base font-extrabold text-surface shadow-lg shadow-primary/20 transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
                 href="/belajar"
               >
-                Mulai Belajar Sekarang
+                Uji Kapasitasmu
                 <span aria-hidden="true" className="ml-2">→</span>
               </Link>
               <Link
                 className="inline-flex min-h-14 w-full items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
                 href="/events"
               >
-                Jelajahi Aksi Lapangan
+                Gerak Warga
               </Link>
               <Link
                 className="inline-flex min-h-14 w-full items-center justify-center rounded-md border border-primary/20 px-4 py-4 text-base font-bold text-primary-hover transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
@@ -110,7 +89,7 @@ export default function LandingPage() {
               Warga berdaya. Ruang publik terjaga.
             </h2>
             <p className="mt-4 leading-7 text-text-muted">
-              Belajar, bergerak, dan saling mengawasi—dalam satu perjalanan
+              Belajar, bergerak, dan saling mengawasi dalam satu perjalanan
               partisipasi yang transparan.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-3 border-t border-background pt-6">
@@ -139,29 +118,32 @@ export default function LandingPage() {
             Mulai dari sini
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-text-main sm:text-4xl">
-            Tiga langkah untuk ikut berperan
+            Empat pilar untuk ikut berperan
           </h2>
           <p className="mt-4 text-lg leading-7 text-text-muted">
-            Perjalanan sederhana untuk membangun kapasitas dan menjaga ruang
-            publik bersama.
+            Belajar, bergerak, memvalidasi, dan mengawal anggaran bersama warga.
           </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {steps.map((step) => (
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {pillars.map((pillar) => (
             <article
-              className="group rounded-2xl border border-background bg-surface p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary-light hover:shadow-lg hover:shadow-primary/5 sm:p-7"
-              key={step.number}
+              className="group flex h-full flex-col rounded-2xl border border-background bg-surface p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary-light hover:shadow-lg hover:shadow-primary/5 sm:p-7"
+              key={pillar.number}
             >
               <span className="inline-flex size-12 items-center justify-center rounded-2xl bg-primary-light text-sm font-black text-primary-hover">
-                {step.number}
+                {pillar.number}
               </span>
-              <h3 className="mt-5 text-xl font-extrabold text-text-main">{step.title}</h3>
-              <p className="mt-3 min-h-14 leading-6 text-text-muted">{step.description}</p>
+              <h3 className="mt-5 text-xl font-extrabold text-text-main">
+                {pillar.title}
+              </h3>
+              <p className="mt-3 flex-1 leading-6 text-text-muted">
+                {pillar.description}
+              </p>
               <Link
                 className="mt-5 inline-flex items-center font-bold text-primary-hover transition group-hover:text-primary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                href={step.href}
+                href={pillar.href}
               >
-                {step.linkLabel}
+                {pillar.linkLabel}
                 <span aria-hidden="true" className="ml-2">→</span>
               </Link>
             </article>
@@ -169,69 +151,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-y border-background bg-surface">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-8 sm:py-24">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-primary-hover">
-                Satu ruang, banyak cara berkontribusi
-              </p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight text-text-main sm:text-4xl">
-                Kenali fitur PARTAI
-              </h2>
-            </div>
-            <p className="max-w-lg leading-6 text-text-muted">
-              Pilih langkah yang sesuai untuk mulai belajar dan terlibat dalam
-              kehidupan publik.
-            </p>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-            {features.map((feature) => {
-              const content = (
-                <>
-                  <div className="flex items-start justify-between gap-4">
-                    <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary-light text-sm font-black text-primary-hover">
-                      {feature.number}
-                    </span>
-                    {!feature.href && (
-                      <span className="rounded-full bg-background px-3 py-1 text-xs font-bold text-text-muted">
-                        Segera hadir
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-5 text-lg font-extrabold text-text-main">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 min-h-12 text-sm leading-6 text-text-muted">
-                    {feature.description}
-                  </p>
-                  {feature.href && feature.linkLabel && (
-                    <span className="mt-5 inline-flex items-center text-sm font-bold text-primary-hover">
-                      {feature.linkLabel}
-                      <span aria-hidden="true" className="ml-2">→</span>
-                    </span>
-                  )}
-                </>
-              );
-
-              return feature.href ? (
-                <Link
-                  className="rounded-2xl border border-background bg-surface p-5 transition hover:-translate-y-1 hover:border-primary-light hover:shadow-lg hover:shadow-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  href={feature.href}
-                  key={feature.number}
-                >
-                  {content}
-                </Link>
-              ) : (
-                <article
-                  className="rounded-2xl border border-background bg-background p-5"
-                  key={feature.number}
-                >
-                  {content}
-                </article>
-              );
-            })}
-          </div>
+      <section className="border-y border-primary/10 bg-primary-light">
+        <div className="mx-auto max-w-7xl px-6 py-8 sm:px-8">
+          <p className="text-center text-base font-semibold leading-7 text-primary-hover sm:text-lg">
+            Kami percaya transparansi adalah pondasi. Setiap rupiah dan data
+            dapat diaudit oleh publik.
+          </p>
         </div>
       </section>
 

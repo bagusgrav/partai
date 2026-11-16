@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import NavbarRegistrationCTA from "@/components/NavbarRegistrationCTA";
 
@@ -8,14 +8,16 @@ const links = [
   { href: "/", label: "Beranda" },
   { href: "/belajar", label: "Belajar" },
   { href: "/review", label: "Juri Warga" },
-  { href: "/events", label: "Aksi Lapangan" },
+  { href: "/events", label: "Gerak Warga" },
   { href: "/manifesto", label: "Manifesto" },
   { href: "/panduan", label: "Panduan" },
 ];
 
 const groupedLinks = {
-  "Data & Info": [
+  "Transparansi Data": [
     { href: "/data", label: "Data Publik" },
+    { href: "/jemput-hak", label: "Jemput Hak" },
+    { href: "/kontrak-faksi", label: "Kontrak Faksi" },
     { href: "/info", label: "Info Indonesia" },
   ],
   Partisipasi: [
@@ -83,16 +85,12 @@ export default function Navbar() {
           ))}
         </div>
         <div className="hidden flex-wrap items-center gap-2 md:flex">
-          <Suspense fallback={null}>
-            <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
-          </Suspense>
+          <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
           <a
             className="whitespace-nowrap rounded-md border border-primary bg-transparent px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-            href="https://api.akuhadir.my.id/admin"
-            rel="noopener noreferrer"
-            target="_blank"
+            href="https://id.akuhadir.my.id"
           >
-            Masuk Pengurus
+            Masuk
           </a>
         </div>
         {isMobileMenuOpen && (
@@ -132,16 +130,12 @@ export default function Navbar() {
               ))}
             </div>
             <div className="mt-2 flex flex-col gap-2 border-t border-background pt-3">
-              <Suspense fallback={null}>
-                <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
-              </Suspense>
+              <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
               <a
                 className="rounded-md border border-primary px-4 py-3 text-center text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                href="https://api.akuhadir.my.id/admin"
-                rel="noopener noreferrer"
-                target="_blank"
+                href="https://id.akuhadir.my.id"
               >
-                Masuk Pengurus
+                Masuk
               </a>
             </div>
           </div>

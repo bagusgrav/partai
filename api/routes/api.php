@@ -5,9 +5,11 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EconomicController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SocialAssistanceController;
 use App\Http\Controllers\Api\SortitionController;
 use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
@@ -43,6 +45,14 @@ Route::get('/economic/summary', [EconomicController::class, 'summary']);
 Route::get('/economic/history/{type}', [EconomicController::class, 'history']);
 Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
 Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet']);
+Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
+    ->middleware('throttle:10,1');
+Route::get('/contracts', [FactionContractController::class, 'index']);
+
+Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {
+    Route::post('/contracts', [FactionContractController::class, 'store']);
+    Route::patch('/contracts/{contract}', [FactionContractController::class, 'update']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/events', [EventController::class, 'store']);

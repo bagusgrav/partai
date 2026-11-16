@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
@@ -22,6 +23,11 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Data Anggota';
 
     protected static ?string $pluralModelLabel = 'Data Anggota';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -42,7 +48,17 @@ class UserResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
     }
 
     public static function table(Table $table): Table

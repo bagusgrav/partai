@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ItemResource extends Resource
 {
@@ -25,6 +26,31 @@ class ItemResource extends Resource
     protected static ?string $modelLabel = 'Bank Soal';
 
     protected static ?string $pluralModelLabel = 'Bank Soal';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'pengurus']) ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'pengurus']) ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'pengurus']) ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
 
     public static function form(Form $form): Form
     {

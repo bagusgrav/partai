@@ -9,6 +9,7 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class ItemResourceTest extends TestCase
@@ -20,9 +21,11 @@ class ItemResourceTest extends TestCase
         parent::setUp();
 
         Filament::setCurrentPanel(Filament::getPanel('admin'));
-        $this->actingAs(User::factory()->create([
+        $user = User::factory()->create([
             'email' => 'admin@partai.id',
-        ]));
+        ]);
+        $user->assignRole(Role::create(['name' => 'super_admin', 'guard_name' => 'web']));
+        $this->actingAs($user);
     }
 
     public function test_item_creation_stores_payload_from_the_structured_form(): void
