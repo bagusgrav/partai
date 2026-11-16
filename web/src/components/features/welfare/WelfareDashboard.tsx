@@ -191,9 +191,8 @@ export default function WelfareDashboard() {
           </table>
         </div>
         <p className="border-t border-slate-100 px-5 py-4 text-xs leading-5 text-text-muted sm:px-6">
-          Data yang ditampilkan saat ini adalah data simulasi untuk demonstrasi,
-          bukan data resmi real-time. Nilai kemiskinan dan stunting menggunakan
-          tahun 2023; data bencana mengikuti tahun berjalan.
+          Data diperbarui otomatis melalui pipeline API BPS dan BNPB. Jika API
+          key belum dikonfigurasi, dasbor menampilkan data simulasi.
         </p>
       </section>
     </main>
