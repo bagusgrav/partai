@@ -1,0 +1,14 @@
+id: KEU-KENALI-004
+domain: keuangan-negara
+level: kenali
+type: multiple-choice
+question: Dalam bentuk hukum apa APBN ditetapkan setiap tahun menurut Pasal 23 ayat (1) UUD 1945?
+options:
+  - Undang-undang
+  - Peraturan Pemerintah
+  - Peraturan Presiden
+  - Peraturan Menteri Keuangan
+answer: 0
+explanation: Pasal 23 ayat (1) UUD 1945 menyatakan bahwa APBN sebagai wujud pengelolaan keuangan negara ditetapkan setiap tahun dengan undang-undang. Ketentuan ini memberikan dasar hukum dan proses persetujuan legislatif bagi anggaran negara.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23 ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: ALS-KENALI-009
+domain: alasan-bernegara
+level: pahami
+type: multiple-choice
+question: Mengapa kewenangan mengaudit pengelolaan dan tanggung jawab keuangan negara diberikan kepada badan yang bebas dan mandiri?
+options:
+  - Agar pemeriksaan dapat berlangsung secara independen dan hasilnya mendukung pertanggungjawaban publik
+  - Agar BPK dapat menetapkan sendiri kebijakan anggaran yang diperiksanya
+  - Agar pemeriksaan keuangan tidak memerlukan tindak lanjut lembaga perwakilan
+  - Agar setiap temuan pemeriksaan langsung menjadi putusan pidana
+answer: 0
+explanation: Pasal 23E UUD 1945 membentuk Badan Pemeriksa Keuangan yang bebas dan mandiri untuk memeriksa pengelolaan dan tanggung jawab keuangan negara. Independensi pemeriksaan membantu menghasilkan pengawasan yang tidak dikendalikan oleh pihak yang diperiksa, tetapi temuan audit tidak dengan sendirinya menetapkan kesalahan pidana.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23E ayat (1) dan ayat (2). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

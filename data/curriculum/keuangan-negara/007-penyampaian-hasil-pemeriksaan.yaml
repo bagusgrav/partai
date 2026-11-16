@@ -1,0 +1,14 @@
+id: KEU-KENALI-007
+domain: keuangan-negara
+level: pahami
+type: multiple-choice
+question: Kepada siapa hasil pemeriksaan keuangan negara oleh BPK diserahkan menurut Pasal 23E ayat (2) UUD 1945?
+options:
+  - DPR, DPD, dan DPRD sesuai dengan kewenangannya
+  - Presiden dan DPR untuk ditetapkan sebagai undang-undang
+  - DPR dan Presiden tanpa melibatkan lembaga perwakilan daerah
+  - Menteri keuangan untuk disahkan sebagai laporan pertanggungjawaban
+answer: 0
+explanation: Pasal 23E ayat (2) UUD 1945 mengatur bahwa hasil pemeriksaan keuangan negara diserahkan kepada DPR, DPD, dan DPRD sesuai dengan kewenangannya. Penyerahan ini membantu lembaga perwakilan menjalankan fungsi pengawasan dan tindak lanjut sesuai lingkup masing-masing.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23E ayat (2) dan ayat (3). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

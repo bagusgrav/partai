@@ -1,0 +1,14 @@
+id: HUK-KENALI-020
+domain: hukum
+level: pahami
+type: multiple-choice
+question: Jika sebuah peraturan di bawah undang-undang diduga bertentangan dengan undang-undang, jalur pengujian yang sesuai dengan UUD 1945 adalah melalui lembaga mana?
+options:
+  - Mahkamah Agung
+  - Mahkamah Konstitusi
+  - Pengadilan Tata Usaha Negara
+  - Dewan Perwakilan Rakyat
+answer: 0
+explanation: Pasal 24A ayat (1) UUD 1945 memberi Mahkamah Agung kewenangan menguji peraturan perundang-undangan di bawah undang-undang terhadap undang-undang. Mahkamah Konstitusi menguji undang-undang terhadap UUD, bukan peraturan yang lebih rendah terhadap undang-undang.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24A ayat (1) dan Pasal 24C ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: ALS-KENALI-004
+domain: alasan-bernegara
+level: kenali
+type: multiple-choice
+question: Di bagian mana rumusan Pancasila sebagai dasar negara tercantum dalam Pembukaan UUD 1945?
+options:
+  - Dalam rumusan alinea pertama
+  - Dalam rumusan alinea keempat
+  - Dalam Pasal 1 ayat (1) sebagai penjelasan bentuk negara
+  - Dalam aturan peralihan UUD 1945
+answer: 1
+explanation: Rumusan Pancasila tercantum dalam alinea keempat Pembukaan UUD 1945, pada bagian yang memuat dasar negara. Pembukaan tersebut juga menyatakan tujuan pembentukan pemerintahan dan prinsip-prinsip penyelenggaraan negara.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pembukaan alinea keempat. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: POL-KENALI-019
+domain: politik-bernegara
+level: pahami
+type: multiple-choice
+question: Lembaga mana yang mengusulkan pemberhentian Presiden atau Wakil Presiden kepada MPR setelah ada proses konstitusional dan putusan Mahkamah Konstitusi?
+options:
+  - DPR
+  - Mahkamah Konstitusi
+  - MPR
+  - Presiden
+answer: 0
+explanation: Pasal 7A dan Pasal 7B UUD 1945 mengatur tahapan pemberhentian Presiden atau Wakil Presiden, termasuk pendapat DPR, pemeriksaan oleh Mahkamah Konstitusi, dan keputusan MPR. DPR menyampaikan usul kepada MPR setelah Mahkamah Konstitusi memutus pendapat DPR terbukti, sehingga prosesnya tidak dapat dilakukan sepihak.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 7A dan Pasal 7B. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

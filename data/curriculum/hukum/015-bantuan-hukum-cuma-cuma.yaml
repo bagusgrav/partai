@@ -1,0 +1,14 @@
+id: HUK-KENALI-015
+domain: hukum
+level: kenali
+type: multiple-choice
+question: Prinsip apa yang dijamin UU Nomor 16 Tahun 2011 bagi penerima bantuan hukum yang memenuhi syarat?
+options:
+  - Bantuan hukum diberikan secara cuma-cuma oleh pemberi bantuan hukum yang memenuhi ketentuan
+  - Bantuan hukum dapat diberikan secara cuma-cuma hanya setelah perkara diputus
+  - Bantuan hukum diberikan oleh pemberi bantuan hukum dengan biaya yang ditentukan pengadilan
+  - Bantuan hukum diberikan tanpa biaya, tetapi hanya dalam perkara pidana
+answer: 0
+explanation: UU Nomor 16 Tahun 2011 tentang Bantuan Hukum mengatur pemberian bantuan hukum secara cuma-cuma kepada penerima bantuan hukum yang memenuhi persyaratan. Pelayanan tersebut dilakukan oleh pemberi bantuan hukum yang memenuhi ketentuan undang-undang, bukan semata-mata oleh pejabat yang menangani perkara.
+sources:
+  - citation: "Undang-Undang Nomor 16 Tahun 2011 tentang Bantuan Hukum, Pasal 1 dan Pasal 4. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Nomor%2016%20Tahun%202011%20Bantuan%20Hukum"

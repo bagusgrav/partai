@@ -1,0 +1,14 @@
+id: POL-KENALI-017
+domain: politik-bernegara
+level: pahami
+type: multiple-choice
+question: Berapa lama masa jabatan Presiden dan Wakil Presiden menurut Pasal 7 UUD 1945, dan berapa kali mereka dapat dipilih kembali?
+options:
+  - Lima tahun dan dapat dipilih kembali hanya untuk satu kali masa jabatan
+  - Lima tahun dan dapat dipilih kembali untuk dua masa jabatan
+  - Empat tahun dan dapat dipilih kembali untuk satu masa jabatan
+  - Enam tahun dan tidak dapat dipilih kembali
+answer: 0
+explanation: Pasal 7 UUD 1945 menetapkan masa jabatan Presiden dan Wakil Presiden selama lima tahun dan sesudahnya dapat dipilih kembali dalam jabatan yang sama hanya untuk satu kali masa jabatan. Pembatasan ini menjaga pergantian kepemimpinan dan membatasi konsentrasi kekuasaan.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 7. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

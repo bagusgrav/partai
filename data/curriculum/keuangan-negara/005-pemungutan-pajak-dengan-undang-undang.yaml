@@ -1,0 +1,14 @@
+id: KEU-KENALI-005
+domain: keuangan-negara
+level: pahami
+type: multiple-choice
+question: Apa makna Pasal 23A UUD 1945 bagi pemungutan pajak dan pungutan lain yang bersifat memaksa?
+options:
+  - Pemungutannya harus diatur dengan undang-undang
+  - Pemungutannya dapat ditetapkan hanya dengan peraturan menteri
+  - Pemungutannya dapat ditentukan oleh pemerintah daerah tanpa dasar undang-undang
+  - Pemungutannya dapat dilakukan berdasarkan keputusan pejabat untuk kebutuhan mendesak
+answer: 0
+explanation: Pasal 23A UUD 1945 menyatakan bahwa pajak dan pungutan lain yang bersifat memaksa untuk keperluan negara diatur dengan undang-undang. Dasar hukum ini membatasi pemungutan agar kewajiban publik tidak dibuat secara sewenang-wenang oleh pejabat.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23A. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: KEU-KENALI-003
+domain: keuangan-negara
+level: pahami
+type: multiple-choice
+question: Bagaimana rancangan APBN dibahas menurut Pasal 23 ayat (2) UUD 1945?
+options:
+  - Presiden mengajukan rancangan APBN untuk dibahas bersama DPR dengan memperhatikan pertimbangan DPD
+  - Presiden dan DPD membahas serta mengesahkan rancangan APBN tanpa DPR
+  - DPR mengajukan rancangan APBN untuk disahkan oleh Mahkamah Agung
+  - Presiden mengajukan rancangan APBN untuk dibahas oleh DPR tanpa pertimbangan DPD
+answer: 0
+explanation: Pasal 23 ayat (2) UUD 1945 menetapkan bahwa rancangan undang-undang APBN diajukan oleh Presiden untuk dibahas bersama DPR dengan memperhatikan pertimbangan DPD. Proses tersebut mencerminkan pembagian peran konstitusional dalam penyusunan anggaran negara.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23 ayat (2). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

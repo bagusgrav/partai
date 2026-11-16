@@ -1,0 +1,14 @@
+id: KEU-KENALI-002
+domain: keuangan-negara
+level: kenali
+type: multiple-choice
+question: Berapa lama masa satu tahun anggaran menurut UU Nomor 17 Tahun 2003 tentang Keuangan Negara?
+options:
+  - Satu tahun kalender, dari 1 Januari sampai 31 Desember
+  - Dua belas bulan yang dimulai pada tanggal pengesahan APBN
+  - Dua belas bulan dari 1 April sampai 31 Maret tahun berikutnya
+  - Mengikuti masa jabatan Presiden yang sedang menyusun APBN
+answer: 0
+explanation: Pasal 4 UU Nomor 17 Tahun 2003 menetapkan bahwa tahun anggaran meliputi masa satu tahun, yaitu dari tanggal 1 Januari sampai dengan 31 Desember. Dengan demikian, tahun anggaran tidak mengikuti tanggal pengesahan APBN atau masa jabatan pejabat.
+sources:
+  - citation: "Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara, Pasal 4. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Nomor%2017%20Tahun%202003%20Keuangan%20Negara"

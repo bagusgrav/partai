@@ -1,0 +1,14 @@
+id: KEU-KENALI-001
+domain: keuangan-negara
+level: kenali
+type: multiple-choice
+question: Menurut UU Nomor 17 Tahun 2003, unsur apa yang termasuk dalam pengertian keuangan negara?
+options:
+  - Hak dan kewajiban negara yang dapat dinilai dengan uang serta uang atau barang yang dapat menjadi milik negara terkait pelaksanaannya
+  - Hanya penerimaan dan belanja yang tercantum dalam APBN pemerintah pusat
+  - Hanya uang atau barang milik pemerintah daerah yang dibeli pada tahun berjalan
+  - Seluruh aset badan usaha swasta yang menerima kontrak pemerintah
+answer: 0
+explanation: UU Nomor 17 Tahun 2003 mendefinisikan keuangan negara secara luas, mencakup hak dan kewajiban negara yang dapat dinilai dengan uang serta uang atau barang yang dapat menjadi milik negara. Karena itu, ruang lingkupnya tidak terbatas pada uang tunai atau penerimaan pajak saja.
+sources:
+  - citation: "Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara, Pasal 1 angka 1. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Nomor%2017%20Tahun%202003%20Keuangan%20Negara"

@@ -1,0 +1,14 @@
+id: POL-KENALI-011
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Lembaga perwakilan apa yang membawa aspirasi daerah ke tingkat nasional dan dapat mengajukan rancangan undang-undang tertentu terkait daerah?
+options:
+  - Dewan Perwakilan Daerah
+  - Dewan Perwakilan Rakyat
+  - Majelis Permusyawaratan Rakyat
+  - Dewan Perwakilan Rakyat Daerah
+answer: 0
+explanation: Pasal 22C dan Pasal 22D UUD 1945 mengatur pembentukan DPD yang dipilih dari setiap provinsi dan kewenangannya mengajukan serta ikut membahas rancangan undang-undang tertentu yang berkaitan dengan daerah. DPD berbeda dari DPR yang mewakili rakyat melalui partai politik.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 22C dan Pasal 22D ayat (1)–(2). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

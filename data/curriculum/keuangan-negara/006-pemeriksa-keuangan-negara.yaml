@@ -1,0 +1,14 @@
+id: KEU-KENALI-006
+domain: keuangan-negara
+level: kenali
+type: multiple-choice
+question: Lembaga negara apa yang menurut Pasal 23E UUD 1945 memeriksa pengelolaan dan tanggung jawab keuangan negara?
+options:
+  - Badan Pemeriksa Keuangan
+  - Badan Pengawasan Keuangan dan Pembangunan
+  - Inspektorat Jenderal pada kementerian terkait
+  - Dewan Perwakilan Rakyat
+answer: 0
+explanation: Pasal 23E ayat (1) UUD 1945 menetapkan Badan Pemeriksa Keuangan (BPK) sebagai lembaga yang bebas dan mandiri untuk memeriksa pengelolaan dan tanggung jawab keuangan negara. BPK bukan lembaga yang menetapkan APBN atau menjalankan belanja kementerian.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23E ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

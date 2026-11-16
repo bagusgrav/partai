@@ -1,0 +1,14 @@
+id: KEU-KENALI-010
+domain: keuangan-negara
+level: pahami
+type: multiple-choice
+question: Asas apa yang diwajibkan UU Nomor 17 Tahun 2003 dalam pengelolaan keuangan negara?
+options:
+  - Tertib, taat pada peraturan perundang-undangan, efisien, ekonomis, efektif, transparan, dan bertanggung jawab
+  - Tertib dan taat aturan, tetapi tidak perlu transparan selama belanja disetujui pejabat
+  - Efisien dan ekonomis, tetapi pertanggungjawaban cukup disampaikan secara internal
+  - Efektif dan transparan, tetapi tidak perlu mempertimbangkan kepatutan dan keadilan
+answer: 0
+explanation: Pasal 3 ayat (1) UU Nomor 17 Tahun 2003 mewajibkan keuangan negara dikelola secara tertib, taat aturan, efisien, ekonomis, efektif, transparan, dan bertanggung jawab. Pengelolaan tersebut juga memperhatikan rasa keadilan dan kepatutan sehingga penggunaan anggaran dapat diawasi publik.
+sources:
+  - citation: "Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara, Pasal 3 ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Nomor%2017%20Tahun%202003%20Keuangan%20Negara"

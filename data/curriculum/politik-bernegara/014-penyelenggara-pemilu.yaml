@@ -1,0 +1,14 @@
+id: POL-KENALI-014
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Apa prinsip yang diwajibkan Pasal 22E ayat (5) UUD 1945 bagi penyelenggara pemilihan umum?
+options:
+  - Bersifat nasional, tetap, dan mandiri
+  - Bersifat nasional dan tetap, tetapi bertanggung jawab kepada peserta pemilu
+  - Bersifat mandiri, tetapi dibentuk secara ad hoc pada setiap daerah
+  - Bersifat tetap dan mandiri, tetapi kewenangannya hanya mencakup pemilu Presiden
+answer: 0
+explanation: Pasal 22E ayat (5) UUD 1945 menyatakan bahwa pemilihan umum diselenggarakan oleh suatu komisi pemilihan umum yang bersifat nasional, tetap, dan mandiri. Prinsip tersebut dirancang untuk menjaga penyelenggaraan pemilu agar tidak dikendalikan oleh peserta tertentu.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 22E ayat (5). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

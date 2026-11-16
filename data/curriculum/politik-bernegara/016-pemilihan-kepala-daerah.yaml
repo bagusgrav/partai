@@ -1,0 +1,14 @@
+id: POL-KENALI-016
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Prinsip apa yang digunakan UUD 1945 untuk pemilihan gubernur, bupati, dan wali kota sebagai kepala pemerintahan daerah?
+options:
+  - Dipilih secara demokratis
+  - Diangkat oleh Presiden setelah berkonsultasi dengan DPRD
+  - Dipilih oleh DPR untuk mewakili seluruh daerah
+  - Ditunjuk oleh pemerintah pusat berdasarkan hasil pemilihan legislatif
+answer: 0
+explanation: Pasal 18 ayat (4) UUD 1945 menyatakan bahwa gubernur, bupati, dan wali kota masing-masing sebagai kepala pemerintah daerah dipilih secara demokratis. Ketentuan konstitusi ini menjadi dasar bagi pengaturan lebih lanjut dalam undang-undang.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 18 ayat (4). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

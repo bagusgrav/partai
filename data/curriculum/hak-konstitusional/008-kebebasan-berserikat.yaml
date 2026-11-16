@@ -1,0 +1,14 @@
+id: HAK-KENALI-008
+domain: hak-konstitusional
+level: kenali
+type: multiple-choice
+question: Kebebasan apa yang dijamin kepada setiap orang dalam Pasal 28E ayat (3) UUD 1945?
+options:
+  - Kebebasan berserikat, berkumpul, dan mengeluarkan pendapat
+  - Kebebasan memeluk agama dan beribadat menurut agama yang dipilih
+  - Kebebasan memilih pendidikan dan pengajaran
+  - Kebebasan memperoleh pekerjaan dan penghidupan yang layak
+answer: 0
+explanation: Pasal 28E ayat (3) UUD 1945 menjamin kebebasan berserikat, berkumpul, dan mengeluarkan pendapat. Pelaksanaan kebebasan tersebut tetap harus menghormati hak orang lain dan tunduk pada pembatasan yang ditetapkan secara sah menurut Pasal 28J.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 28E ayat (3) dan Pasal 28J. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

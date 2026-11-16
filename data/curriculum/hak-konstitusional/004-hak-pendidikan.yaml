@@ -1,0 +1,14 @@
+id: HAK-KENALI-004
+domain: hak-konstitusional
+level: kenali
+type: multiple-choice
+question: Apa hak setiap warga negara yang disebut dalam Pasal 31 ayat (1) UUD 1945?
+options:
+  - Hak memperoleh pendidikan
+  - Hak memperoleh pekerjaan dan penghidupan yang layak
+  - Hak memperoleh pelayanan kesehatan
+  - Hak untuk berkomunikasi dan memperoleh informasi
+answer: 0
+explanation: Pasal 31 ayat (1) UUD 1945 menyebut bahwa setiap warga negara berhak mendapat pendidikan. Pasal 31 juga menetapkan kewajiban pemerintah untuk mengusahakan dan menyelenggarakan satu sistem pendidikan nasional.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 31 ayat (1) dan ayat (3). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

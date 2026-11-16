@@ -1,0 +1,14 @@
+id: HUK-KENALI-018
+domain: hukum
+level: pahami
+type: multiple-choice
+question: Seorang pemohon berpendapat bahwa suatu undang-undang bertentangan dengan UUD 1945. Ke lembaga mana permohonan pengujian undang-undang diajukan?
+options:
+  - Mahkamah Konstitusi
+  - Mahkamah Agung
+  - Dewan Perwakilan Rakyat
+  - Pengadilan Tata Usaha Negara
+answer: 0
+explanation: Pasal 24C ayat (1) UUD 1945 memberikan Mahkamah Konstitusi kewenangan mengadili pada tingkat pertama dan terakhir untuk menguji undang-undang terhadap UUD. Mahkamah Agung menguji peraturan di bawah undang-undang terhadap undang-undang, sehingga objek pengujiannya berbeda.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 24A ayat (1) dan Pasal 24C ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

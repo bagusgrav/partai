@@ -1,0 +1,14 @@
+id: HAK-KENALI-003
+domain: hak-konstitusional
+level: kenali
+type: multiple-choice
+question: Hak apa yang secara tegas dijamin bagi setiap orang dalam Pasal 28A UUD 1945?
+options:
+  - Hak untuk hidup serta mempertahankan hidup dan kehidupannya
+  - Hak untuk membentuk keluarga dan melanjutkan keturunan
+  - Hak untuk mendapatkan lingkungan hidup yang baik dan sehat
+  - Hak untuk memperoleh pengakuan dan kepastian hukum yang adil
+answer: 0
+explanation: Pasal 28A UUD 1945 menyatakan bahwa setiap orang berhak untuk hidup serta berhak mempertahankan hidup dan kehidupannya. Rumusan ini melindungi hak hidup sebagai hak dasar setiap orang.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 28A. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

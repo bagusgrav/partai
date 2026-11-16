@@ -1,0 +1,14 @@
+id: ALS-KENALI-003
+domain: alasan-bernegara
+level: kenali
+type: multiple-choice
+question: Bagaimana bentuk dan bentuk pemerintahan Negara Indonesia menurut Pasal 1 ayat (1) UUD 1945?
+options:
+  - Negara kesatuan yang berbentuk republik
+  - Negara kesatuan yang berbentuk monarki konstitusional
+  - Negara federal yang berbentuk republik
+  - Negara konfederasi yang berbentuk republik
+answer: 0
+explanation: Pasal 1 ayat (1) UUD 1945 menyatakan bahwa Negara Indonesia ialah Negara Kesatuan yang berbentuk Republik. Ketentuan ini menjadi dasar konstitusional mengenai bentuk negara dan bentuk pemerintahan Indonesia.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 1 ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

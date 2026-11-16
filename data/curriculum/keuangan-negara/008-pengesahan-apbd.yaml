@@ -1,0 +1,14 @@
+id: KEU-KENALI-008
+domain: keuangan-negara
+level: kenali
+type: multiple-choice
+question: Dalam bentuk hukum apa rencana keuangan tahunan pemerintahan daerah yang disebut APBD ditetapkan?
+options:
+  - Peraturan daerah
+  - Peraturan gubernur atau peraturan bupati/wali kota
+  - Peraturan Menteri Keuangan
+  - Undang-undang yang ditetapkan oleh DPR
+answer: 0
+explanation: Pasal 16 ayat (1) UU Nomor 17 Tahun 2003 menyatakan bahwa APBD merupakan rencana keuangan tahunan pemerintahan daerah yang disetujui oleh DPRD. Pasal 16 ayat (4) mengatur bahwa APBD ditetapkan setiap tahun dengan peraturan daerah.
+sources:
+  - citation: "Undang-Undang Nomor 17 Tahun 2003 tentang Keuangan Negara, Pasal 16 ayat (1) dan ayat (4). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Nomor%2017%20Tahun%202003%20Keuangan%20Negara"

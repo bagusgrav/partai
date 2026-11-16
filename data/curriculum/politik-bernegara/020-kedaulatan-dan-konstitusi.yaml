@@ -1,0 +1,14 @@
+id: POL-KENALI-020
+domain: politik-bernegara
+level: pahami
+type: multiple-choice
+question: Jika suara mayoritas mendukung kebijakan yang bertentangan dengan UUD 1945, prinsip apa yang harus menjadi pedoman penyelenggara negara?
+options:
+  - Kedaulatan rakyat dilaksanakan menurut UUD, sehingga kebijakan tetap harus sesuai konstitusi
+  - Dukungan mayoritas dapat menggantikan prosedur perubahan UUD yang ditetapkan konstitusi
+  - Kebijakan dapat dijalankan sampai lembaga perwakilan membatalkannya, meskipun bertentangan dengan UUD
+  - Pelaksanaan kedaulatan rakyat berada di luar batas konstitusi apabila didukung pemilih
+answer: 0
+explanation: Pasal 1 ayat (2) UUD 1945 menyatakan bahwa kedaulatan berada di tangan rakyat dan dilaksanakan menurut UUD. Demokrasi konstitusional menggabungkan kehendak rakyat dengan batas dan prosedur konstitusi, sehingga dukungan mayoritas tidak dengan sendirinya membenarkan pelanggaran UUD.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 1 ayat (2) dan ayat (3). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

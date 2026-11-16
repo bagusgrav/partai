@@ -1,0 +1,14 @@
+id: POL-KENALI-013
+domain: politik-bernegara
+level: pahami
+type: multiple-choice
+question: Bagaimana Presiden dan Wakil Presiden dipilih menurut Pasal 6A ayat (1) UUD 1945?
+options:
+  - Dipilih dalam satu pasangan secara langsung oleh rakyat
+  - Dipilih oleh MPR setelah pemilihan anggota DPR
+  - Dipilih oleh DPR bersama DPD melalui sidang gabungan
+  - Dipilih secara terpisah oleh rakyat untuk setiap jabatan
+answer: 0
+explanation: Pasal 6A ayat (1) UUD 1945 menetapkan bahwa Presiden dan Wakil Presiden dipilih dalam satu pasangan secara langsung oleh rakyat. Tata cara pemilihan lebih lanjut diatur dalam undang-undang pemilihan umum.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 6A ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: ALS-KENALI-008
+domain: alasan-bernegara
+level: kenali
+type: multiple-choice
+question: Menurut Pasal 27 ayat (3) UUD 1945, apa hak dan kewajiban warga negara dalam upaya pembelaan negara?
+options:
+  - Setiap warga negara berhak dan wajib ikut serta
+  - Hanya warga yang bertugas dalam angkatan bersenjata yang berhak ikut serta
+  - Setiap warga negara wajib mengikuti pendidikan militer sebagai satu-satunya bentuk keikutsertaan
+  - Keikutsertaan warga negara hanya diwajibkan pada saat negara menyatakan perang
+answer: 0
+explanation: Pasal 27 ayat (3) UUD 1945 menyatakan bahwa setiap warga negara berhak dan wajib ikut serta dalam upaya pembelaan negara. Ketentuan tersebut tidak berarti setiap orang wajib menjadi anggota militer, karena bentuk dan tata cara keikutsertaan diatur lebih lanjut oleh undang-undang.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 27 ayat (3) dan Pasal 30 ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

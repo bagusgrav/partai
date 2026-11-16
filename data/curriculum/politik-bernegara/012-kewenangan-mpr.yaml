@@ -1,0 +1,14 @@
+id: POL-KENALI-012
+domain: politik-bernegara
+level: kenali
+type: multiple-choice
+question: Lembaga apa yang berwenang mengubah dan menetapkan Undang-Undang Dasar menurut Pasal 3 ayat (1) UUD 1945?
+options:
+  - Majelis Permusyawaratan Rakyat
+  - Dewan Perwakilan Rakyat
+  - Mahkamah Konstitusi
+  - Presiden
+answer: 0
+explanation: Pasal 3 ayat (1) UUD 1945 memberi MPR kewenangan mengubah dan menetapkan UUD. Pelaksanaan kewenangan tersebut mengikuti persyaratan dan tata cara perubahan yang tercantum dalam Pasal 37 UUD 1945.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 3 ayat (1) dan Pasal 37. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

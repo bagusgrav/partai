@@ -1,0 +1,14 @@
+id: ALS-KENALI-006
+domain: alasan-bernegara
+level: kenali
+type: multiple-choice
+question: Tujuan bernegara apa yang disebut secara eksplisit dalam Pembukaan UUD 1945 alinea keempat selain melindungi bangsa?
+options:
+  - Memajukan kesejahteraan umum dan mencerdaskan kehidupan bangsa
+  - Menjamin pertumbuhan ekonomi nasional pada tingkat tertentu
+  - Memelihara keamanan dan ketertiban di setiap daerah
+  - Mewujudkan pemerataan kepemilikan seluruh sumber daya pribadi
+answer: 0
+explanation: Pembukaan UUD 1945 alinea keempat mencantumkan memajukan kesejahteraan umum dan mencerdaskan kehidupan bangsa sebagai tujuan negara. Rumusan tujuan ini menjadi orientasi penyelenggaraan kebijakan publik, bukan jaminan hasil ekonomi yang sama untuk setiap orang.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pembukaan alinea keempat. URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

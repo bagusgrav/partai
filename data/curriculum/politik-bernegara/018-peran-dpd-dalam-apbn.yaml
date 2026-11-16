@@ -1,0 +1,14 @@
+id: POL-KENALI-018
+domain: politik-bernegara
+level: pahami
+type: multiple-choice
+question: Apa peran DPD dalam pembahasan rancangan APBN menurut UUD 1945?
+options:
+  - Memberikan pertimbangan kepada DPR
+  - Memberikan persetujuan akhir atas rancangan APBN bersama Presiden
+  - Menyusun rancangan APBN dan menyampaikannya kepada DPR
+  - Memeriksa dan mengesahkan laporan pertanggungjawaban APBN
+answer: 0
+explanation: Pasal 22D ayat (2) UUD 1945 memberi DPD kewenangan memberikan pertimbangan kepada DPR atas rancangan undang-undang APBN. Kewenangan tersebut berbeda dari kewenangan DPR dan Presiden dalam pembahasan rancangan APBN sebagaimana diatur Pasal 23 ayat (2).
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 22D ayat (2) dan Pasal 23 ayat (2). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: KEU-KENALI-009
+domain: keuangan-negara
+level: pahami
+type: multiple-choice
+question: Apa yang berlaku jika DPR tidak menyetujui rancangan APBN yang diajukan Presiden menurut Pasal 23 ayat (3) UUD 1945?
+options:
+  - Pemerintah menjalankan APBN tahun yang lalu
+  - Pemerintah menjalankan rancangan APBN yang diajukan Presiden
+  - Pemerintah menjalankan anggaran sementara yang ditetapkan BPK
+  - Pemerintah menunda seluruh belanja hingga DPR menyetujui rancangan baru
+answer: 0
+explanation: Pasal 23 ayat (3) UUD 1945 menyatakan bahwa apabila DPR tidak menyetujui rancangan APBN yang diusulkan Presiden, pemerintah menjalankan APBN tahun yang lalu. Ketentuan ini menyediakan dasar anggaran sementara dan menghindari kekosongan pengelolaan keuangan negara.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 23 ayat (3). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

@@ -1,0 +1,14 @@
+id: HAK-KENALI-001
+domain: hak-konstitusional
+level: kenali
+type: multiple-choice
+question: Menurut Pasal 27 ayat (1) UUD 1945, bagaimana kedudukan warga negara di dalam hukum dan pemerintahan?
+options:
+  - Sama kedudukannya dan wajib menjunjung hukum serta pemerintahan tanpa kecuali
+  - Sama kedudukannya di dalam hukum, tetapi tidak di dalam pemerintahan
+  - Sama kedudukannya di dalam pemerintahan, tetapi tidak di dalam hukum
+  - Sama kedudukannya hanya bagi warga yang tidak memegang jabatan publik
+answer: 0
+explanation: Pasal 27 ayat (1) menyatakan bahwa segala warga negara bersamaan kedudukannya di dalam hukum dan pemerintahan. Pasal yang sama juga mewajibkan warga negara menjunjung hukum dan pemerintahan itu dengan tidak ada kecualinya.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 27 ayat (1). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"

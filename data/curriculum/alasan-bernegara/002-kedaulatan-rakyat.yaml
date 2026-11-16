@@ -1,0 +1,14 @@
+id: ALS-KENALI-002
+domain: alasan-bernegara
+level: pahami
+type: multiple-choice
+question: Apa makna ketentuan bahwa kedaulatan berada di tangan rakyat dan dilaksanakan menurut UUD dalam Pasal 1 ayat (2) UUD 1945?
+options:
+  - Kekuasaan negara bersumber dari rakyat dan pelaksanaannya harus mengikuti aturan konstitusi
+  - Kekuasaan rakyat dijalankan hanya oleh lembaga perwakilan dan tidak melalui pemilu
+  - Keputusan mayoritas dapat mengesampingkan batas-batas yang ditetapkan UUD
+  - Kedaulatan berada pada lembaga negara yang dipilih rakyat, bukan pada rakyat
+answer: 0
+explanation: Pasal 1 ayat (2) menempatkan kedaulatan pada rakyat sekaligus menegaskan bahwa pelaksanaannya menurut UUD. Artinya, kekuasaan rakyat disalurkan melalui mekanisme konstitusional dan tidak membenarkan tindakan negara yang melampaui konstitusi.
+sources:
+  - citation: "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Pasal 1 ayat (2). URL: https://peraturan.bpk.go.id/Search?keywords=Undang-Undang%20Dasar%20Negara%20Republik%20Indonesia%20Tahun%201945"
