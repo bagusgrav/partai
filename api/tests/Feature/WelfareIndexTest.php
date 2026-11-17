@@ -225,7 +225,7 @@ class WelfareIndexTest extends TestCase
                     'region_code' => $regionCode,
                     'region_name' => $regionName,
                     'period_year' => 2024,
-                    'period_month' => null,
+                    'period_month' => in_array($indicator, ['kemiskinan', 'tpt'], true) ? 12 : null,
                     'value' => $value,
                     'unit' => $indicator === 'gini' ? 'rasio' : 'persen',
                     'source' => 'BPS WebAPI',

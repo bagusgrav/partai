@@ -26,7 +26,10 @@ class SyncWelfareFromEconomicIndicators extends Command
         $observations = EconomicIndicatorObservation::query()
             ->whereIn('indicator_name', ['kemiskinan', 'tpt', 'gini', 'stunting'])
             ->where('period_year', $year)
-            ->whereNull('period_month')
+            ->where(function ($query): void {
+                $query->whereNull('period_month')
+                    ->orWhere('period_month', 12);
+            })
             ->where(function ($query): void {
                 $query->where('region_code', '9999')
                     ->orWhere('region_code', 'like', '__00');
