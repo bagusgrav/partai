@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class BpsApiService
@@ -234,16 +235,28 @@ class BpsApiService
     private function requestJson(string $url, string $description): array
     {
         try {
-            $response = Http::acceptJson()
+            $response = Http::withHeaders([
+                'User-Agent' => 'PARTAI-CivicTech/1.0 (https://akuhadir.my.id; bagusgrav@gmail.com)',
+                'Accept' => 'application/json',
+            ])
+                ->withOptions(['verify' => config('bps.ssl_verify', true)])
                 ->connectTimeout(5)
-                ->timeout(20)
+                ->timeout(30)
                 ->retry([200, 500], throw: false)
                 ->get($url);
         } catch (ConnectionException $exception) {
+            Log::error($this->redactApiKey($exception->getMessage()), ['description' => $description]);
+
             throw new RuntimeException("Tidak dapat terhubung ke API BPS saat meminta {$description}.", previous: $exception);
         }
 
         if (! $response->successful()) {
+            Log::error("BPS API request failed with HTTP {$response->status()}.", [
+                'description' => $description,
+                'status' => $response->status(),
+                'body' => $this->redactApiKey($response->body()),
+            ]);
+
             throw new RuntimeException("Permintaan {$description} ke BPS gagal dengan HTTP {$response->status()}.");
         }
 
@@ -254,5 +267,16 @@ class BpsApiService
         }
 
         return $payload;
+    }
+
+    private function redactApiKey(string $value): string
+    {
+        $apiKey = config('bps.api_key');
+
+        if (! is_string($apiKey) || $apiKey === '') {
+            return $value;
+        }
+
+        return str_replace(array_unique([$apiKey, rawurlencode($apiKey)]), '[redacted]', $value);
     }
 }

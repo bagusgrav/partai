@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\EconomicIndicator;
 use App\Models\EconomicIndicatorObservation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class BpsEconomicDataTest extends TestCase
@@ -63,6 +65,57 @@ class BpsEconomicDataTest extends TestCase
         ]);
 
         Http::assertSentCount(4);
+        Http::assertSent(fn ($request): bool => $request->hasHeader(
+            'User-Agent',
+            'PARTAI-CivicTech/1.0 (https://akuhadir.my.id; bagusgrav@gmail.com)',
+        ) && $request->hasHeader('Accept', 'application/json'));
+    }
+
+    public function test_bps_http_failures_are_logged_with_status_and_response_body(): void
+    {
+        config([
+            'bps.api_key' => 'test-key',
+            'bps.api_url' => 'https://bps.test/v1/api',
+            'bps.domain' => '0000',
+            'bps.inflation_variable_id' => 1,
+        ]);
+        Http::preventStrayRequests();
+        Http::fake([
+            '*' => Http::response('upstream unavailable /key/test-key', 503),
+        ]);
+        Log::spy();
+
+        $this->artisan('bps:fetch-economic-data')->assertFailed();
+
+        Log::shouldHaveReceived('error')
+            ->withArgs(fn (string $message, array $context): bool => str_contains($message, '503')
+                && ($context['status'] ?? null) === 503
+                && ($context['body'] ?? null) === 'upstream unavailable /key/[redacted]');
+    }
+
+    public function test_bps_connection_errors_are_logged_before_the_user_facing_message_is_returned(): void
+    {
+        config([
+            'bps.api_key' => 'test-key',
+            'bps.api_url' => 'https://bps.test/v1/api',
+            'bps.domain' => '0000',
+            'bps.inflation_variable_id' => 1,
+        ]);
+        Http::preventStrayRequests();
+        Http::fake(fn () => throw new ConnectionException(
+            'cURL error 60: SSL certificate problem for https://bps.test/key/test-key',
+        ));
+        Log::spy();
+
+        $this->artisan('bps:fetch-economic-data')
+            ->expectsOutputToContain('Tidak dapat terhubung ke API BPS')
+            ->assertFailed();
+
+        Log::shouldHaveReceived('error')
+            ->withArgs(fn (string $message, array $context): bool => str_contains($message, 'cURL error 60')
+                && str_contains($message, '[redacted]')
+                && ! str_contains($message, 'test-key')
+                && ($context['description'] ?? null) === 'daftar periode inflasi BPS');
     }
 
     public function test_economy_indicators_are_grouped_and_ordered_for_time_series(): void
