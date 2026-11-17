@@ -1,50 +1,71 @@
-# PARTAI (akuhadir.my.id)
+# PARTAI
 
-> **Infrastruktur digital untuk partai politik yang mendidik, melayani, dan dapat diawasi oleh warga.**
+> Infrastruktur digital civic-tech untuk mendidik, melayani, dan membantu warga mengawasi tata kelola partai.
 
-[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
-[![SQLite](https://img.shields.io/badge/Database-SQLite%20WAL-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Build Status](https://github.com/bagusgrav/partai/actions/workflows/deploy-api.yml/badge.svg)](https://github.com/bagusgrav/partai/actions/workflows/deploy-api.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
 
-## Tentang Proyek
+PARTAI (akuhadir.my.id) adalah aplikasi open-source untuk pendidikan kewargaan, partisipasi lapangan, akses informasi kesejahteraan, dan akuntabilitas internal. Aplikasi mendukung kerja dan pengawasan warga; ia tidak menggantikan proses demokratis, keputusan resmi pemerintah, atau verifikasi data oleh instansi yang berwenang.
 
-PARTAI adalah proyek civic-tech open-source yang membangun **infrastruktur digital untuk mewujudkan delapan fungsi ideal partai politik**: pendidikan dan sosialisasi politik, komunikasi politik, artikulasi dan agregasi kepentingan, partisipasi politik, rekrutmen politik, pengelolaan konflik, serta perumusan dan pengawasan kebijakan.
+## Mulai di sini
 
-Platform ini dirancang untuk menjawab persoalan yang kerap dibahas dalam riset tata kelola partai—seperti korupsi, politik transaksional, dominasi oligarki, kolusi, serta minimnya transparansi—dengan menyediakan proses yang dapat ditelusuri dan data yang terbuka. Tujuannya adalah memperkuat akuntabilitas, bukan menggantikan peran organisasi dan deliberasi warga.
+- [Panduan pengembangan lokal](#pengembangan-lokal)
+- [Panduan kontribusi](CONTRIBUTING.md)
+- [Blueprint arsitektur](docs/architecture.md)
+- [Referensi API](docs/api-reference.md)
+- [Panduan warga](docs/user-guide.md)
+- [Roadmap](ROADMAP.md)
+- [Aturan ekosistem](ECOSYSTEM.md)
 
-## Fitur Utama
+## Fitur utama
 
-| Fase | Fitur | Ringkasan |
+Status di bawah merujuk pada fitur yang ditandai selesai di [ROADMAP.md](ROADMAP.md). Penyelesaian satu komponen tidak berarti seluruh fase sudah tuntas.
+
+| Fase | Kemampuan yang tersedia | Catatan cakupan |
 | --- | --- | --- |
-| 🟢 | **Pendidikan Kewargaan (SM-2)** | Materi kewargaan, latihan soal, pengulangan terjadwal, dan pembahasan/kunci jawaban esai setelah jawaban dikirim. |
-| 🟠 | **Aksi Lapangan (Anti-Kolusi QR)** | Kehadiran aksi berbasis QR dinamis, geofence, dan atestasi silang antarwilayah. |
-| 🔵 | **Open Data & Jemput Hak (Bansos Tracker)** | Data sosial dan ekonomi publik serta alat bantu pengecekan hak dan bantuan sosial. |
-| 🟣 | **Tata Kelola (Kontrak Faksi & Recall)** | Kontrak faksi yang dapat dipantau dan mekanisme partisipasi serta recall anggota. |
-| 🏆 | **Sistem Reputasi** | Poin dan level warga berdasarkan kuis benar, esai dengan nilai peer-review minimal 70/100, kehadiran tervalidasi, dan atestasi klaim—dengan umpan balik pembahasan untuk belajar mandiri. |
+| **1 — Pendidikan kewargaan** | Latihan kuis dengan pengulangan terjadwal SM-2; soal esai dan peer review; pembahasan; poin reputasi; daily digest. | Kurikulum penuh lima domain dan mastery/sertifikasi masih dalam roadmap. |
+| **2 — Aksi lapangan** | Acara, QR dinamis, pemeriksaan geofence, klaim kehadiran, dan atestasi silang antar-cluster. | Sistem juri acak untuk mengaudit klaim belum lengkap. |
+| **3 — Pengawasan data & kesejahteraan** | Ringkasan/wilayah data kesejahteraan, pipeline BPS/BNPB, indikator ekonomi, wawasan, dan pemeriksaan bansos “Jemput Hak”. | IKK kabupaten/kota serta kanal pelaporan tambahan masih dalam roadmap. |
+| **4 — Tata kelola** | Panel sortisi berbasis mastery, voting, pengajuan dan voting recall, serta daftar publik Kontrak Faksi. | Voting parameter, panel etik/editorial, dan seluruh dasbor kontrak dewan masih dalam roadmap. |
 
-## Arsitektur Teknis
+## Arsitektur singkat
+
+Frontend Next.js dilayani melalui Vercel. Permintaan API menuju Laravel di VPS melalui Cloudflare Tunnel `protocol: http2`; SQLite WAL berada di `/var/data/partai/database.sqlite` pada deployment sesuai panduan. Model aplikasi adalah **Laravel modular monolith**, bukan layanan backend terpisah per fitur.
+
+```mermaid
+flowchart LR
+    U[User / Browser] --> V[Vercel / Next.js]
+    V -->|HTTPS API| C[Cloudflare Tunnel<br/>HTTP/2]
+    C -->|Loopback only| L[VPS / Laravel Monolith]
+    L --> D[(SQLite WAL<br/>/var/data/partai)]
+    S[Central SSO<br/>id.akuhadir.my.id] -. Identity policy .-> U
+```
+
+Diagram menunjukkan batas arsitektur dan kebijakan identitas. Rute API saat ini masih mencakup sesi tamu dan pendaftaran anggota; status kesenjangan SSO dan batas operasional lain dijelaskan di [architecture](docs/architecture.md).
+
+## Teknologi
 
 | Lapisan | Teknologi |
 | --- | --- |
-| Frontend | Next.js App Router, React, dan Tailwind CSS — siap untuk deployment di Vercel |
-| Backend | Laravel API — dapat dijalankan pada VPS |
-| Database | SQLite dengan WAL dan konfigurasi ringan; tidak memerlukan server database terpisah |
-| Autentikasi | SSO terpusat melalui ekosistem Aku Hadir dan API token Sanctum |
+| Web | Next.js 16 App Router, React, Tailwind CSS |
+| API | Laravel 13, PHP 8.3+, Sanctum |
+| Data | SQLite, WAL, foreign keys, busy timeout |
+| Deployment | Vercel, VPS, Cloudflare Tunnel HTTP/2 |
+| Integrasi | API JSON; permintaan mutasi idempoten memakai `request_id` sesuai endpoint |
 
-> Versi badge mengikuti dependency proyek saat ini. Backend pada `api/composer.json` menggunakan Laravel 13 dan frontend pada `web/package.json` menggunakan Next.js 16.
+Arsitektur rinci, SSO, kebijakan Single Door, dan batas memori dijelaskan di [docs/architecture.md](docs/architecture.md). Kontrak integrasi antar-aplikasi ada di [ECOSYSTEM.md](ECOSYSTEM.md).
 
-## Pengembangan Lokal
+## Pengembangan lokal
 
 ### Prasyarat
 
-- PHP 8.3 atau lebih baru
-- Composer
-- Node.js 20 atau lebih baru
-- npm
+- PHP 8.3 atau lebih baru dan Composer
+- Node.js 20 atau lebih baru dan npm
+- Git
 
-### 1. Jalankan API Laravel
+### API Laravel
 
 ```powershell
 cd api
@@ -58,7 +79,7 @@ php artisan serve
 
 API lokal tersedia di `http://127.0.0.1:8000/api`.
 
-### 2. Jalankan frontend Next.js
+### Frontend Next.js
 
 Buka terminal baru dari root repository:
 
@@ -67,7 +88,7 @@ cd web
 npm install
 ```
 
-Buat `web/.env.local` bila API tidak menggunakan URL default:
+Untuk memakai API lokal, atur `web/.env.local`:
 
 ```dotenv
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
@@ -79,28 +100,27 @@ Lalu jalankan:
 npm run dev
 ```
 
-Frontend tersedia di `http://localhost:3000`. Untuk memeriksa test API dan build frontend:
+Frontend tersedia di `http://localhost:3000`.
+
+### Pemeriksaan
 
 ```powershell
 cd api
 php artisan test
-
 cd ..\web
+npm run lint
 npm run build
 ```
 
-## Kontribusi
+Lihat [docs/deployment.md](docs/deployment.md) untuk deployment VPS/Vercel. Jangan menaruh `.env`, token, kunci, atau data warga produksi di repository.
 
-Kontribusi melalui issue dan pull request sangat kami sambut. Sebelum mengirim perubahan:
+## Keamanan dan data warga
 
-1. Jelaskan konteks dan dampak perubahan pada issue atau deskripsi pull request.
-2. Jalankan test API dan build frontend yang relevan.
-3. Pertahankan invariant proyek:
-   - Jangan mengubah skema inti `users`, `events`, atau `items` secara destruktif; gunakan migrasi baru yang kompatibel.
-   - Gunakan UUID untuk tabel baru.
-   - Gunakan `fetchWithRetry` untuk setiap proses fetching di frontend.
-   - Pertahankan idempotensi endpoint yang mengubah data melalui `request_id`.
+- Pemeriksaan bantuan sosial hanya dapat meminta NIK milik akun yang sedang terautentikasi; data NIK bersifat pribadi dan respons tidak boleh disimpan di cache publik.
+- Hasil “Jemput Hak” mengikuti dataset yang tersedia dan bukan penetapan resmi penerima bantuan.
+- Perubahan data harus tervalidasi, berotorisasi, tercatat bila sesuai, dan mengikuti aturan idempotensi. Jangan memasukkan kredensial atau data pribadi ke log, issue, maupun contoh dokumentasi.
+- Laporkan dugaan kerentanan secara privat kepada maintainer, bukan melalui issue publik.
 
 ## Lisensi
 
-PARTAI dirilis di bawah [MIT License](LICENSE).
+PARTAI dirilis dengan [MIT License](LICENSE).

@@ -1,0 +1,111 @@
+# Referensi API PARTAI
+
+Dokumen ini mencatat rute yang didefinisikan di `api/routes/api.php` dan perilaku controller saat ini. Semua path di bawah memakai prefix `/api`; base URL produksi `https://api.akuhadir.my.id`. Body dan respons menggunakan JSON kecuali dinyatakan lain.
+
+> **Penting:** ini adalah gambaran implementasi aktual, bukan jaminan bahwa seluruh standar target sudah terpenuhi. Rute autentikasi SSO belum tampak di daftar route; mutasi lama tanpa `request_id` dicatat pada [kesenjangan kepatuhan](#kesenjangan-idempotensi-dan-kepatuhan).
+
+## Autentikasi dan format umum
+
+- Rute bertanda **Bearer** membutuhkan `Authorization: Bearer <sanctum-token>`.
+- Token saat ini dapat diperoleh dari `/api/auth/guest` atau `/api/auth/register`. Keduanya adalah mekanisme yang tersedia pada kode sekarang; keduanya bukan endpoint SSO.
+- Rute **Publik** tidak memasang middleware autentikasi pada definisi API. Endpoint `/api/user` membutuhkan Bearer token.
+- Untuk request JSON kirim `Accept: application/json` dan `Content-Type: application/json`.
+- Kesalahan validasi umumnya `422`, belum terautentikasi `401`, tidak berwenang `403`, tidak ditemukan `404`, konflik/state/idempotensi `409`, dan rate limit `429`. Detail error dapat bervariasi per controller.
+
+## Sesi dan profil
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `POST /api/auth/guest` | Publik; throttle 300/menit | JSON: `request_id` (UUID) | `201 {"token":"..."}`. Mengulang ID mempertahankan akun tamu; endpoint mengeluarkan bearer token Sanctum. |
+| `POST /api/auth/register` | Publik; throttle 10/menit | JSON: `request_id` (UUID), `name`, `email`, `password` (min. 8 karakter), `cluster_id`; `nik` opsional | `201 {"token":"..."}` untuk pendaftaran baru; `{"token":"..."}` untuk retry identik; `409 {"message":"..."}` bila ID yang sama dikirim dengan data berbeda. |
+| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `reputation_points`, `reputation_level`. |
+| `GET /api/reputation` | Bearer | — | `reputation_points`, `reputation_level`, dan hingga 10 `logs` terbaru. |
+
+Tidak ada route `/api/auth/login` atau route exchange SSO dalam route API saat ini. Jangan mengarang URL tersebut untuk integrasi.
+
+## Data publik dan layanan “Jemput Hak”
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/welfare/summary` | Publik | — | Ringkasan sesuai `WelfareService`. |
+| `GET /api/welfare/regions` | Publik | — | Daftar wilayah/data sesuai `WelfareService`. |
+| `GET /api/welfare/region/{code}` | Publik | Path: `code` kode wilayah | Satu objek wilayah; `404 {"message":"Data wilayah tidak ditemukan."}` bila tidak ada. |
+| `GET /api/economic/summary` | Publik | — | `{"indicators":[...],"last_updated":"..."}`; satu rekaman terbaru per tipe indikator. |
+| `GET /api/economic/history/{type}` | Publik | Path: `type` jenis indikator | `{"type":"...","data":[...]}`; paling banyak 90 rekaman. |
+| `GET /api/insights/news` | Publik | — | `{"insights":[...]}` berisi hingga 10 wawasan kategori berita terbaru. |
+| `GET /api/insights/cabinet` | Publik | — | `{"insights":[...]}` kategori kabinet. |
+| `GET /api/rights/check/{nik}` | Bearer; throttle 5/menit | Path: `nik` 16 digit dan harus sama dengan NIK akun | `{"program":"PKH\|BPNT\|PIP","status":"DITERIMA\|TIDAK_DITERIMA\|PROSES","period":"..."}`. Respons memakai `Cache-Control: no-store, private`; NIK tidak terdaftar `404`, NIK bukan milik akun `403`, format salah `422`. |
+| `GET /api/contracts` | Publik | Query opsional: `status` salah satu `BELUM_DIMULAI`, `SEDANG_BERJALAN`, `TERPENUHI`, `GAGAL` | Array kontrak berisi antara lain `id`, `politician_name`, `title`, `description`, `status`, `evidence_url`, `deadline`. |
+
+Data “Jemput Hak” mengikuti dataset yang tersedia dan tidak menggantikan keputusan resmi penyaluran bantuan sosial.
+
+## Pendidikan dan reputasi
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/review` | Bearer | Query opsional: `limit` integer 1–20 (default 5) | `{"items":[...]}` soal yang jatuh tempo; payload soal tidak memuat jawaban/pembahasan. |
+| `POST /api/answer` | Bearer | JSON: `item_id`, `selected_option` (integer mulai 0), `request_id` (UUID) | `{"status":"processed","data":{"next_review_at":"...","correct":true,"correct_option":0,"explanation":"..."}}`; retry identik berstatus `already_processed`. |
+| `GET /api/essay/question` | Bearer | — | `{"item":{...}}` atau `{"item":null}`; kunci/pembahasan tidak dikirim di payload soal. |
+| `POST /api/essay/submit` | Bearer | JSON: `item_id`, `answer_text` (maks. 20.000 karakter), `request_id` (UUID) | `201 {"status":"processed","data":{"submission_id":123,"explanation":"..."}}`; retry identik berstatus `already_processed`. |
+| `GET /api/essay/review` | Bearer | — | `{"submission":{...}}` esai pending milik anggota lain, atau `{"submission":null}`. |
+| `POST /api/essay/review` | Bearer | JSON: `submission_id`, `score` integer 0–100, `request_id` (UUID), `feedback` opsional maks. 10.000 karakter | `{"status":"processed","data":{"submission_id":123}}`; reviewer tidak boleh menilai esainya sendiri. Retry identik berstatus `already_processed`. |
+
+Jawaban benar kuis menambah reputasi sesuai aturan layanan yang berlaku; esai dengan nilai minimal 70 juga dapat memberi reputasi. Nilai dan aturan rinci dapat berkembang bersama implementasi—lihat respons `/api/reputation` untuk total dan log akun.
+
+## Kegiatan dan kehadiran
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `POST /api/events` | Bearer | JSON: `title`, `description`, `location_lat` (-90..90), `location_lng` (-180..180), `starts_at`, `ends_at` setelah waktu mulai, `request_id` (UUID), `radius_m` integer opsional (default 100) | `201 {"status":"processed","event":{"id":"..."}}`; retry identik berstatus `already_processed`. |
+| `GET /api/events/active` | Bearer | — | `{"events":[...]}` kegiatan aktif yang sedang berlangsung. |
+| `GET /api/events/{id}/qr` | Bearer; hanya koordinator acara | Path: `id` UUID kegiatan | Token QR dinamis dalam respons JSON; kegiatan tidak ada `404`, bukan koordinator `403`, bukan aktif `409`. |
+| `POST /api/attendance/claim` | Bearer | JSON: `event_id`, token QR, `lat`, `lng`, `request_id` (UUID) | `201` berisi `status`, `claim_id`, `distance_m` (dan `radius_m` jika ditolak karena jarak). Klaim di luar radius berstatus `rejected`; retry identik aman. |
+| `GET /api/attendance/pending` | Bearer | Query: `event_id` UUID | `{"claims":[...]}` klaim menunggu atestasi, selain milik pemanggil. |
+| `POST /api/attendance/attest` | Bearer | JSON: `claim_id` UUID, `request_id` UUID | `201 {"status":"processed","claim_status":"pending\|valid","attestations":N}`; retry identik aman. Validator tidak dapat memvalidasi klaim sendiri dan harus berasal dari cluster berbeda. |
+
+## Notifikasi
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/notifications` | Bearer | — | `{"notifications":[...],"unread_count":N}`; paling banyak 50 notifikasi terbaru milik pemanggil. |
+| `POST /api/notifications/{id}/read` | Bearer; hanya pemilik notifikasi | Path: `id` ID notifikasi | `{"status":"read","id":"...","read_at":"..."}`. Endpoint saat ini tidak menerima `request_id`. |
+
+## Voting, recall, dan sortisi
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/votes/active` | Bearer | — | `{"votes":[{"id":1,"title":"...","description":"...","starts_at":"...","ends_at":"...","vote_options":[{"id":1,"option_text":"..."}]}]}`. |
+| `POST /api/votes/submit` | Bearer | JSON: `vote_id` integer, `vote_option_id` integer milik voting itu, `request_id` UUID | `201 {"status":"processed","data":{"submission_id":123}}`; retry identik `already_processed`; satu suara per anggota per voting. |
+| `POST /api/recall/request` | Bearer; anggota terverifikasi | JSON: `target_user_id` UUID anggota terverifikasi, `reason` maks. 10.000 karakter, `request_id` UUID; `evidence_url` HTTP(S) opsional | `201 {"status":"processed","recall":{"id":"...","target_user_id":"...","reason":"...","evidence_url":"...","status":"voting"}}`; retry identik aman. |
+| `GET /api/recall/active` | Bearer | — | `{"recalls":[...]}` recall yang sedang voting beserta `agree_count`, `reject_count`, `active_member_count`, `votes_required`, dan `has_voted`. |
+| `POST /api/recall/vote` | Bearer; anggota terverifikasi | JSON: `recall_request_id` UUID, `vote` boolean, `request_id` UUID | `201 {"status":"processed","data":{"vote_id":"...","recall_status":"voting\|approved","agree_count":N,"votes_required":N}}`; retry identik `already_processed`. |
+| `GET /api/sortition/panels` | Bearer | — | `{"panels":[{"id":"...","name":"...","mastery":N}]}` anggota terverifikasi terpilih acak sesuai kriteria mastery. |
+
+## Kontrak Faksi
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/contracts` | Publik | Query opsional `status` | Array objek kontrak; dapat difilter menurut status. |
+| `POST /api/contracts` | Bearer; role `super_admin` atau `pengurus` | JSON: `politician_name`, `title`, `description`; opsional `politician_id` UUID, `status`, `evidence_url`, `deadline` (`YYYY-MM-DD`) | `201` satu objek kontrak. Endpoint saat ini tidak menerima `request_id`. |
+| `PATCH /api/contracts/{contract}` | Bearer; role `super_admin` atau `pengurus` | Path `contract` UUID; body berisi subset field kontrak yang sama | Objek kontrak yang diperbarui. Endpoint saat ini tidak menerima `request_id`. |
+
+Status yang sah: `BELUM_DIMULAI`, `SEDANG_BERJALAN`, `TERPENUHI`, dan `GAGAL`.
+
+## Kesenjangan idempotensi dan kepatuhan
+
+Standar Thortech v2.0 mewajibkan UUID `request_id` untuk operasi tulis baru yang aman dicoba ulang. Dukungan yang terlihat saat ini:
+
+| Endpoint | Kondisi yang tercatat |
+| --- | --- |
+| `POST /api/answer`, `/api/essay/submit`, `/api/essay/review` | Memvalidasi UUID `request_id` dan mengembalikan hasil retry identik. |
+| `POST /api/events`, `/api/attendance/claim`, `/api/attendance/attest` | Memvalidasi UUID `request_id`; payload berbeda dengan ID yang sudah dipakai ditolak. |
+| `POST /api/votes/submit`, `/api/recall/request`, `/api/recall/vote` | Memvalidasi UUID `request_id` dan melindungi pengulangan operasi. |
+| `POST /api/auth/guest`, `/api/auth/register` | Menggunakan UUID `request_id` untuk membuat sesi/pendaftaran secara idempoten; keduanya bukan SSO. |
+| `POST /api/contracts`, `PATCH /api/contracts/{contract}` | Belum memakai `request_id`. |
+| `POST /api/notifications/{id}/read` | Belum memakai `request_id`. |
+
+Untuk operasi yang sudah mendukung idempotensi, gunakan ID yang sama hanya untuk payload dan pengguna yang sama. Jangan menganggap metode HTTP atau helper retry sendiri sudah membuat operasi idempoten.
+
+## Referensi implementasi
+
+Daftar route kanonis berada di `api/routes/api.php`; response dan validasi berada di controller masing-masing di `api/app/Http/Controllers/Api/`. Perubahan implementasi wajib memperbarui tabel ini agar dokumentasi tidak tertinggal dari kontrak.
