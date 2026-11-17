@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\GovernmentInsightController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
@@ -59,6 +60,8 @@ Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::get('/reputation', ReputationController::class);
     Route::post('/events', [EventController::class, 'store']);
     Route::get('/events/active', [EventController::class, 'active']);

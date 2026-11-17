@@ -17,7 +17,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 - [ ] **Kurikulum Penuh:** Bank soal 5 domain (Hak, Alasan Bernegara, Keuangan, Hukum, Politik) hingga Level 4 (Kritisi).
 - [x] **Sistem Esai & Peer-Review:** Untuk soal Level 3 & 4, anggota menjawab esai pendek yang dinilai oleh panel (bukan pilihan ganda).
 - [ ] **Mastery Score & Sertifikasi:** Sistem lencana (badge) digital bagi anggota yang lulus level tertentu.
-- [ ] **Daily Digest:** Notifikasi harian otomatis berisi 1 soal, 1 berita pengawasan, dan 1 data kesejahteraan.
+- [x] **Daily Digest:** Notifikasi harian otomatis berisi 1 soal, 1 berita pengawasan, dan 1 data kesejahteraan.
 
 ## 🟠 FASE 2: AKSI LAPANGAN (MODUL "AKU HADIR")
 *Tujuan: Menggerakkan anggota di lapangan dengan validasi anti-kolusi.*

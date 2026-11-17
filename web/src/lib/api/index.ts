@@ -2,6 +2,7 @@ export * from "./attendance";
 export * from "./auth";
 export * from "./contracts";
 export { fetchWithRetry } from "./client";
+export * from "./notifications";
 export * from "./essay";
 export * from "./events";
 export * from "./economics";

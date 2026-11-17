@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import NavbarRegistrationCTA from "@/components/NavbarRegistrationCTA";
-import { getCurrentUser } from "@/lib/api";
+import {
+  getCurrentUser,
+  getNotifications,
+  NOTIFICATIONS_UPDATED_EVENT,
+} from "@/lib/api";
 import type { RegisteredUser } from "@/types";
 
 const links = [
@@ -28,10 +32,48 @@ const groupedLinks = {
   ],
 };
 
+function NotificationBellLink({
+  unreadCount,
+  error,
+}: {
+  unreadCount: number;
+  error: string | null;
+}) {
+  return (
+    <Link
+      aria-label={`Notifikasi${unreadCount > 0 ? `, ${unreadCount} belum dibaca` : ""}`}
+      className="relative inline-flex size-10 items-center justify-center rounded-md text-text-main transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      href="/notifikasi"
+      title={error ?? "Notifikasi"}
+    >
+      <svg
+        aria-hidden="true"
+        className="size-5"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+        viewBox="0 0 24 24"
+      >
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M10 21h4" />
+      </svg>
+      {unreadCount > 0 && (
+        <span className="absolute right-0 top-0 min-w-5 rounded-full bg-red-600 px-1 text-center text-xs font-bold leading-5 text-white">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
+    </Link>
+  );
+}
+
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationError, setNotificationError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -54,6 +96,37 @@ export default function Navbar() {
 
     return () => {
       active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadUnreadCount = () => {
+      getNotifications()
+        .then((result) => {
+          if (active) {
+            setUnreadCount(result.unread_count);
+            setNotificationError(null);
+          }
+        })
+        .catch((loadError: unknown) => {
+          if (active) {
+            setNotificationError(
+              loadError instanceof Error
+                ? loadError.message
+                : "Notifikasi tidak dapat dimuat.",
+            );
+          }
+        });
+    };
+
+    loadUnreadCount();
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT, loadUnreadCount);
+
+    return () => {
+      active = false;
+      window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT, loadUnreadCount);
     };
   }, []);
 
@@ -113,6 +186,12 @@ export default function Navbar() {
           ))}
         </div>
         <div className="hidden flex-wrap items-center gap-2 md:flex">
+          {currentUser && (
+            <NotificationBellLink
+              error={notificationError}
+              unreadCount={unreadCount}
+            />
+          )}
           {currentUser ? (
             <Link
               className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-text-main hover:bg-primary-light"
@@ -173,6 +252,36 @@ export default function Navbar() {
               ))}
             </div>
             <div className="mt-2 flex flex-col gap-2 border-t border-background pt-3">
+              {currentUser && (
+                <Link
+                  className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
+                  href="/notifikasi"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  title={notificationError ?? "Notifikasi"}
+                >
+                  <span className="flex items-center gap-2">
+                    <svg
+                      aria-hidden="true"
+                      className="size-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.8"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                      <path d="M10 21h4" />
+                    </svg>
+                    Notifikasi
+                  </span>
+                  {unreadCount > 0 && (
+                    <span className="rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </Link>
+              )}
               {currentUser ? (
                 <Link
                   className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
