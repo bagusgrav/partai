@@ -224,6 +224,22 @@ export interface EconomicHistoryResponse {
   data: EconomicIndicator[];
 }
 
+export interface EconomicIndicatorObservation {
+  id: string;
+  indicator_name: string;
+  period_year: number;
+  period_month: number | null;
+  value: number;
+  unit: string;
+  source: string;
+  updated_at: string | null;
+}
+
+export interface EconomicIndicatorsResponse {
+  indicators: Record<string, EconomicIndicatorObservation[]>;
+  last_updated: string | null;
+}
+
 export interface GovernmentInsight {
   id: number;
   category: "kabinet" | "berita";

@@ -16,13 +16,12 @@ import {
   YAxis,
 } from "recharts";
 import {
-  getEconomicHistory,
-  getEconomicSummary,
+  getEconomicIndicators,
   getGovernmentCabinet,
   getGovernmentNews,
 } from "@/lib/api";
 import type {
-  EconomicIndicator,
+  EconomicIndicatorObservation,
   GovernmentInsight,
 } from "@/types";
 
@@ -37,9 +36,9 @@ const dateFormatter = new Intl.DateTimeFormat("id-ID", {
   timeStyle: "short",
   timeZone: "Asia/Jakarta",
 });
-const dayFormatter = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
+const monthFormatter = new Intl.DateTimeFormat("id-ID", {
   month: "short",
+  year: "numeric",
   timeZone: "UTC",
 });
 
@@ -58,9 +57,23 @@ function formatDate(value: string | null): string {
     : dateFormatter.format(date);
 }
 
-function formatDay(value: string): string {
-  const date = new Date(`${value}T00:00:00Z`);
-  return Number.isNaN(date.getTime()) ? value : dayFormatter.format(date);
+function formatPeriod(value: string): string {
+  const [year, month] = value.split("-");
+  if (!month || month === "00") {
+    return year;
+  }
+
+  const date = new Date(`${year}-${month}-01T00:00:00Z`);
+  return Number.isNaN(date.getTime()) ? value : monthFormatter.format(date);
+}
+
+function toTrendData(
+  observations: EconomicIndicatorObservation[],
+): TrendData[] {
+  return observations.map(({ period_year, period_month, value }) => ({
+    period: `${period_year}-${String(period_month ?? "00").padStart(2, "0")}`,
+    value,
+  }));
 }
 
 function sourceLabel(source: string): string {
@@ -90,7 +103,7 @@ function TrendChart({
       </div>
       {data.length === 0 ? (
         <p className="flex h-64 items-center justify-center text-sm text-text-muted">
-          Belum ada riwayat untuk ditampilkan.
+          Data sedang diperbarui.
         </p>
       ) : (
         <>
@@ -101,7 +114,7 @@ function TrendChart({
                 <XAxis
                   axisLine={false}
                   dataKey="period"
-                  tickFormatter={formatDay}
+                  tickFormatter={formatPeriod}
                   tickLine={false}
                   tick={{ fill: "#64748b", fontSize: 12 }}
                 />
@@ -114,7 +127,7 @@ function TrendChart({
                 />
                 <Tooltip
                   formatter={(value) => [`${formatValue(Number(value))} ${unit}`, title]}
-                  labelFormatter={(label) => formatDay(String(label))}
+                  labelFormatter={(label) => formatPeriod(String(label))}
                 />
                 <Line
                   activeDot={{ r: 5 }}
@@ -145,7 +158,7 @@ function MetricCard({
   loading,
 }: {
   title: string;
-  indicator: EconomicIndicator | undefined;
+  indicator: EconomicIndicatorObservation | undefined;
   loading: boolean;
 }) {
   return (
@@ -156,7 +169,7 @@ function MetricCard({
           ? "Memuat..."
           : indicator
             ? `${formatValue(indicator.value)} ${indicator.unit}`
-            : "Belum tersedia"}
+            : "Data sedang diperbarui"}
       </p>
       {indicator && (
         <>
@@ -164,8 +177,9 @@ function MetricCard({
             Sumber: {sourceLabel(indicator.source)}
           </p>
           <p className="mt-1 text-xs text-text-muted">
-            Periode {indicator.period}
-            {indicator.trend ? ` · Tren ${indicator.trend}` : ""}
+            Periode {formatPeriod(
+              `${indicator.period_year}-${String(indicator.period_month ?? "00").padStart(2, "0")}`,
+            )}
           </p>
         </>
       )}
@@ -192,7 +206,9 @@ function InsightLink({ item, children }: { item: GovernmentInsight; children: Re
 
 export default function EconomicDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>("ekonomi");
-  const [indicators, setIndicators] = useState<EconomicIndicator[]>([]);
+  const [indicators, setIndicators] = useState<
+    Record<string, EconomicIndicatorObservation[]>
+  >({});
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [exchangeHistory, setExchangeHistory] = useState<TrendData[]>([]);
   const [inflationHistory, setInflationHistory] = useState<TrendData[]>([]);
@@ -203,9 +219,7 @@ export default function EconomicDashboard() {
 
   const loadData = useCallback(async () => {
     return Promise.all([
-      getEconomicSummary(),
-      getEconomicHistory("exchange_rate"),
-      getEconomicHistory("inflation"),
+      getEconomicIndicators(),
       getGovernmentNews(),
       getGovernmentCabinet(),
     ] as const);
@@ -217,28 +231,26 @@ export default function EconomicDashboard() {
     async function refresh() {
       try {
         const [
-          summaryResponse,
-          exchangeResponse,
-          inflationResponse,
+          economicResponse,
           newsResponse,
           cabinetResponse,
         ] = await loadData();
         if (!isCurrent) {
           return;
         }
-        setIndicators(summaryResponse.indicators);
-        setLastUpdated(summaryResponse.last_updated);
-        setExchangeHistory(
-          exchangeResponse.data.map(({ period, value }) => ({ period, value })),
-        );
-        setInflationHistory(
-          inflationResponse.data.map(({ period, value }) => ({ period, value })),
-        );
+        setIndicators(economicResponse.indicators);
+        setLastUpdated(economicResponse.last_updated);
+        setExchangeHistory(toTrendData(economicResponse.indicators.kurs_usd ?? []));
+        setInflationHistory(toTrendData(economicResponse.indicators.inflasi ?? []));
         setNews(newsResponse.insights);
         setCabinet(cabinetResponse.insights);
         setError(null);
       } catch (requestError) {
         if (isCurrent) {
+          setIndicators({});
+          setExchangeHistory([]);
+          setInflationHistory([]);
+          setLastUpdated(null);
           setError(
             requestError instanceof Error
               ? requestError.message
@@ -263,9 +275,10 @@ export default function EconomicDashboard() {
     };
   }, [loadData]);
 
-  const indicatorsByType = new Map(
-    indicators.map((indicator) => [indicator.indicator_type, indicator] as const),
-  );
+  const latestIndicator = (name: string) => {
+    const observations = indicators[name] ?? [];
+    return observations[observations.length - 1];
+  };
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-10 sm:px-8">
@@ -326,24 +339,14 @@ export default function EconomicDashboard() {
           id="panel-ekonomi"
           role="tabpanel"
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <MetricCard
-              indicator={indicatorsByType.get("debt")}
-              loading={isLoading}
-              title="Utang Pemerintah"
-            />
-            <MetricCard
-              indicator={indicatorsByType.get("apbn")}
-              loading={isLoading}
-              title="APBN"
-            />
-            <MetricCard
-              indicator={indicatorsByType.get("inflation")}
+              indicator={latestIndicator("inflasi")}
               loading={isLoading}
               title="Inflasi"
             />
             <MetricCard
-              indicator={indicatorsByType.get("exchange_rate")}
+              indicator={latestIndicator("kurs_usd")}
               loading={isLoading}
               title="Kurs USD/IDR"
             />
@@ -366,9 +369,7 @@ export default function EconomicDashboard() {
             />
           </div>
           <p className="text-xs leading-5 text-text-muted">
-            Ringkasan utang, APBN, dan inflasi saat ini merupakan simulasi, bukan
-            data resmi. Kurs diambil dari API publik ExchangeRate-API. Data berita
-            diperbarui otomatis melalui RSS ANTARA.
+            Layanan ini menggunakan API Badan Pusat Statistik (BPS).
           </p>
         </section>
       )}

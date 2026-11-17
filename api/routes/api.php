@@ -62,6 +62,7 @@ Route::post('/welfare/ikk/ingest', [WelfareIndexController::class, 'ingest'])
     ->middleware(['auth:sanctum', 'role:super_admin|pengurus', 'throttle:20,1']);
 Route::get('/economic/summary', [EconomicController::class, 'summary']);
 Route::get('/economic/history/{type}', [EconomicController::class, 'history']);
+Route::get('/economy/indicators', [EconomicController::class, 'indicators']);
 Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
 Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet']);
 Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])

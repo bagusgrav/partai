@@ -1,5 +1,6 @@
 import type {
   EconomicHistoryResponse,
+  EconomicIndicatorsResponse,
   EconomicSummaryResponse,
   GovernmentInsightsResponse,
 } from "@/types";
@@ -21,6 +22,10 @@ async function getJson<T>(path: string): Promise<T> {
 
 export function getEconomicSummary(): Promise<EconomicSummaryResponse> {
   return getJson("/economic/summary");
+}
+
+export function getEconomicIndicators(): Promise<EconomicIndicatorsResponse> {
+  return getJson("/economy/indicators");
 }
 
 export function getEconomicHistory(
