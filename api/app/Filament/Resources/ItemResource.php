@@ -5,10 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ItemResource\Pages;
 use App\Models\Item;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -85,6 +87,7 @@ class ItemResource extends Resource
                         'multiple-choice' => 'Pilihan Ganda',
                         'essay' => 'Esai',
                     ])
+                    ->live()
                     ->required(),
                 TextInput::make('payload.question')
                     ->label('Pertanyaan')
@@ -93,6 +96,11 @@ class ItemResource extends Resource
                 Textarea::make('payload.explanation')
                     ->label('Penjelasan')
                     ->rows(4)
+                    ->visible(fn (Get $get): bool => $get('payload.type') !== 'essay')
+                    ->columnSpanFull(),
+                RichEditor::make('payload.explanation')
+                    ->label('Kunci Jawaban / Pembahasan')
+                    ->visible(fn (Get $get): bool => $get('payload.type') === 'essay')
                     ->columnSpanFull(),
                 TextInput::make('payload.instructions')
                     ->label('Instruksi Esai')
@@ -100,9 +108,11 @@ class ItemResource extends Resource
                 Repeater::make('payload.options')
                     ->label('Pilihan Jawaban')
                     ->simple(TextInput::make('option')->label('Pilihan')->required())
+                    ->visible(fn (Get $get): bool => $get('payload.type') !== 'essay')
                     ->columnSpanFull(),
                 TextInput::make('payload.answer')
-                    ->label('Kunci Jawaban'),
+                    ->label('Kunci Jawaban')
+                    ->visible(fn (Get $get): bool => $get('payload.type') !== 'essay'),
                 TextInput::make('payload.sources.0.citation')
                     ->label('Sumber Hukum')
                     ->columnSpanFull(),

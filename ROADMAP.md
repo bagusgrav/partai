@@ -16,6 +16,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 *Tujuan: Memastikan setiap anggota memiliki kapasitas intelektual yang terukur.*
 - [ ] **Kurikulum Penuh:** Bank soal 5 domain (Hak, Alasan Bernegara, Keuangan, Hukum, Politik) hingga Level 4 (Kritisi).
 - [x] **Sistem Esai & Peer-Review:** Untuk soal Level 3 & 4, anggota menjawab esai pendek yang dinilai oleh panel (bukan pilihan ganda).
+- [x] **Pembahasan Esai:** Kunci jawaban ideal ditampilkan setelah esai dikirim ke antrean penilaian; pembahasan tidak bocor pada daftar soal.
 - [ ] **Mastery Score & Sertifikasi:** Sistem lencana (badge) digital bagi anggota yang lulus level tertentu.
 - [x] **Daily Digest:** Notifikasi harian otomatis berisi 1 soal, 1 berita pengawasan, dan 1 data kesejahteraan.
 

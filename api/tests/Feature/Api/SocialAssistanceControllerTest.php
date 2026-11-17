@@ -3,9 +3,11 @@
 namespace Tests\Feature\Api;
 
 use App\Models\SocialAssistance;
+use App\Models\User;
 use Database\Seeders\SocialAssistanceSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class SocialAssistanceControllerTest extends TestCase
@@ -14,6 +16,7 @@ class SocialAssistanceControllerTest extends TestCase
 
     public function test_it_returns_the_program_status_and_period_for_a_registered_nik(): void
     {
+        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
         SocialAssistance::query()->create([
             'nik' => '3201010101010001',
             'name' => 'Nama Rahasia',
@@ -36,6 +39,8 @@ class SocialAssistanceControllerTest extends TestCase
 
     public function test_it_returns_not_found_for_an_unregistered_nik(): void
     {
+        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+
         $this->getJson('/api/rights/check/3201010101010001')
             ->assertNotFound()
             ->assertJsonPath('message', 'NIK tidak terdaftar sebagai penerima bansos')
@@ -44,6 +49,8 @@ class SocialAssistanceControllerTest extends TestCase
 
     public function test_it_rejects_nik_values_that_are_not_sixteen_digits(): void
     {
+        Sanctum::actingAs(User::factory()->create());
+
         $this->getJson('/api/rights/check/12345')
             ->assertUnprocessable()
             ->assertJsonPath('message', 'NIK harus terdiri dari 16 digit angka.');
@@ -52,11 +59,35 @@ class SocialAssistanceControllerTest extends TestCase
             ->assertUnprocessable();
     }
 
-    public function test_it_limits_public_checks_to_ten_requests_per_minute(): void
+    public function test_it_rejects_unauthenticated_checks(): void
+    {
+        $this->getJson('/api/rights/check/3201010101010001')->assertUnauthorized();
+    }
+
+    public function test_it_cannot_check_another_users_nik(): void
+    {
+        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+        SocialAssistance::query()->create([
+            'nik' => '3201010101010002',
+            'name' => 'Nama Rahasia',
+            'program' => 'PKH',
+            'status' => 'DITERIMA',
+            'period' => '2026',
+            'region_code' => '3201',
+        ]);
+
+        $this->getJson('/api/rights/check/3201010101010002')
+            ->assertForbidden()
+            ->assertJsonMissingPath('program')
+            ->assertHeader('Cache-Control', 'no-store, private');
+    }
+
+    public function test_it_limits_checks_to_five_requests_per_minute(): void
     {
         RateLimiter::clear('127.0.0.1');
+        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
 
-        for ($attempt = 0; $attempt < 10; $attempt++) {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->getJson('/api/rights/check/3201010101010001')->assertNotFound();
         }
 

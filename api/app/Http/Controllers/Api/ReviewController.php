@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ReviewController extends Controller
 {
@@ -46,6 +47,11 @@ class ReviewController extends Controller
             ->get()
             ->map(function ($item) {
                 $item->payload = json_decode($item->payload, true, flags: JSON_THROW_ON_ERROR);
+                unset(
+                    $item->payload['answer'],
+                    $item->payload['explanation'],
+                    $item->payload['reference_answer'],
+                );
 
                 return $item;
             });
@@ -57,20 +63,48 @@ class ReviewController extends Controller
     {
         $validated = $request->validate([
             'item_id' => ['required', 'string', 'exists:items,id'],
-            'correct' => ['required', 'boolean'],
+            'selected_option' => ['required', 'integer', 'min:0'],
             'request_id' => ['required', 'uuid'],
         ]);
         $userId = $request->user()->getAuthIdentifier();
+        $itemPayload = DB::table('items')
+            ->where('id', $validated['item_id'])
+            ->value('payload');
+        $item = json_decode($itemPayload, true, flags: JSON_THROW_ON_ERROR);
+        $options = $item['options'] ?? null;
+        $correctOption = $item['answer'] ?? null;
+
+        if (
+            ($item['type'] ?? 'multiple-choice') === 'essay'
+            || ! is_array($options)
+            || ! array_key_exists($validated['selected_option'], $options)
+            || ! is_numeric($correctOption)
+            || ! array_key_exists((int) $correctOption, $options)
+        ) {
+            throw ValidationException::withMessages([
+                'item_id' => 'Item ini tidak memiliki kunci jawaban pilihan ganda yang valid.',
+            ]);
+        }
+
+        $correctOption = (int) $correctOption;
+        $correct = $correctOption === $validated['selected_option'];
+        $explanation = $this->plainText($item['explanation'] ?? $item['reference_answer'] ?? null);
 
         $existingReview = DB::table('reviews')
             ->where('request_id', $validated['request_id'])
             ->first();
 
         if ($existingReview !== null) {
-            return $this->duplicateResponse($existingReview, $userId, $validated['item_id']);
+            return $this->duplicateResponse(
+                $existingReview,
+                $userId,
+                $validated['item_id'],
+                $correct,
+                $correctOption,
+                $explanation,
+            );
         }
 
-        $correct = filter_var($validated['correct'], FILTER_VALIDATE_BOOLEAN);
         $quality = $correct ? 4 : 1;
         $reviewedAt = now();
 
@@ -80,6 +114,14 @@ class ReviewController extends Controller
                     ->where('user_id', $userId)
                     ->where('item_id', $validated['item_id'])
                     ->first();
+
+                if (
+                    $state !== null
+                    && $state->next_review !== null
+                    && now()->lt($state->next_review)
+                ) {
+                    abort(409, 'Item ini belum dijadwalkan untuk ditinjau kembali.');
+                }
 
                 $reps = (int) ($state->reps ?? 0);
                 $interval = (int) ($state->interval_d ?? 0);
@@ -152,18 +194,40 @@ class ReviewController extends Controller
                 throw $exception;
             }
 
-            return $this->duplicateResponse($existingReview, $userId, $validated['item_id']);
+            return $this->duplicateResponse(
+                $existingReview,
+                $userId,
+                $validated['item_id'],
+                $correct,
+                $correctOption,
+                $explanation,
+            );
         }
 
         return response()->json([
             'status' => 'processed',
-            'data' => ['next_review_at' => $nextReview->toISOString()],
+            'data' => [
+                'next_review_at' => $nextReview->toISOString(),
+                'correct' => $correct,
+                'correct_option' => $correctOption,
+                'explanation' => $explanation,
+            ],
         ]);
     }
 
-    private function duplicateResponse(object $review, string $userId, string $itemId): JsonResponse
-    {
-        if ($review->user_id !== $userId || $review->item_id !== $itemId) {
+    private function duplicateResponse(
+        object $review,
+        string $userId,
+        string $itemId,
+        bool $correct,
+        int $correctOption,
+        ?string $explanation,
+    ): JsonResponse {
+        if (
+            $review->user_id !== $userId
+            || $review->item_id !== $itemId
+            || (bool) $review->correct !== $correct
+        ) {
             return response()->json([
                 'message' => 'The request_id has already been used for a different review.',
             ], 409);
@@ -176,7 +240,27 @@ class ReviewController extends Controller
 
         return response()->json([
             'status' => 'already_processed',
-            'data' => ['state' => $state],
+            'data' => [
+                'state' => $state,
+                'correct' => $correct,
+                'correct_option' => $correctOption,
+                'explanation' => $explanation,
+            ],
         ]);
+    }
+
+    private function plainText(mixed $content): ?string
+    {
+        if (! is_string($content) || trim($content) === '') {
+            return null;
+        }
+
+        $content = preg_replace(
+            '/<\/?(?:p|div|br|li|h[1-6]|blockquote|pre|ul|ol)\b[^>]*>/i',
+            "\n",
+            $content,
+        );
+
+        return trim(html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 }

@@ -5,6 +5,10 @@ interface QuizCardProps {
   questionNumber: number;
   selectedOption: number | null;
   essayAnswer: string;
+  answerCorrect: boolean | null;
+  answerPending: boolean;
+  correctOption: number | null;
+  explanation: string | null;
   isRevealed: boolean;
   loading: boolean;
   submitError: string | null;
@@ -20,6 +24,10 @@ export default function QuizCard({
   questionNumber,
   selectedOption,
   essayAnswer,
+  answerCorrect,
+  answerPending,
+  correctOption,
+  explanation,
   isRevealed,
   loading,
   submitError,
@@ -29,8 +37,6 @@ export default function QuizCard({
   onSubmitEssay,
   onNext,
 }: QuizCardProps) {
-  const correctAnswer = item.payload.type === "essay" ? null : item.payload.answer;
-
   return (
     <section className="rounded-3xl border border-background bg-surface p-6 shadow-xl shadow-primary/5 sm:p-10">
       <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-hover">
@@ -61,6 +67,16 @@ export default function QuizCard({
               Esai berhasil dikirim dan menunggu penilaian anggota lain.
             </p>
           )}
+          {isRevealed && (
+            <div className="mt-4 rounded-2xl border border-primary-light bg-primary-light p-5">
+              <h2 className="font-extrabold text-primary-hover">
+                Pembahasan &amp; Kunci Jawaban
+              </h2>
+              <p className="mt-2 whitespace-pre-wrap leading-relaxed text-text-main">
+                {explanation || "Pembahasan untuk soal ini belum tersedia."}
+              </p>
+            </div>
+          )}
           {submitError && (
             <p className="mt-4 text-sm font-semibold text-slate-700" role="alert">
               Esai belum berhasil dikirim. {submitError}
@@ -71,7 +87,7 @@ export default function QuizCard({
         <div className="mt-8 space-y-3">
           {item.payload.options.map((option, optionIndex) => {
             const isSelected = selectedOption === optionIndex;
-            const isCorrect = correctAnswer === optionIndex;
+            const isCorrect = correctOption === optionIndex;
             const revealedStyle = isRevealed
               ? isCorrect
                 ? "border-primary bg-primary-light text-primary-hover"
@@ -86,7 +102,7 @@ export default function QuizCard({
               <button
                 aria-pressed={isSelected}
                 className={`flex min-h-16 w-full items-center gap-4 rounded-2xl border-2 px-4 py-3 text-left font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default ${revealedStyle}`}
-                disabled={isRevealed || loading}
+                disabled={isRevealed || loading || answerPending}
                 key={`${item.id}-${optionIndex}`}
                 onClick={() => onSelectOption(optionIndex)}
                 type="button"
@@ -115,22 +131,22 @@ export default function QuizCard({
         <div
           aria-live="polite"
           className={`mt-7 rounded-2xl border p-5 ${
-            selectedOption === correctAnswer
+            answerCorrect
               ? "border-primary-light bg-primary-light"
               : "border-slate-300 bg-slate-100"
           }`}
         >
           <h2
             className={`font-extrabold ${
-              selectedOption === correctAnswer
+              answerCorrect
                 ? "text-primary-hover"
                 : "text-slate-800"
             }`}
           >
-            {selectedOption === correctAnswer ? "Benar!" : "Belum tepat"}
+            {answerCorrect ? "Benar!" : "Belum tepat"}
           </h2>
           <p className="mt-2 leading-relaxed text-text-main">
-            {item.payload.explanation}
+            {explanation || "Pembahasan untuk soal ini belum tersedia."}
           </p>
           {item.payload.sources.length > 0 && (
             <ul className="mt-4 space-y-2 border-t border-background/80 pt-4 text-sm">

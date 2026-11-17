@@ -31,6 +31,11 @@ class EssayController extends Controller
 
         if ($item !== null) {
             $item->payload = json_decode($item->payload, true, flags: JSON_THROW_ON_ERROR);
+            unset(
+                $item->payload['answer'],
+                $item->payload['explanation'],
+                $item->payload['reference_answer'],
+            );
         }
 
         return response()->json(['item' => $item]);
@@ -56,6 +61,7 @@ class EssayController extends Controller
             ]);
         }
 
+        $explanation = $this->plainText($item['explanation'] ?? $item['reference_answer'] ?? null);
         $existingSubmission = DB::table('essay_submissions')
             ->where('request_id', $validated['request_id'])
             ->first();
@@ -66,6 +72,7 @@ class EssayController extends Controller
                 $userId,
                 $validated['item_id'],
                 $validated['answer_text'],
+                $explanation,
             );
         }
 
@@ -95,12 +102,16 @@ class EssayController extends Controller
                 $userId,
                 $validated['item_id'],
                 $validated['answer_text'],
+                $explanation,
             );
         }
 
         return response()->json([
             'status' => 'processed',
-            'data' => ['submission_id' => $submissionId],
+            'data' => [
+                'submission_id' => $submissionId,
+                'explanation' => $explanation,
+            ],
         ], 201);
     }
 
@@ -126,9 +137,11 @@ class EssayController extends Controller
             return response()->json(['submission' => null]);
         }
 
+        $payload = json_decode($submission->payload, true, flags: JSON_THROW_ON_ERROR);
+        unset($payload['answer'], $payload['explanation'], $payload['reference_answer']);
         $submission->item = [
             'id' => $submission->item_id,
-            'payload' => json_decode($submission->payload, true, flags: JSON_THROW_ON_ERROR),
+            'payload' => $payload,
         ];
         unset($submission->payload, $submission->item_id);
 
@@ -231,6 +244,7 @@ class EssayController extends Controller
         string $userId,
         string $itemId,
         string $answerText,
+        ?string $explanation,
     ): JsonResponse {
         if (
             $submission->user_id !== $userId
@@ -244,8 +258,26 @@ class EssayController extends Controller
 
         return response()->json([
             'status' => 'already_processed',
-            'data' => ['submission_id' => $submission->id],
+            'data' => [
+                'submission_id' => $submission->id,
+                'explanation' => $explanation,
+            ],
         ]);
+    }
+
+    private function plainText(mixed $content): ?string
+    {
+        if (! is_string($content) || trim($content) === '') {
+            return null;
+        }
+
+        $content = preg_replace(
+            '/<\/?(?:p|div|br|li|h[1-6]|blockquote|pre|ul|ol)\b[^>]*>/i',
+            "\n",
+            $content,
+        );
+
+        return trim(html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 
     /**

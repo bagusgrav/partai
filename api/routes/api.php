@@ -51,7 +51,7 @@ Route::get('/economic/history/{type}', [EconomicController::class, 'history']);
 Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
 Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet']);
 Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
-    ->middleware('throttle:10,1');
+    ->middleware(['auth:sanctum', 'throttle:5,1']);
 Route::get('/contracts', [FactionContractController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {

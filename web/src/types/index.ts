@@ -6,8 +6,6 @@ export interface Item {
     type?: "multiple-choice";
     question: string;
     options: string[];
-    answer: number;
-    explanation: string;
     sources: {
       citation: string;
       url?: string;
@@ -27,6 +25,9 @@ export interface AnswerResponse {
   status: "processed" | "already_processed";
   data: {
     next_review_at?: string;
+    correct: boolean;
+    correct_option: number;
+    explanation: string | null;
     state?: Record<string, unknown>;
   };
 }
@@ -56,6 +57,7 @@ export interface EssaySubmissionResponse {
   status: "processed" | "already_processed";
   data: {
     submission_id: number;
+    explanation: string | null;
   };
 }
 

@@ -71,7 +71,7 @@ export default function RightsChecker() {
           Cek Status Bansos Anda
         </h1>
         <p className="mt-3 text-base leading-7 text-text-muted">
-          Masukkan NIK untuk melihat status bantuan sosial yang tercatat.
+          Masukkan NIK yang terdaftar pada akun Anda untuk memeriksa status bantuan sosial.
         </p>
 
         <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
@@ -97,7 +97,7 @@ export default function RightsChecker() {
               value={nik}
             />
             <p className="mt-2 text-sm text-text-muted">
-              {nik.length}/16 digit. NIK digunakan untuk mencari data bansos.
+              {nik.length}/16 digit. NIK hanya digunakan untuk memeriksa data akun Anda.
             </p>
           </div>
           <button

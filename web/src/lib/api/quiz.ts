@@ -18,15 +18,16 @@ export async function getReviewItems(): Promise<ReviewResponse> {
 
 export async function submitAnswer(
   itemId: string,
-  correct: boolean,
+  selectedOption: number,
+  requestId: string,
 ): Promise<AnswerResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/answer`, {
     method: "POST",
     headers: await getHeaders(true),
     body: JSON.stringify({
       item_id: itemId,
-      correct,
-      request_id: crypto.randomUUID(),
+      selected_option: selectedOption,
+      request_id: requestId,
     }),
   });
 

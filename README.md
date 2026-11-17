@@ -18,11 +18,11 @@ Platform ini dirancang untuk menjawab persoalan yang kerap dibahas dalam riset t
 
 | Fase | Fitur | Ringkasan |
 | --- | --- | --- |
-| 🟢 | **Pendidikan Kewargaan (SM-2)** | Materi kewargaan, latihan soal, dan pengulangan terjadwal untuk mendukung pembelajaran berkelanjutan. |
+| 🟢 | **Pendidikan Kewargaan (SM-2)** | Materi kewargaan, latihan soal, pengulangan terjadwal, dan pembahasan/kunci jawaban esai setelah jawaban dikirim. |
 | 🟠 | **Aksi Lapangan (Anti-Kolusi QR)** | Kehadiran aksi berbasis QR dinamis, geofence, dan atestasi silang antarwilayah. |
 | 🔵 | **Open Data & Jemput Hak (Bansos Tracker)** | Data sosial dan ekonomi publik serta alat bantu pengecekan hak dan bantuan sosial. |
 | 🟣 | **Tata Kelola (Kontrak Faksi & Recall)** | Kontrak faksi yang dapat dipantau dan mekanisme partisipasi serta recall anggota. |
-| 🏆 | **Sistem Reputasi** | Poin dan level warga berdasarkan kuis benar, esai dengan nilai peer-review minimal 70/100, kehadiran tervalidasi, dan atestasi klaim. |
+| 🏆 | **Sistem Reputasi** | Poin dan level warga berdasarkan kuis benar, esai dengan nilai peer-review minimal 70/100, kehadiran tervalidasi, dan atestasi klaim—dengan umpan balik pembahasan untuk belajar mandiri. |
 
 ## Arsitektur Teknis
 

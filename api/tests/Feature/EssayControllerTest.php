@@ -16,7 +16,11 @@ class EssayControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
-        $this->createItem('ESSAY-001', ['type' => 'essay', 'question' => 'Question']);
+        $this->createItem('ESSAY-001', [
+            'type' => 'essay',
+            'question' => 'Question',
+            'explanation' => '<p>Ideal answer</p><p>Second paragraph</p>',
+        ]);
         $payload = [
             'item_id' => 'ESSAY-001',
             'answer_text' => 'My answer',
@@ -25,10 +29,12 @@ class EssayControllerTest extends TestCase
 
         $this->postJson('/api/essay/submit', $payload)
             ->assertCreated()
-            ->assertJsonPath('status', 'processed');
+            ->assertJsonPath('status', 'processed')
+            ->assertJsonPath('data.explanation', "Ideal answer\n\nSecond paragraph");
         $this->postJson('/api/essay/submit', $payload)
             ->assertOk()
-            ->assertJsonPath('status', 'already_processed');
+            ->assertJsonPath('status', 'already_processed')
+            ->assertJsonPath('data.explanation', "Ideal answer\n\nSecond paragraph");
         $this->postJson('/api/essay/submit', [...$payload, 'answer_text' => 'Changed answer'])
             ->assertConflict();
 
@@ -60,7 +66,12 @@ class EssayControllerTest extends TestCase
     {
         $author = User::factory()->create();
         $reviewer = User::factory()->create();
-        $this->createItem('ESSAY-001', ['type' => 'essay', 'question' => 'Question']);
+        $this->createItem('ESSAY-001', [
+            'type' => 'essay',
+            'question' => 'Question',
+            'answer' => 'Private answer',
+            'explanation' => 'Private until submission',
+        ]);
         $ownSubmission = $this->createSubmission($author, 'ESSAY-001', 'My own answer');
         $otherSubmission = $this->createSubmission($reviewer, 'ESSAY-001', 'Another answer');
         Sanctum::actingAs($author);
@@ -69,7 +80,9 @@ class EssayControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('submission.id', $otherSubmission)
             ->assertJsonPath('submission.answer_text', 'Another answer')
-            ->assertJsonPath('submission.item.payload.question', 'Question');
+            ->assertJsonPath('submission.item.payload.question', 'Question')
+            ->assertJsonMissingPath('submission.item.payload.answer')
+            ->assertJsonMissingPath('submission.item.payload.explanation');
 
         $this->assertDatabaseHas('essay_submissions', ['id' => $ownSubmission]);
     }
@@ -78,13 +91,22 @@ class EssayControllerTest extends TestCase
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
-        $this->createItem('ESSAY-001', ['type' => 'essay', 'question' => 'Question']);
+        $this->createItem('ESSAY-001', [
+            'type' => 'essay',
+            'question' => 'Question',
+            'answer' => 'Private answer',
+            'explanation' => 'Private until submission',
+            'reference_answer' => 'Alternate private answer',
+        ]);
         $this->createItem('QUIZ-001', ['type' => 'multiple-choice', 'question' => 'Quiz']);
 
         $this->getJson('/api/essay/question')
             ->assertOk()
             ->assertJsonPath('item.id', 'ESSAY-001')
-            ->assertJsonPath('item.payload.type', 'essay');
+            ->assertJsonPath('item.payload.type', 'essay')
+            ->assertJsonMissingPath('item.payload.answer')
+            ->assertJsonMissingPath('item.payload.explanation')
+            ->assertJsonMissingPath('item.payload.reference_answer');
     }
 
     public function test_submission_cannot_be_reviewed_by_its_author_and_reviews_are_idempotent(): void

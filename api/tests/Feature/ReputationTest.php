@@ -18,10 +18,14 @@ class ReputationTest extends TestCase
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user);
-        $this->createItem('QUIZ-001', ['type' => 'multiple-choice']);
+        $this->createItem('QUIZ-001', [
+            'type' => 'multiple-choice',
+            'options' => ['First', 'Second'],
+            'answer' => 0,
+        ]);
         $payload = [
             'item_id' => 'QUIZ-001',
-            'correct' => true,
+            'selected_option' => 0,
             'request_id' => 'a27fdc51-8b86-49b0-a185-42cab168a876',
         ];
 
@@ -29,9 +33,9 @@ class ReputationTest extends TestCase
         $this->postJson('/api/answer', $payload)->assertOk();
         $this->postJson('/api/answer', [
             ...$payload,
-            'correct' => false,
+            'selected_option' => 0,
             'request_id' => 'b82feb2e-6b98-49a7-b607-70d59cb9f248',
-        ])->assertOk();
+        ])->assertConflict();
 
         $this->assertDatabaseCount('reputation_logs', 1);
         $this->assertDatabaseHas('users', [

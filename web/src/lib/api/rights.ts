@@ -1,4 +1,5 @@
 import { API_BASE_URL, ensureSuccessfulResponse, fetchWithRetry } from "./client";
+import { getHeaders } from "./auth";
 
 export type SocialAssistanceStatus = {
   program: "PKH" | "BPNT" | "PIP";
@@ -23,7 +24,7 @@ export async function checkSocialAssistance(
     `${API_BASE_URL}/rights/check/${encodeURIComponent(nik)}`,
     {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: await getHeaders(),
       cache: "no-store",
     },
   );

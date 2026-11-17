@@ -24,8 +24,12 @@ export default function LearningSession() {
   const [items, setItems] = useState<Item[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [answerRequestId, setAnswerRequestId] = useState<string | null>(null);
+  const [answerCorrect, setAnswerCorrect] = useState<boolean | null>(null);
+  const [correctOption, setCorrectOption] = useState<number | null>(null);
   const [essayAnswer, setEssayAnswer] = useState("");
   const [essayRequestId, setEssayRequestId] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<string | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<QuizStats>({ correct: 0, incorrect: 0 });
@@ -67,20 +71,27 @@ export default function LearningSession() {
       return;
     }
 
-    const correct = selectedOption === item.payload.answer;
-    setIsRevealed(true);
+    const requestId = answerRequestId ?? crypto.randomUUID();
+    setAnswerRequestId(requestId);
     setSubmitError(null);
-    setStats((currentStats) => ({
-      correct: currentStats.correct + (correct ? 1 : 0),
-      incorrect: currentStats.incorrect + (correct ? 0 : 1),
-    }));
+    setExplanation(null);
     setLoading(true);
 
     try {
-      await submitAnswer(item.id, correct);
+      const response = await submitAnswer(item.id, selectedOption, requestId);
+      const correct = response.data.correct;
+      setAnswerRequestId(null);
+      setAnswerCorrect(correct);
+      setCorrectOption(response.data.correct_option);
+      setExplanation(response.data.explanation);
+      setIsRevealed(true);
+      setStats((currentStats) => ({
+        correct: currentStats.correct + (correct ? 1 : 0),
+        incorrect: currentStats.incorrect + (correct ? 0 : 1),
+      }));
     } catch (error) {
       setSubmitError(
-        `Jawaban ditampilkan, tetapi gagal disimpan ke server. ${getErrorMessage(error)}`,
+        `Jawaban gagal disimpan ke server. ${getErrorMessage(error)}`,
       );
     } finally {
       setLoading(false);
@@ -95,10 +106,12 @@ export default function LearningSession() {
     const requestId = essayRequestId ?? crypto.randomUUID();
     setEssayRequestId(requestId);
     setSubmitError(null);
+    setExplanation(null);
     setLoading(true);
 
     try {
-      await submitEssay(item.id, essayAnswer.trim(), requestId);
+      const response = await submitEssay(item.id, essayAnswer.trim(), requestId);
+      setExplanation(response.data.explanation);
       setIsRevealed(true);
       setEssayRequestId(null);
     } catch (error) {
@@ -111,8 +124,12 @@ export default function LearningSession() {
   function handleNext() {
     setCurrentIndex((index) => index + 1);
     setSelectedOption(null);
+    setAnswerRequestId(null);
+    setAnswerCorrect(null);
+    setCorrectOption(null);
     setEssayAnswer("");
     setEssayRequestId(null);
+    setExplanation(null);
     setIsRevealed(false);
     setSubmitError(null);
   }
@@ -222,6 +239,10 @@ export default function LearningSession() {
 
         <QuizCard
           essayAnswer={essayAnswer}
+          answerCorrect={answerCorrect}
+          answerPending={answerRequestId !== null}
+          correctOption={correctOption}
+          explanation={explanation}
           isRevealed={isRevealed}
           item={item}
           loading={loading}

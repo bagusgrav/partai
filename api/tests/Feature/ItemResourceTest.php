@@ -93,4 +93,26 @@ class ItemResourceTest extends TestCase
         $this->assertSame('ITEM-ORIGINAL', $item->refresh()->id);
         $this->assertDatabaseMissing('items', ['id' => 'ITEM-CHANGED']);
     }
+
+    public function test_essay_explanation_is_saved_from_the_rich_text_field(): void
+    {
+        Livewire::test(CreateItem::class)
+            ->fillForm([
+                'id' => 'ESSAY-RICH-TEXT',
+                'domain' => 'hukum',
+                'level' => 'kritisi',
+                'payload' => [
+                    'type' => 'essay',
+                    'question' => 'Question',
+                    'explanation' => '<p>Reference answer</p>',
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(
+            '<p>Reference answer</p>',
+            Item::query()->findOrFail('ESSAY-RICH-TEXT')->payload['explanation'],
+        );
+    }
 }
