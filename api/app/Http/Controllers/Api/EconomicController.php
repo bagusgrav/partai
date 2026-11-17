@@ -7,13 +7,34 @@ use App\Models\EconomicIndicator;
 use App\Models\EconomicIndicatorObservation;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class EconomicController extends Controller
 {
-    public function indicators(): JsonResponse
+    public function indicators(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'region_code' => ['nullable', 'string', 'regex:/^\d{4}$/'],
+        ]);
+        $regionCode = $validated['region_code'] ?? '9999';
+
+        $data = EconomicIndicatorObservation::query()
+            ->where('indicator_name', 'inflasi')
+            ->where('region_code', $regionCode)
+            ->orderBy('period_year')
+            ->orderBy('period_month')
+            ->get(['period_year', 'period_month', 'value', 'region_name'])
+            ->map(static fn (EconomicIndicatorObservation $observation): array => [
+                'period_year' => $observation->period_year,
+                'period_month' => $observation->period_month,
+                'value' => $observation->value,
+                'region_name' => $observation->region_name,
+            ])
+            ->values();
+
         $grouped = EconomicIndicatorObservation::query()
             ->where('indicator_name', 'inflasi')
+            ->where('region_code', '9999')
             ->orderBy('period_year')
             ->orderBy('period_month')
             ->get()
@@ -50,8 +71,25 @@ class EconomicController extends Controller
             ->max();
 
         return response()->json([
+            'data' => $data,
             'indicators' => $grouped,
             'last_updated' => $lastUpdated,
+        ]);
+    }
+
+    public function regions(): JsonResponse
+    {
+        $regions = EconomicIndicatorObservation::query()
+            ->select('region_code')
+            ->selectRaw('MIN(region_name) AS region_name')
+            ->where('region_code', '!=', '9999')
+            ->where('region_code', 'like', '__00')
+            ->groupBy('region_code')
+            ->orderBy('region_name')
+            ->get();
+
+        return response()->json([
+            'regions' => $regions,
         ]);
     }
 

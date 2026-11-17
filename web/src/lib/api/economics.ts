@@ -1,6 +1,7 @@
 import type {
   EconomicHistoryResponse,
   EconomicIndicatorsResponse,
+  EconomicIndicatorRegionsResponse,
   EconomicSummaryResponse,
   GovernmentInsightsResponse,
 } from "@/types";
@@ -24,8 +25,17 @@ export function getEconomicSummary(): Promise<EconomicSummaryResponse> {
   return getJson("/economic/summary");
 }
 
-export function getEconomicIndicators(): Promise<EconomicIndicatorsResponse> {
-  return getJson("/economy/indicators");
+export function getEconomicIndicators(
+  regionCode?: string,
+): Promise<EconomicIndicatorsResponse> {
+  const query = regionCode
+    ? `?region_code=${encodeURIComponent(regionCode)}`
+    : "";
+  return getJson(`/economy/indicators${query}`);
+}
+
+export function getEconomicRegions(): Promise<EconomicIndicatorRegionsResponse> {
+  return getJson("/economy/regions");
 }
 
 export function getEconomicHistory(

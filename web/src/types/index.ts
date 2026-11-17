@@ -236,8 +236,25 @@ export interface EconomicIndicatorObservation {
 }
 
 export interface EconomicIndicatorsResponse {
+  data: EconomicInflationObservation[];
   indicators: Record<string, EconomicIndicatorObservation[]>;
   last_updated: string | null;
+}
+
+export interface EconomicInflationObservation {
+  period_year: number;
+  period_month: number | null;
+  value: number;
+  region_name: string;
+}
+
+export interface EconomicIndicatorRegion {
+  region_code: string;
+  region_name: string;
+}
+
+export interface EconomicIndicatorRegionsResponse {
+  regions: EconomicIndicatorRegion[];
 }
 
 export interface GovernmentInsight {

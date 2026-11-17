@@ -151,4 +151,64 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonPath('indicators.kurs_usd.0.period_year', 2024)
             ->assertJsonPath('indicators.kurs_usd.0.value', 16325.75);
     }
+
+    public function test_economy_indicators_default_to_national_and_filter_by_region(): void
+    {
+        foreach ([
+            ['region_code' => '9999', 'region_name' => 'Nasional (Indonesia)', 'period_year' => 2024, 'period_month' => 2, 'value' => 2.8],
+            ['region_code' => '3100', 'region_name' => 'DKI Jakarta', 'period_year' => 2024, 'period_month' => 2, 'value' => 2.5],
+            ['region_code' => '3100', 'region_name' => 'DKI Jakarta', 'period_year' => 2024, 'period_month' => 1, 'value' => 2.3],
+            ['region_code' => '3200', 'region_name' => 'Jawa Barat', 'period_year' => 2024, 'period_month' => 1, 'value' => 2.1],
+        ] as $observation) {
+            EconomicIndicatorObservation::query()->create([
+                'indicator_name' => 'inflasi',
+                ...$observation,
+                'unit' => 'persen',
+                'source' => 'BPS WebAPI',
+            ]);
+        }
+
+        $this->getJson('/api/economy/indicators')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.region_name', 'Nasional (Indonesia)')
+            ->assertJsonPath('data.0.value', 2.8);
+
+        $this->getJson('/api/economy/indicators?region_code=3100')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.period_month', 1)
+            ->assertJsonPath('data.0.region_name', 'DKI Jakarta')
+            ->assertJsonPath('data.1.period_month', 2)
+            ->assertJsonPath('data.1.value', 2.5);
+    }
+
+    public function test_economy_regions_returns_only_unique_provinces_publicly(): void
+    {
+        foreach ([
+            ['region_code' => '3100', 'region_name' => 'DKI Jakarta'],
+            ['region_code' => '3200', 'region_name' => 'Jawa Barat', 'period_month' => 1],
+            ['region_code' => '3200', 'region_name' => 'Jawa Barat', 'period_month' => 2],
+            ['region_code' => '3171', 'region_name' => 'Jakarta Selatan'],
+            ['region_code' => '9999', 'region_name' => 'Nasional (Indonesia)'],
+        ] as $region) {
+            EconomicIndicatorObservation::query()->create([
+                'indicator_name' => 'inflasi',
+                ...$region,
+                'period_year' => 2024,
+                'period_month' => $region['period_month'] ?? 1,
+                'value' => 2.5,
+                'unit' => 'persen',
+                'source' => 'BPS WebAPI',
+            ]);
+        }
+
+        $this->getJson('/api/economy/regions')
+            ->assertOk()
+            ->assertJsonCount(2, 'regions')
+            ->assertJsonPath('regions.0.region_code', '3100')
+            ->assertJsonPath('regions.0.region_name', 'DKI Jakarta')
+            ->assertJsonPath('regions.1.region_code', '3200')
+            ->assertJsonPath('regions.1.region_name', 'Jawa Barat');
+    }
 }

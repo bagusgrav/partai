@@ -11,6 +11,8 @@ class EconomicIndicatorObservation extends Model
 
     protected $fillable = [
         'indicator_name',
+        'region_code',
+        'region_name',
         'period_year',
         'period_month',
         'value',

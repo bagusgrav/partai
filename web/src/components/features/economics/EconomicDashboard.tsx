@@ -8,6 +8,7 @@ import {
 } from "react";
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -17,16 +18,22 @@ import {
 } from "recharts";
 import {
   getEconomicIndicators,
+  getEconomicRegions,
   getGovernmentCabinet,
   getGovernmentNews,
 } from "@/lib/api";
 import type {
   EconomicIndicatorObservation,
+  EconomicIndicatorRegion,
   GovernmentInsight,
 } from "@/types";
 
 type DashboardTab = "ekonomi" | "wawasan";
-type TrendData = { period: string; value: number };
+type TrendData = {
+  period: string;
+  value?: number;
+  comparisonValue?: number;
+};
 
 const numberFormatter = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 2,
@@ -68,12 +75,45 @@ function formatPeriod(value: string): string {
 }
 
 function toTrendData(
-  observations: EconomicIndicatorObservation[],
+  observations: Array<{
+    period_year: number;
+    period_month: number | null;
+    value: number;
+  }>,
 ): TrendData[] {
   return observations.map(({ period_year, period_month, value }) => ({
     period: `${period_year}-${String(period_month ?? "00").padStart(2, "0")}`,
     value,
   }));
+}
+
+function mergeInflationData(
+  regionalData: TrendData[],
+  nationalData: TrendData[],
+): TrendData[] {
+  const merged = new Map<string, TrendData>();
+
+  for (const point of nationalData) {
+    merged.set(point.period, {
+      period: point.period,
+      comparisonValue: point.value,
+    });
+  }
+
+  for (const point of regionalData) {
+    const existing = merged.get(point.period);
+    merged.set(point.period, {
+      period: point.period,
+      value: point.value,
+      ...(existing?.comparisonValue === undefined
+        ? {}
+        : { comparisonValue: existing.comparisonValue }),
+    });
+  }
+
+  return [...merged.values()].sort((first, second) =>
+    first.period.localeCompare(second.period),
+  );
 }
 
 function sourceLabel(source: string): string {
@@ -89,11 +129,19 @@ function TrendChart({
   description,
   unit,
   data,
+  seriesLabel,
+  comparisonLabel,
+  loading = false,
+  emptyMessage = "Data sedang diperbarui.",
 }: {
   title: string;
   description: string;
   unit: string;
   data: TrendData[];
+  seriesLabel?: string;
+  comparisonLabel?: string;
+  loading?: boolean;
+  emptyMessage?: string;
 }) {
   return (
     <article className="rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm sm:p-6">
@@ -103,7 +151,7 @@ function TrendChart({
       </div>
       {data.length === 0 ? (
         <p className="flex h-64 items-center justify-center text-sm text-text-muted">
-          Data sedang diperbarui.
+          {loading ? "Memuat data wilayah..." : emptyMessage}
         </p>
       ) : (
         <>
@@ -126,18 +174,34 @@ function TrendChart({
                   width={72}
                 />
                 <Tooltip
-                  formatter={(value) => [`${formatValue(Number(value))} ${unit}`, title]}
+                  formatter={(value, name) => [
+                    `${formatValue(Number(value))} ${unit}`,
+                    String(name ?? title),
+                  ]}
                   labelFormatter={(label) => formatPeriod(String(label))}
                 />
+                {comparisonLabel && <Legend />}
                 <Line
                   activeDot={{ r: 5 }}
                   dataKey="value"
                   dot={{ r: 3 }}
-                  name={title}
+                  name={seriesLabel ?? title}
                   stroke="#0f172a"
                   strokeWidth={3}
                   type="monotone"
                 />
+                {comparisonLabel && (
+                  <Line
+                    activeDot={{ r: 4 }}
+                    dataKey="comparisonValue"
+                    dot={false}
+                    name={comparisonLabel}
+                    stroke="#64748b"
+                    strokeDasharray="6 4"
+                    strokeWidth={2}
+                    type="monotone"
+                  />
+                )}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -211,7 +275,17 @@ export default function EconomicDashboard() {
   >({});
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [exchangeHistory, setExchangeHistory] = useState<TrendData[]>([]);
-  const [inflationHistory, setInflationHistory] = useState<TrendData[]>([]);
+  const [nationalInflationHistory, setNationalInflationHistory] = useState<
+    TrendData[]
+  >([]);
+  const [regionalInflation, setRegionalInflation] = useState<{
+    regionCode: string;
+    data: TrendData[];
+    error: string | null;
+  } | null>(null);
+  const [regions, setRegions] = useState<EconomicIndicatorRegion[]>([]);
+  const [selectedRegionCode, setSelectedRegionCode] = useState("9999");
+  const [regionSearch, setRegionSearch] = useState("Nasional (Indonesia)");
   const [news, setNews] = useState<GovernmentInsight[]>([]);
   const [cabinet, setCabinet] = useState<GovernmentInsight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -220,6 +294,7 @@ export default function EconomicDashboard() {
   const loadData = useCallback(async () => {
     return Promise.all([
       getEconomicIndicators(),
+      getEconomicRegions(),
       getGovernmentNews(),
       getGovernmentCabinet(),
     ] as const);
@@ -230,18 +305,16 @@ export default function EconomicDashboard() {
 
     async function refresh() {
       try {
-        const [
-          economicResponse,
-          newsResponse,
-          cabinetResponse,
-        ] = await loadData();
+        const [economicResponse, regionsResponse, newsResponse, cabinetResponse] =
+          await loadData();
         if (!isCurrent) {
           return;
         }
         setIndicators(economicResponse.indicators);
         setLastUpdated(economicResponse.last_updated);
         setExchangeHistory(toTrendData(economicResponse.indicators.kurs_usd ?? []));
-        setInflationHistory(toTrendData(economicResponse.indicators.inflasi ?? []));
+        setNationalInflationHistory(toTrendData(economicResponse.data));
+        setRegions(regionsResponse.regions);
         setNews(newsResponse.insights);
         setCabinet(cabinetResponse.insights);
         setError(null);
@@ -249,7 +322,7 @@ export default function EconomicDashboard() {
         if (isCurrent) {
           setIndicators({});
           setExchangeHistory([]);
-          setInflationHistory([]);
+          setNationalInflationHistory([]);
           setLastUpdated(null);
           setError(
             requestError instanceof Error
@@ -275,10 +348,65 @@ export default function EconomicDashboard() {
     };
   }, [loadData]);
 
+  useEffect(() => {
+    if (selectedRegionCode === "9999") {
+      return;
+    }
+
+    let isCurrent = true;
+
+    async function refreshRegionalInflation() {
+      try {
+        const response = await getEconomicIndicators(selectedRegionCode);
+        if (isCurrent) {
+          setRegionalInflation({
+            regionCode: selectedRegionCode,
+            data: toTrendData(response.data),
+            error: null,
+          });
+        }
+      } catch {
+        if (isCurrent) {
+          setRegionalInflation({
+            regionCode: selectedRegionCode,
+            data: [],
+            error:
+              "Data untuk wilayah ini sedang dalam proses sinkronisasi.",
+          });
+        }
+      }
+    }
+
+    void refreshRegionalInflation();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedRegionCode]);
+
   const latestIndicator = (name: string) => {
     const observations = indicators[name] ?? [];
     return observations[observations.length - 1];
   };
+  const selectedRegionName =
+    regions.find((region) => region.region_code === selectedRegionCode)
+      ?.region_name ?? "Nasional (Indonesia)";
+  const currentRegionalInflation =
+    regionalInflation?.regionCode === selectedRegionCode
+      ? regionalInflation
+      : null;
+  const inflationHistory =
+    selectedRegionCode === "9999"
+      ? nationalInflationHistory
+      : currentRegionalInflation && currentRegionalInflation.data.length > 0
+        ? mergeInflationData(
+            currentRegionalInflation.data,
+            nationalInflationHistory,
+          )
+        : [];
+  const isInflationLoading =
+    selectedRegionCode !== "9999" && currentRegionalInflation === null;
+  const inflationError = currentRegionalInflation?.error ?? null;
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-5 py-10 sm:px-8">
@@ -289,6 +417,10 @@ export default function EconomicDashboard() {
         <h1 className="mt-2 text-3xl font-black tracking-tight text-text-main sm:text-4xl">
           Ekonomi &amp; Wawasan Indonesia
         </h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-text-muted">
+          Data ini bersumber dari BPS. Digunakan untuk transparansi dan
+          pengawasan publik. Tidak diperlukan akun untuk melihat data.
+        </p>
         <p className="mt-3 max-w-3xl text-base leading-7 text-text-muted">
           Pantau indikator ekonomi, perkembangan berita, dan informasi kabinet
           dari sumber yang dapat ditelusuri.
@@ -354,6 +486,41 @@ export default function EconomicDashboard() {
           <p className="text-sm text-text-muted">
             Terakhir diperbarui: {formatDate(lastUpdated)}
           </p>
+          <div className="max-w-md">
+            <label
+              className="mb-2 block text-sm font-semibold text-text-main"
+              htmlFor="inflation-region"
+            >
+              Cari dan pilih provinsi
+            </label>
+            <input
+              autoComplete="off"
+              className="w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-text-main shadow-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              id="inflation-region"
+              list="inflation-region-options"
+              onChange={(event) => {
+                const searchValue = event.currentTarget.value;
+                setRegionSearch(searchValue);
+                const selectedRegion = regions.find(
+                  (region) => region.region_name === searchValue,
+                );
+
+                if (searchValue === "Nasional (Indonesia)") {
+                  setSelectedRegionCode("9999");
+                } else if (selectedRegion) {
+                  setSelectedRegionCode(selectedRegion.region_code);
+                }
+              }}
+              placeholder="Ketik nama provinsi"
+              value={regionSearch}
+            />
+            <datalist id="inflation-region-options">
+              <option value="Nasional (Indonesia)" />
+              {regions.map((region) => (
+                <option key={region.region_code} value={region.region_name} />
+              ))}
+            </datalist>
+          </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <TrendChart
               data={exchangeHistory}
@@ -363,7 +530,18 @@ export default function EconomicDashboard() {
             />
             <TrendChart
               data={inflationHistory}
-              description="Riwayat indikator inflasi yang tersimpan."
+              comparisonLabel={
+                selectedRegionCode === "9999"
+                  ? undefined
+                  : "Nasional (Indonesia)"
+              }
+              description={`Riwayat inflasi untuk ${selectedRegionName} dibandingkan dengan rata-rata nasional.`}
+              emptyMessage={
+                inflationError ??
+                "Data untuk wilayah ini sedang dalam proses sinkronisasi."
+              }
+              loading={isInflationLoading}
+              seriesLabel={selectedRegionName}
               title="Tren Inflasi"
               unit="persen"
             />
