@@ -57,7 +57,7 @@ const navigationGroups: {
         icon: BookOpen,
       },
       {
-        href: "/review",
+        href: "/juri-warga",
         label: "Juri Warga",
         description: "Panel pengawasan & etik acak",
         icon: Scale,
@@ -116,7 +116,7 @@ const navigationGroups: {
         icon: Award,
       },
       {
-        href: "/info",
+        href: "/info-indonesia",
         label: "Info Indonesia",
         description: "Data sosial-ekonomi & kerentanan",
         icon: BarChart3,
@@ -133,7 +133,7 @@ const navigationGroups: {
         icon: Vote,
       },
       {
-        href: "/recall",
+        href: "/tata-kelola",
         label: "Tata Kelola",
         description: "Struktur, sortisi, & konstitusi kode",
         icon: Network,
