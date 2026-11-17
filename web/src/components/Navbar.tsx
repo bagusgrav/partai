@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import NavbarRegistrationCTA from "@/components/NavbarRegistrationCTA";
 import {
@@ -69,11 +69,42 @@ function NotificationBellLink({
 }
 
 export default function Navbar() {
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationError, setNotificationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        event.target instanceof Node &&
+        !dropdownRef.current?.contains(event.target)
+      ) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -165,25 +196,40 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          {Object.entries(groupedLinks).map(([label, items]) => (
-            <details className="relative" key={label}>
-              <summary className="cursor-pointer list-none whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
-                {label}
-                <span aria-hidden="true" className="ml-2">▾</span>
-              </summary>
-              <div className="absolute left-0 top-full z-10 mt-2 min-w-44 rounded-md border border-background bg-surface p-2 shadow-lg">
-                {items.map(({ href, label: itemLabel }) => (
-                  <Link
-                    className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-                    href={href}
-                    key={href}
-                  >
-                    {itemLabel}
-                  </Link>
-                ))}
-              </div>
-            </details>
-          ))}
+          <div
+            className="flex flex-wrap items-center gap-2 lg:gap-4"
+            ref={dropdownRef}
+          >
+            {Object.entries(groupedLinks).map(([label, items]) => (
+              <details
+                className="relative"
+                key={label}
+                open={dropdownOpen === label}
+              >
+                <summary
+                  className="cursor-pointer list-none whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setDropdownOpen((open) => (open === label ? null : label));
+                  }}
+                >
+                  {label}
+                  <span aria-hidden="true" className="ml-2">▾</span>
+                </summary>
+                <div className="absolute left-0 top-full z-10 mt-2 min-w-44 rounded-md border border-background bg-surface p-2 shadow-lg">
+                  {items.map(({ href, label: itemLabel }) => (
+                    <Link
+                      className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                      href={href}
+                      key={href}
+                    >
+                      {itemLabel}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
         <div className="hidden flex-wrap items-center gap-2 md:flex">
           {currentUser && (
