@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Manifesto | PARTAI",
@@ -49,7 +50,7 @@ export default function ManifestoContent() {
           </p>
         </header>
 
-        <div className="space-y-12 py-10 sm:space-y-16 sm:py-14">
+        <div className="space-y-12 pt-10 pb-4 sm:space-y-16 sm:pt-14 sm:pb-6">
           <section>
             <h2 className="text-2xl font-extrabold tracking-tight text-text-main sm:text-3xl">
               Mengapa Partai Politik Sering Mengecewakan?
@@ -98,6 +99,12 @@ export default function ManifestoContent() {
             mereka yang mau berpikir dan peduli. Buka akuhadir.my.id. Belajar.
             Bergerak. Awasi.
           </p>
+          <Link
+            className="mt-8 inline-flex w-full items-center justify-center rounded-md bg-primary px-8 py-4 text-base font-bold text-white shadow-sm transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto sm:text-lg"
+            href="/daftar"
+          >
+            Gabung Anggota Sekarang
+          </Link>
         </footer>
       </article>
     </main>

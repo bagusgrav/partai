@@ -260,12 +260,6 @@ export default function Navbar() {
           >
             Masuk
           </a>
-          <Link
-            className="whitespace-nowrap text-sm font-semibold text-primary hover:underline"
-            href="/lupa-password"
-          >
-            Lupa Password?
-          </Link>
         </div>
         {isMobileMenuOpen && (
           <div
@@ -357,13 +351,6 @@ export default function Navbar() {
               >
                 Masuk
               </a>
-              <Link
-                className="py-2 text-center text-sm font-semibold text-primary hover:underline"
-                href="/lupa-password"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Lupa Password?
-              </Link>
             </div>
           </div>
         )}
