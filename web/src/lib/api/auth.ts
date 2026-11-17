@@ -7,6 +7,7 @@ import {
 
 const GUEST_TOKEN_KEY = "partai_guest_token";
 const GUEST_REQUEST_ID_KEY = "partai_guest_request_id";
+export const SSO_URL = "https://id.akuhadir.my.id";
 let guestTokenPromise: Promise<string> | null = null;
 
 export async function getHeaders(json = false): Promise<Headers> {

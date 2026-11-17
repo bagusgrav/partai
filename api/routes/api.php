@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CivicEducationController;
 use App\Http\Controllers\Api\EconomicController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
@@ -64,6 +65,7 @@ Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('throttle:5,1');
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
+Route::get('/education/overview', [CivicEducationController::class, 'overview'])->middleware('throttle:60,1');
 
 Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {
     Route::post('/contracts', [FactionContractController::class, 'store'])->middleware('throttle:20,1');
@@ -76,6 +78,8 @@ Route::middleware(['auth:sanctum', 'role:super_admin|pengurus|panelis'])->group(
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/education/session', [CivicEducationController::class, 'session']);
+    Route::post('/education/answers', [CivicEducationController::class, 'answer'])->middleware('throttle:30,1');
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->middleware('throttle:30,1');
     Route::get('/reputation', ReputationController::class);

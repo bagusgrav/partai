@@ -49,6 +49,9 @@ Data “Jemput Hak” mengikuti dataset yang tersedia dan tidak menggantikan kep
 
 | Method & endpoint | Akses | Parameter | Respons utama |
 | --- | --- | --- | --- |
+| `GET /api/education/overview` | Publik; throttle 60/menit | — | Kurikulum lima domain, distribusi soal terpublikasi menurut domain/level, `daily_digest` (sorotan konstitusional dan konteks kontrak/agendas), serta hingga tiga `preview_questions` tanpa kunci jawaban. |
+| `GET /api/education/session` | Bearer anggota (`role=member`) | — | Maksimal lima soal: ulasan `next_review_at` yang jatuh tempo terlebih dahulu, lalu soal terpublikasi yang belum pernah dijawab sesuai tingkat penguasaan; mengembalikan `mastery_scores` dan `overall_mastery_level`. |
+| `POST /api/education/answers` | Bearer; throttle 30/menit | JSON: `request_id` (UUID), `question_id` (UUID), `selected_option` (`A\|B\|C\|D`), `confidence` (`ragu\|yakin`, opsional) | `correct`, kunci dan penjelasan setelah menjawab, sitasi/sumber primer, `mastery_awarded`, `points_delta`, `next_review_at`, dan `updated_reputation`. Retry identik mengembalikan respons yang sama; ID sama dengan payload berbeda menghasilkan `409`. Tamu dapat berlatih tanpa menyimpan jadwal atau skor; poin hanya diberikan satu kali per soal kepada anggota. |
 | `GET /api/review` | Bearer | Query opsional: `limit` integer 1–20 (default 5) | `{"items":[...]}` soal yang jatuh tempo; payload soal tidak memuat jawaban/pembahasan. |
 | `POST /api/answer` | Bearer | JSON: `item_id`, `selected_option` (integer mulai 0), `request_id` (UUID) | `{"status":"processed","data":{"next_review_at":"...","correct":true,"correct_option":0,"explanation":"..."}}`; retry identik berstatus `already_processed`. |
 | `GET /api/essay/question` | Bearer | — | `{"item":{...}}` atau `{"item":null}`; kunci/pembahasan tidak dikirim di payload soal. |
@@ -119,6 +122,7 @@ Standar Thortech v2.0 mewajibkan UUID `request_id` untuk operasi tulis baru yang
 | `POST /api/auth/guest`, `/api/auth/register` | Menggunakan UUID `request_id` untuk membuat sesi/pendaftaran secara idempoten; keduanya bukan SSO. |
 | `POST /api/auth/forgot-password`, `/api/auth/reset-password` | Memvalidasi UUID `request_id`, menyimpan hash payload dan respons untuk replay identik, serta menolak pemakaian ulang ID dengan payload/endpoint berbeda. |
 | `POST /api/contracts`, `PATCH /api/contracts/{contract}` | Memvalidasi UUID `request_id`, menyimpan hasil mutasi untuk replay, dan menolak ID yang dipakai ulang dengan payload/operasi/kontrak berbeda. |
+| `POST /api/education/answers` | Memvalidasi UUID `request_id`, menyimpan hash payload dan respons; replay identik tidak mengubah jadwal atau ledger, sedangkan payload berbeda ditolak. |
 | `POST /api/notifications/{id}/read` | Memvalidasi UUID `request_id`; perubahan `read_at` atomik dan replay saat sudah dibaca mengembalikan `already_processed`. |
 | `POST /api/inquiries`, `/api/reputation/contributions` | Memvalidasi UUID `request_id`; retry identik aman dan payload berbeda ditolak dengan `409`. |
 

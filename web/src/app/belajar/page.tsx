@@ -1,5 +1,5 @@
-import LearningSession from "@/components/features/quiz/LearningSession";
+import CivicEducationExperience from "@/components/features/education/CivicEducationExperience";
 
 export default function LearnPage() {
-  return <LearningSession />;
+  return <CivicEducationExperience />;
 }
