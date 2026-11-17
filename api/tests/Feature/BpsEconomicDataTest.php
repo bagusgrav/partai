@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class BpsEconomicDataTest extends TestCase
@@ -186,6 +187,33 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonPath('data.0.region_name', 'DKI Jakarta')
             ->assertJsonPath('data.1.period_month', 2)
             ->assertJsonPath('data.1.value', 2.5);
+    }
+
+    public function test_economic_region_migration_handles_columns_previously_added_outside_migrations(): void
+    {
+        Schema::table('economic_indicator_observations', function ($table): void {
+            $table->dropUnique('economic_indicator_observations_region_period_unique');
+            $table->unique(
+                ['indicator_name', 'period_year', 'period_month'],
+                'economic_indicator_observations_indicator_name_period_year_period_month_unique',
+            );
+        });
+
+        $migration = require database_path(
+            'migrations/2026_11_17_170000_add_region_fields_to_economic_indicator_observations_table.php',
+        );
+        $migration->up();
+
+        $this->assertTrue(Schema::hasColumn('economic_indicator_observations', 'region_code'));
+        $this->assertTrue(Schema::hasColumn('economic_indicator_observations', 'region_name'));
+        $this->assertTrue(Schema::hasIndex(
+            'economic_indicator_observations',
+            'economic_indicator_observations_region_period_unique',
+        ));
+        $this->assertFalse(Schema::hasIndex(
+            'economic_indicator_observations',
+            'economic_indicator_observations_indicator_name_period_year_period_month_unique',
+        ));
     }
 
     public function test_economy_indicators_filter_by_type_and_order_annual_series(): void
