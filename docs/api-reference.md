@@ -2,7 +2,7 @@
 
 Dokumen ini mencatat rute yang didefinisikan di `api/routes/api.php` dan perilaku controller saat ini. Semua path di bawah memakai prefix `/api`; base URL produksi `https://api.akuhadir.my.id`. Body dan respons menggunakan JSON kecuali dinyatakan lain.
 
-> **Penting:** ini adalah gambaran implementasi aktual, bukan jaminan bahwa seluruh standar target sudah terpenuhi. Rute autentikasi SSO belum tampak di daftar route; mutasi lama tanpa `request_id` dicatat pada [kesenjangan kepatuhan](#kesenjangan-idempotensi-dan-kepatuhan).
+> **Penting:** ini adalah gambaran implementasi aktual, bukan jaminan bahwa seluruh standar target sudah terpenuhi. Rute autentikasi SSO belum tampak di daftar route; endpoint autentikasi yang tersedia saat ini adalah guest dan register.
 
 ## Autentikasi dan format umum
 
@@ -68,7 +68,7 @@ Jawaban benar kuis menambah reputasi sesuai aturan layanan yang berlaku; esai de
 | Method & endpoint | Akses | Parameter | Respons utama |
 | --- | --- | --- | --- |
 | `GET /api/notifications` | Bearer | — | `{"notifications":[...],"unread_count":N}`; paling banyak 50 notifikasi terbaru milik pemanggil. |
-| `POST /api/notifications/{id}/read` | Bearer; hanya pemilik notifikasi | Path: `id` ID notifikasi | `{"status":"read","id":"...","read_at":"..."}`. Endpoint saat ini tidak menerima `request_id`. |
+| `POST /api/notifications/{id}/read` | Bearer; hanya pemilik notifikasi | Path: `id` ID notifikasi; JSON: `request_id` (UUID) | `{"status":"read","id":"...","read_at":"..."}`; pengulangan setelah dibaca menghasilkan `{"status":"already_processed",...}` tanpa mengubah `read_at`. |
 
 ## Voting, recall, dan sortisi
 
@@ -86,12 +86,12 @@ Jawaban benar kuis menambah reputasi sesuai aturan layanan yang berlaku; esai de
 | Method & endpoint | Akses | Parameter | Respons utama |
 | --- | --- | --- | --- |
 | `GET /api/contracts` | Publik | Query opsional `status` | Array objek kontrak; dapat difilter menurut status. |
-| `POST /api/contracts` | Bearer; role `super_admin` atau `pengurus` | JSON: `politician_name`, `title`, `description`; opsional `politician_id` UUID, `status`, `evidence_url`, `deadline` (`YYYY-MM-DD`) | `201` satu objek kontrak. Endpoint saat ini tidak menerima `request_id`. |
-| `PATCH /api/contracts/{contract}` | Bearer; role `super_admin` atau `pengurus` | Path `contract` UUID; body berisi subset field kontrak yang sama | Objek kontrak yang diperbarui. Endpoint saat ini tidak menerima `request_id`. |
+| `POST /api/contracts` | Bearer; role `super_admin` atau `pengurus` | JSON: `politician_name`, `title`, `description`, `request_id` (UUID); opsional `politician_id` UUID, `status`, `evidence_url`, `deadline` (`YYYY-MM-DD`) | `201` satu objek kontrak; retry identik menghasilkan HTTP `200 {"status":"already_processed","data":{...}}`. |
+| `PATCH /api/contracts/{contract}` | Bearer; role `super_admin` atau `pengurus` | Path `contract` UUID; JSON: `request_id` (UUID) dan subset field kontrak | Objek kontrak yang diperbarui; retry identik menghasilkan HTTP `200 {"status":"already_processed","data":{...}}` tanpa menerapkan perubahan ulang. ID yang sama dengan operasi/payload berbeda menghasilkan `409`. |
 
 Status yang sah: `BELUM_DIMULAI`, `SEDANG_BERJALAN`, `TERPENUHI`, dan `GAGAL`.
 
-## Kesenjangan idempotensi dan kepatuhan
+## Dukungan idempotensi dan kepatuhan
 
 Standar Thortech v2.0 mewajibkan UUID `request_id` untuk operasi tulis baru yang aman dicoba ulang. Dukungan yang terlihat saat ini:
 
@@ -101,8 +101,8 @@ Standar Thortech v2.0 mewajibkan UUID `request_id` untuk operasi tulis baru yang
 | `POST /api/events`, `/api/attendance/claim`, `/api/attendance/attest` | Memvalidasi UUID `request_id`; payload berbeda dengan ID yang sudah dipakai ditolak. |
 | `POST /api/votes/submit`, `/api/recall/request`, `/api/recall/vote` | Memvalidasi UUID `request_id` dan melindungi pengulangan operasi. |
 | `POST /api/auth/guest`, `/api/auth/register` | Menggunakan UUID `request_id` untuk membuat sesi/pendaftaran secara idempoten; keduanya bukan SSO. |
-| `POST /api/contracts`, `PATCH /api/contracts/{contract}` | Belum memakai `request_id`. |
-| `POST /api/notifications/{id}/read` | Belum memakai `request_id`. |
+| `POST /api/contracts`, `PATCH /api/contracts/{contract}` | Memvalidasi UUID `request_id`, menyimpan hasil mutasi untuk replay, dan menolak ID yang dipakai ulang dengan payload/operasi/kontrak berbeda. |
+| `POST /api/notifications/{id}/read` | Memvalidasi UUID `request_id`; perubahan `read_at` atomik dan replay saat sudah dibaca mengembalikan `already_processed`. |
 
 Untuk operasi yang sudah mendukung idempotensi, gunakan ID yang sama hanya untuk payload dan pengguna yang sama. Jangan menganggap metode HTTP atau helper retry sendiri sudah membuat operasi idempoten.
 

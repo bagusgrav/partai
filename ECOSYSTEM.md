@@ -34,7 +34,7 @@ Permintaan menggunakan HTTPS dan JSON (`Accept: application/json`, serta `Conten
 
 ### Kesenjangan kompatibilitas yang diketahui
 
-Kontrak mutasi baru wajib idempoten, tetapi sejumlah endpoint yang ada belum menerima `request_id`, antara lain `POST /api/contracts`, `PATCH /api/contracts/{contract}`, dan `POST /api/notifications/{id}/read`. Rute guest/register juga merupakan jalur autentikasi yang tersedia saat ini, bukan alur SSO yang telah dibuktikan. Integrator harus mengikuti perilaku aktual di referensi API; penyelarasan memerlukan perubahan backend terpisah dan tidak dilakukan oleh dokumen ini.
+Endpoint mutasi kontrak dan penandaan notifikasi telah menerima UUID `request_id` dan menangani replay sesuai kontrak di [referensi API](docs/api-reference.md). Rute guest/register merupakan jalur autentikasi yang tersedia saat ini, bukan alur SSO yang telah dibuktikan. Integrator harus mengikuti perilaku aktual di referensi API.
 
 ## Data dan reliabilitas
 

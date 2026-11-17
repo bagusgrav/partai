@@ -31,11 +31,22 @@ class NotificationController extends Controller
 
     public function markAsRead(Request $request, string $id): JsonResponse
     {
+        $request->validate([
+            'request_id' => ['required', 'uuid'],
+        ]);
+
         $notification = $request->user()->notifications()->whereKey($id)->firstOrFail();
-        $notification->markAsRead();
+        $updated = $request->user()->notifications()
+            ->whereKey($id)
+            ->whereNull('read_at')
+            ->update([
+                'read_at' => now(),
+                'updated_at' => now(),
+            ]);
+        $notification->refresh();
 
         return response()->json([
-            'status' => 'read',
+            'status' => $updated === 1 ? 'read' : 'already_processed',
             'id' => $notification->id,
             'read_at' => $notification->read_at?->toISOString(),
         ]);

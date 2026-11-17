@@ -107,7 +107,9 @@ class DailyDigestTest extends TestCase
             ->assertJsonPath('notifications.0.data.type', 'daily_digest');
         $notificationId = $user->notifications()->firstOrFail()->id;
 
-        $this->postJson("/api/notifications/{$notificationId}/read")
+        $this->postJson("/api/notifications/{$notificationId}/read", [
+            'request_id' => (string) Str::uuid(),
+        ])
             ->assertOk()
             ->assertJsonPath('status', 'read');
 
@@ -127,7 +129,9 @@ class DailyDigestTest extends TestCase
         $notificationId = $owner->notifications()->firstOrFail()->id;
         Sanctum::actingAs($otherUser);
 
-        $this->postJson("/api/notifications/{$notificationId}/read")->assertNotFound();
+        $this->postJson("/api/notifications/{$notificationId}/read", [
+            'request_id' => (string) Str::uuid(),
+        ])->assertNotFound();
         $this->assertNull($owner->notifications()->firstOrFail()->read_at);
     }
 

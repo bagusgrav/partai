@@ -60,7 +60,8 @@ export async function markAsRead(id: string): Promise<void> {
     `${API_BASE_URL}/notifications/${encodeURIComponent(id)}/read`,
     {
       method: "POST",
-      headers: await getHeaders(),
+      headers: await getHeaders(true),
+      body: JSON.stringify({ request_id: crypto.randomUUID() }),
     },
   );
 

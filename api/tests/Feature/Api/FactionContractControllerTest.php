@@ -49,6 +49,7 @@ class FactionContractControllerTest extends TestCase
     public function test_only_pengurus_or_super_admin_can_create_and_update_contracts(): void
     {
         $payload = [
+            'request_id' => '18e6bdf2-7a8a-4bdb-989d-3d72e7212eb9',
             'politician_name' => 'Politisi Uji',
             'title' => 'Janji uji',
             'description' => 'Detail janji uji.',
@@ -76,6 +77,7 @@ class FactionContractControllerTest extends TestCase
 
         $contract = FactionContract::query()->firstOrFail();
         $this->patchJson("/api/contracts/{$contract->id}", [
+            'request_id' => '90922a45-d759-4a2d-b242-693d206addb3',
             'status' => 'TERPENUHI',
             'evidence_url' => 'https://example.org/bukti',
         ])
