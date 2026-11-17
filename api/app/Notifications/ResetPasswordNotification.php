@@ -10,9 +10,7 @@ class ResetPasswordNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(#[\SensitiveParameter] public string $token)
-    {
-    }
+    public function __construct(#[\SensitiveParameter] public string $token) {}
 
     /**
      * @return array<int, string>
