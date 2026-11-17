@@ -262,7 +262,7 @@ test("landing page menampilkan judul dan ajakan belajar", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: /Aku Hadir/ })).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Mulai Belajar/ }),
+    page.getByRole("link", { name: /Uji Kapasitasmu/ }),
   ).toBeVisible();
 });
 
