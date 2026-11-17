@@ -14,12 +14,14 @@ class EconomicController extends Controller
     public function indicators(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'type' => ['nullable', 'string', 'in:inflasi,kemiskinan,tpt'],
             'region_code' => ['nullable', 'string', 'regex:/^\d{4}$/'],
         ]);
+        $indicatorType = $validated['type'] ?? 'inflasi';
         $regionCode = $validated['region_code'] ?? '9999';
 
         $data = EconomicIndicatorObservation::query()
-            ->where('indicator_name', 'inflasi')
+            ->where('indicator_name', $indicatorType)
             ->where('region_code', $regionCode)
             ->orderBy('period_year')
             ->orderBy('period_month')
@@ -33,7 +35,7 @@ class EconomicController extends Controller
             ->values();
 
         $grouped = EconomicIndicatorObservation::query()
-            ->where('indicator_name', 'inflasi')
+            ->where('indicator_name', $indicatorType)
             ->where('region_code', '9999')
             ->orderBy('period_year')
             ->orderBy('period_month')

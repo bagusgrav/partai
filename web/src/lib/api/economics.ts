@@ -1,5 +1,6 @@
 import type {
   EconomicHistoryResponse,
+  EconomicIndicatorType,
   EconomicIndicatorsResponse,
   EconomicIndicatorRegionsResponse,
   EconomicSummaryResponse,
@@ -27,11 +28,14 @@ export function getEconomicSummary(): Promise<EconomicSummaryResponse> {
 
 export function getEconomicIndicators(
   regionCode?: string,
+  type: EconomicIndicatorType = "inflasi",
 ): Promise<EconomicIndicatorsResponse> {
-  const query = regionCode
-    ? `?region_code=${encodeURIComponent(regionCode)}`
-    : "";
-  return getJson(`/economy/indicators${query}`);
+  const query = new URLSearchParams({ type });
+  if (regionCode) {
+    query.set("region_code", regionCode);
+  }
+
+  return getJson(`/economy/indicators?${query.toString()}`);
 }
 
 export function getEconomicRegions(): Promise<EconomicIndicatorRegionsResponse> {

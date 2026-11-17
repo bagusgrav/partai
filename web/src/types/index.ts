@@ -236,12 +236,14 @@ export interface EconomicIndicatorObservation {
 }
 
 export interface EconomicIndicatorsResponse {
-  data: EconomicInflationObservation[];
+  data: EconomicIndicatorDataPoint[];
   indicators: Record<string, EconomicIndicatorObservation[]>;
   last_updated: string | null;
 }
 
-export interface EconomicInflationObservation {
+export type EconomicIndicatorType = "inflasi" | "kemiskinan" | "tpt";
+
+export interface EconomicIndicatorDataPoint {
   period_year: number;
   period_month: number | null;
   value: number;

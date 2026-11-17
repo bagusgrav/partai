@@ -183,6 +183,33 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonPath('data.1.value', 2.5);
     }
 
+    public function test_economy_indicators_filter_by_type_and_order_annual_series(): void
+    {
+        foreach ([
+            ['indicator_name' => 'kemiskinan', 'region_code' => '9999', 'region_name' => 'Nasional (Indonesia)', 'period_year' => 2024, 'period_month' => null, 'value' => 9.1],
+            ['indicator_name' => 'kemiskinan', 'region_code' => '9999', 'region_name' => 'Nasional (Indonesia)', 'period_year' => 2022, 'period_month' => null, 'value' => 9.6],
+            ['indicator_name' => 'kemiskinan', 'region_code' => '3100', 'region_name' => 'DKI Jakarta', 'period_year' => 2024, 'period_month' => null, 'value' => 4.2],
+            ['indicator_name' => 'tpt', 'region_code' => '9999', 'region_name' => 'Nasional (Indonesia)', 'period_year' => 2023, 'period_month' => null, 'value' => 5.3],
+        ] as $observation) {
+            EconomicIndicatorObservation::query()->create([
+                ...$observation,
+                'unit' => 'persen',
+                'source' => 'BPS WebAPI',
+            ]);
+        }
+
+        $this->getJson('/api/economy/indicators?type=kemiskinan&region_code=3100')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.period_year', 2024)
+            ->assertJsonPath('data.0.period_month', null)
+            ->assertJsonPath('data.0.region_name', 'DKI Jakarta')
+            ->assertJsonPath('data.0.value', 4.2)
+            ->assertJsonCount(2, 'indicators.kemiskinan')
+            ->assertJsonPath('indicators.kemiskinan.0.period_year', 2022)
+            ->assertJsonPath('indicators.kemiskinan.1.period_year', 2024);
+    }
+
     public function test_economy_regions_returns_only_unique_provinces_publicly(): void
     {
         foreach ([
