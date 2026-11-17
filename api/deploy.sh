@@ -11,7 +11,7 @@ cd api
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
-if [[ -n "${BPS_API_KEY:-}" ]] || grep -Eq '^[[:space:]]*BPS_API_KEY[[:space:]]*=[[:space:]]*[^[:space:]#]' .env; then
+if python3 scripts/fetch_gini_stunting.py --check-config; then
     python3 scripts/fetch_gini_stunting.py
     php artisan welfare:sync-economic-indicators --year=2024
 else

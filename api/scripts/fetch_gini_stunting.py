@@ -226,6 +226,11 @@ def values_for_year(
 
 
 def main() -> int:
+    if sys.argv[1:] == ["--check-config"]:
+        return 0 if API_KEY else 1
+    if sys.argv[1:]:
+        print("Usage: fetch_gini_stunting.py [--check-config]", file=sys.stderr)
+        return 2
     if not API_KEY:
         print("BPS_API_KEY must be configured in the environment.", file=sys.stderr)
         return 1
