@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class InquiryController extends Controller
 {
@@ -27,6 +28,14 @@ class InquiryController extends Controller
                 'status' => 'pending',
             ],
         );
+
+        if (
+            $inquiry->name !== ($validated['name'] ?? null)
+            || $inquiry->email !== ($validated['email'] ?? null)
+            || $inquiry->question !== $validated['question']
+        ) {
+            throw new ConflictHttpException('request_id sudah digunakan untuk pertanyaan yang berbeda.');
+        }
 
         return response()->json([
             'status' => $inquiry->wasRecentlyCreated ? 'created' : 'already_processed',

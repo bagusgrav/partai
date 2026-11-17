@@ -1,74 +1,131 @@
 # PARTAI
 
-> Infrastruktur digital civic-tech untuk mendidik, melayani, dan membantu warga mengawasi tata kelola partai.
+> Infrastruktur civic-tech untuk mendidik, melayani, dan membantu warga mengawasi tata kelola partai politik secara terbuka.
 
 [![Build Status](https://github.com/bagusgrav/partai/actions/workflows/deploy-api.yml/badge.svg)](https://github.com/bagusgrav/partai/actions/workflows/deploy-api.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
 
-PARTAI (akuhadir.my.id) adalah aplikasi open-source untuk pendidikan kewargaan, partisipasi lapangan, akses informasi kesejahteraan, dan akuntabilitas internal. Aplikasi mendukung kerja dan pengawasan warga; ia tidak menggantikan proses demokratis, keputusan resmi pemerintah, atau verifikasi data oleh instansi yang berwenang.
+PARTAI (`akuhadir.my.id`) adalah perangkat lunak bebas untuk pendidikan kewargaan, partisipasi anggota, akses informasi kesejahteraan, dan akuntabilitas internal. Proyek ini menerjemahkan prinsip tata kelola menjadi aturan, data, dan alur yang dapat diperiksa—**Constitution as Code**. Aplikasi membantu warga bekerja dan mengawasi; ia tidak menggantikan pemilu, keputusan resmi pemerintah, atau verifikasi instansi berwenang.
 
-## Mulai di sini
+## Visi dan latar belakang
 
-- [Panduan pengembangan lokal](#pengembangan-lokal)
-- [Panduan kontribusi](CONTRIBUTING.md)
-- [Blueprint arsitektur](docs/architecture.md)
-- [Referensi API](docs/api-reference.md)
-- [Panduan warga](docs/user-guide.md)
-- [Roadmap](ROADMAP.md)
-- [Aturan ekosistem](ECOSYSTEM.md)
+Kepercayaan pada partai politik melemah ketika keputusan, rekrutmen, pendanaan, dan pengawasan tertutup di sekitar segelintir elite. PARTAI dirancang untuk membuat proses organisasi lebih terbuka, dapat ditelusuri, dan mudah diaudit oleh anggota maupun publik—tanpa menjadikan popularitas, kekayaan, atau banyaknya aktivitas sebagai hak suara tambahan.
 
-## Fitur utama
+Platform ini mendukung delapan fungsi partai ideal sebagai kerangka kerja digital:
 
-Status di bawah merujuk pada fitur yang ditandai selesai di [ROADMAP.md](ROADMAP.md). Penyelesaian satu komponen tidak berarti seluruh fase sudah tuntas.
+1. Pendidikan dan sosialisasi politik berbasis kurikulum kewargaan.
+2. Menyerap dan menyalurkan aspirasi anggota serta masyarakat.
+3. Mengagregasi kepentingan menjadi agenda dan usulan kebijakan.
+4. Menyediakan komunikasi politik yang terbuka dan dapat diperiksa.
+5. Memperluas partisipasi melalui kegiatan lapangan maupun kontribusi asinkron.
+6. Mengembangkan rekrutmen dan kapasitas kepemimpinan berdasarkan ambang kompetensi.
+7. Mendorong integrasi, musyawarah, dan penyelesaian konflik secara tertib.
+8. Mengawasi kekuasaan, janji publik, dan penggunaan sumber daya.
 
-| Fase | Kemampuan yang tersedia | Catatan cakupan |
+Daftar tersebut adalah kerangka produk PARTAI, bukan pengganti rumusan hukum. Informasi warga tetap diperlakukan secara privat, dan data publik tidak dipresentasikan sebagai keputusan resmi pemerintah.
+
+## Prinsip tata kelola anti-oligarki
+
+### Empat lapis pemisahan kekuasaan
+
+| Lapis | Peran | Batas |
 | --- | --- | --- |
-| **1 — Pendidikan kewargaan** | Latihan kuis dengan pengulangan terjadwal SM-2; soal esai dan peer review; pembahasan; poin reputasi; daily digest. | Kurikulum penuh lima domain dan mastery/sertifikasi masih dalam roadmap. |
-| **2 — Aksi lapangan** | Acara, QR dinamis, pemeriksaan geofence, klaim kehadiran, dan atestasi silang antar-cluster. | Sistem juri acak untuk mengaudit klaim belum lengkap. |
-| **3 — Pengawasan data & kesejahteraan** | Ringkasan/wilayah data kesejahteraan, pipeline BPS/BNPB, indikator ekonomi, wawasan, dan pemeriksaan bansos “Jemput Hak”. | IKK kabupaten/kota serta kanal pelaporan tambahan masih dalam roadmap. |
-| **4 — Tata kelola** | Panel sortisi berbasis mastery, voting, pengajuan dan voting recall, serta daftar publik Kontrak Faksi. | Voting parameter, panel etik/editorial, dan seluruh dasbor kontrak dewan masih dalam roadmap. |
+| **1. Anggota** | Pemegang kedaulatan organisasi; satu anggota, satu suara. | Skor, jabatan, dan jumlah kontribusi tidak menambah bobot suara. |
+| **2. Mandat representatif** | Pengurus dan wakil menjalankan keputusan anggota dengan mandat serta Kontrak Faksi yang dapat dipantau. | Mandat dibatasi aturan, waktu, transparansi, dan mekanisme recall. |
+| **3. Pengawasan independen** | Panel audit/etik memeriksa klaim dan proses; komposisi panel ditujukan untuk dipilih melalui sortisi. | Panel tidak mengambil alih hak suara anggota atau menjalankan fungsi eksekutif. |
+| **4. Akuntabilitas publik** | Data, alasan keputusan, bukti, dan hasil pemeriksaan dapat ditinjau sesuai batas privasi. | Data sensitif dan identitas warga tidak dibuka demi transparansi semu. |
 
-## Arsitektur singkat
+Pemisahan ini adalah prinsip desain; tidak semua lapis dan proses telah diimplementasikan penuh.
 
-Frontend Next.js dilayani melalui Vercel. Permintaan API menuju Laravel di VPS melalui Cloudflare Tunnel `protocol: http2`; SQLite WAL berada di `/var/data/partai/database.sqlite` pada deployment sesuai panduan. Model aplikasi adalah **Laravel modular monolith**, bukan layanan backend terpisah per fitur.
+### Mastery Score terpisah dari Participation Score
+
+- **Mastery Score (0–100 per domain)** mengukur penguasaan materi kewargaan pada `hak_konstitusional`, `alasan_bernegara`, `keuangan_negara`, `hukum`, dan `politik_bernegara`. Rata-rata domain membentuk level 1–4. Level 4 (rata-rata minimal 80) menjadi ambang absolut untuk Panel Audit, Panel Etik, dan Bakal Caleg—bukan peringkat relatif.
+- **Participation Score (poin kumulatif)** mencatat kontribusi yang telah diverifikasi, baik lapangan maupun non-fisik: riset, bantuan hukum, logistik, editorial, dan kerja asinkron. Kategori tersebut memiliki bobot poin yang setara.
+- Kedua skor disimpan dan dihitung terpisah. Participation Score **tidak memengaruhi hak suara**; prinsipnya selalu satu anggota, satu suara.
+- Koreksi skor menambah entri audit baru. Riwayat tidak diedit atau dihapus.
+
+### Sortisi dan perwalian teknis
+
+Sortisi yang dituju memakai seed publik yang diumumkan sebelum undian dan algoritma yang dapat direproduksi sesudahnya. Kriteria kelayakan, snapshot peserta, seed, dan hasil perlu dipublikasikan dalam bentuk yang dapat diaudit tanpa mengekspos data pribadi.
+
+Perwalian teknis bukan mandat politik: kewenangan sementara memiliki **sunset clause dua tahun** dan pemulihan/perubahan kritis memerlukan **multi-signature 3-of-3**. Prinsip ini merupakan sasaran tata kelola; status tiap kontrol tercatat di [ROADMAP.md](ROADMAP.md), bukan diasumsikan sudah aktif hanya karena tercantum di dokumentasi.
+
+## Peta fitur dan status implementasi
+
+“Tersedia di kode” berarti rute atau halaman ada di repo; status deployment dan kelengkapan seluruh proses tata kelola dapat berbeda.
+
+| Modul | Route | Status dan batas |
+| --- | --- | --- |
+| Data publik | [`/data`](web/src/app/data) | Dasbor data kesejahteraan dan ringkasan wilayah. Dataset dan indikator mengikuti sumber yang tersedia. |
+| Kegiatan warga | [`/events`](web/src/app/events) | Daftar/kegiatan, klaim kehadiran, QR dan atestasi silang. Sortisi audit penuh masih dalam roadmap. |
+| Jemput Hak | [`/jemput-hak`](web/src/app/jemput-hak) | Pemeriksaan program bantuan untuk akun terautentikasi; hasil bukan penetapan penerima resmi. |
+| Kontrak Faksi | [`/kontrak-faksi`](web/src/app/kontrak-faksi) | Daftar publik janji dan status; cakupan data bergantung pada entri yang tersedia. |
+| Tanya Jawab | [`/tanya-jawab`](web/src/app/tanya-jawab) | FAQ terpublikasi dan pengiriman pertanyaan untuk ditinjau pengurus. |
+| Reputasi | [`/reputasi`](web/src/app/reputasi) | Statistik anonim, simulator ambang kelayakan, API dua skor terpisah, dan ledger audit. Verifikasi asesmen/mastery operasional penuh masih berkembang. |
+
+### Roadmap berikutnya
+
+- Menuntaskan kurikulum lima domain, asesmen mastery, dan sertifikasi level 1–4.
+- Menghubungkan hasil asesmen resmi ke ledger mastery tanpa mencampur poin partisipasi.
+- Menerapkan sortisi ber-seed publik, panel etik/editorial, dan proses audit klaim.
+- Memperluas dashboard kontrak, indikator kesejahteraan daerah, serta voting kebijakan.
+- Menyelaraskan alur identitas dan token dengan SSO pusat.
+
+Rincian fase dan status terkini ada di [ROADMAP.md](ROADMAP.md).
+
+## Arsitektur teknis
+
+Repositori ini adalah monorepo dua aplikasi. API merupakan **Laravel modular monolith**, bukan sekumpulan microservice. Frontend Next.js berkomunikasi dengan API melalui HTTPS; akses publik ke origin API mengikuti Single Door melalui Cloudflare Tunnel.
 
 ```mermaid
 flowchart LR
-    U[User / Browser] --> V[Vercel / Next.js]
-    V -->|HTTPS API| C[Cloudflare Tunnel<br/>HTTP/2]
-    C -->|Loopback only| L[VPS / Laravel Monolith]
-    L --> D[(SQLite WAL<br/>/var/data/partai)]
-    S[Central SSO<br/>id.akuhadir.my.id] -. Identity policy .-> U
+    U[Browser / anggota] --> W[web/ Next.js<br/>Vercel]
+    W -->|HTTPS JSON API| CF[Cloudflare Tunnel<br/>HTTP/2]
+    CF -->|origin loopback| API[api/ Laravel + Filament<br/>VPS]
+    API --> DB[(SQLite WAL<br/>/var/data/partai/database.sqlite)]
+    U -. autentikasi pusat .-> SSO[id.akuhadir.my.id]
 ```
 
-Diagram menunjukkan batas arsitektur dan kebijakan identitas. Rute API saat ini masih mencakup sesi tamu dan pendaftaran anggota; status kesenjangan SSO dan batas operasional lain dijelaskan di [architecture](docs/architecture.md).
+| Komponen | Tanggung jawab |
+| --- | --- |
+| `web/` | Next.js App Router, UI warga, dan API client berbasis `fetchWithRetry`. Deploy frontend melalui Vercel. |
+| `api/` | Laravel API, autentikasi token legacy, logika domain, migrasi, tes, dan panel back-office Filament. Deploy pada VPS di belakang Tunnel. |
+| `data/` | Dataset kurikulum per domain. |
+| `docs/` | Referensi API, arsitektur, deployment, desain, dan panduan pengguna. |
+| `SQLite` | Database operasional di `/var/data/partai/`, dengan WAL, foreign keys, `synchronous=NORMAL`, dan busy timeout. Berkas database berada di luar working tree. |
+| `id.akuhadir.my.id` | Pintu masuk SSO pusat. UI mengarahkan pengguna ke SSO dan tidak menyediakan form login lokal. Endpoint guest/registrasi lama di API masih tercatat sebagai pekerjaan penyelarasan. |
+
+Mutation API menggunakan UUID `request_id`, replay aman untuk payload yang sama, konflik `409` untuk penggunaan ulang ID dengan payload berbeda, dan rate limit sesuai jenis operasi. Tabel baru memakai primary key UUID. Perubahan data anggota harus berotorisasi dan tercatat; data publik tidak boleh memuat identitas atau NIK.
+
+Rujukan lebih rinci: [arsitektur](docs/architecture.md), [deployment](docs/deployment.md), [referensi API](docs/api-reference.md), dan [kontrak ekosistem](ECOSYSTEM.md).
 
 ## Teknologi
 
 | Lapisan | Teknologi |
 | --- | --- |
-| Web | Next.js 16 App Router, React, Tailwind CSS |
-| API | Laravel 13, PHP 8.3+, Sanctum |
-| Data | SQLite, WAL, foreign keys, busy timeout |
-| Deployment | Vercel, VPS, Cloudflare Tunnel HTTP/2 |
-| Integrasi | API JSON; permintaan mutasi idempoten memakai `request_id` sesuai endpoint |
-
-Arsitektur rinci, SSO, kebijakan Single Door, dan batas memori dijelaskan di [docs/architecture.md](docs/architecture.md). Kontrak integrasi antar-aplikasi ada di [ECOSYSTEM.md](ECOSYSTEM.md).
+| Web | Next.js 16 App Router, React, TypeScript, Tailwind CSS |
+| API | Laravel 13, PHP 8.3+, Sanctum, Filament 3 |
+| Otorisasi | `spatie/laravel-permission`; role panel `super_admin`, `pengurus`, `panelis` |
+| Data | SQLite WAL, UUID, foreign keys |
+| Hosting | Vercel, VPS, Cloudflare Tunnel HTTP/2 |
+| Lisensi | GNU Affero General Public License v3.0 (AGPL-3.0) |
 
 ## Pengembangan lokal
 
 ### Prasyarat
 
-- PHP 8.3 atau lebih baru dan Composer
-- Node.js 20 atau lebih baru dan npm
+- PHP 8.3+ dan Composer
+- Node.js 20+ dan npm
 - Git
 
 ### API Laravel
 
+Jalankan dari PowerShell di root repo:
+
 ```powershell
-cd api
+Set-Location api
 composer install
 Copy-Item .env.example .env
 php artisan key:generate
@@ -77,18 +134,18 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-API lokal tersedia di `http://127.0.0.1:8000/api`.
+API lokal tersedia di `http://127.0.0.1:8000/api`. File `.env` dan database SQLite lokal diabaikan Git.
 
 ### Frontend Next.js
 
-Buka terminal baru dari root repository:
+Buka terminal baru dari root:
 
 ```powershell
-cd web
+Set-Location web
 npm install
 ```
 
-Untuk memakai API lokal, atur `web/.env.local`:
+Untuk memakai API lokal, buat `web/.env.local`:
 
 ```dotenv
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
@@ -105,22 +162,27 @@ Frontend tersedia di `http://localhost:3000`.
 ### Pemeriksaan
 
 ```powershell
-cd api
+Set-Location api
 php artisan test
-cd ..\web
+php vendor\bin\pint --test
+
+Set-Location ..\web
 npm run lint
 npm run build
 ```
 
-Lihat [docs/deployment.md](docs/deployment.md) untuk deployment VPS/Vercel. Jangan menaruh `.env`, token, kunci, atau data warga produksi di repository.
+## Kontribusi terbuka
 
-## Keamanan dan data warga
+Mulai dengan [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), serta dokumentasi modul yang terkait. Untuk perubahan kode:
 
-- Pemeriksaan bantuan sosial hanya dapat meminta NIK milik akun yang sedang terautentikasi; data NIK bersifat pribadi dan respons tidak boleh disimpan di cache publik.
-- Hasil “Jemput Hak” mengikuti dataset yang tersedia dan bukan penetapan resmi penerima bantuan.
-- Perubahan data harus tervalidasi, berotorisasi, tercatat bila sesuai, dan mengikuti aturan idempotensi. Jangan memasukkan kredensial atau data pribadi ke log, issue, maupun contoh dokumentasi.
-- Laporkan dugaan kerentanan secara privat kepada maintainer, bukan melalui issue publik.
+1. Buat branch terarah dan perubahan sekecil mungkin.
+2. Ikuti pola proyek: UUID untuk tabel baru, `request_id` UUID dan rate limit untuk operasi POST, `fetchWithRetry` untuk setiap panggilan API web, serta RBAC melalui role yang telah ditetapkan.
+3. Tambahkan atau ubah tes untuk perilaku dan kegagalan penting; perbarui dokumentasi kontrak saat rute/payload berubah.
+4. Jalankan tes, Pint, lint, atau build yang sesuai; jelaskan hasil dan risiko migrasi di pull request.
+5. Jangan commit `.env`, kredensial, token, database lokal/produksi, NIK, atau data pribadi. Jangan membuat form login lokal; autentikasi pengguna diarahkan ke SSO pusat.
+
+Laporkan isu keamanan secara privat kepada maintainer, bukan melalui issue publik.
 
 ## Lisensi
 
-PARTAI dirilis dengan [MIT License](LICENSE).
+PARTAI dilisensikan di bawah [GNU Affero General Public License v3.0](LICENSE).

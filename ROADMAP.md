@@ -24,7 +24,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 *Tujuan: Menggerakkan anggota di lapangan dengan validasi anti-kolusi.*
 - [x] **Atestasi Aksi (QR & Geofencing):** Koordinator membuat QR berputar 90 detik di lokasi aksi. Anggota memindai untuk klaim kehadiran.
 - [x] **Validasi Silang Lintas Cluster:** Klaim kehadiran wajib divalidasi oleh 2 anggota dari cluster (wilayah) berbeda.
-- [ ] **Sistem Skor Reputasi:** Pemberian poin untuk kehadiran fisik, riset, bantuan hukum, dan logistik.
+- [x] **Sistem Skor Reputasi (Fase 2):** Mastery Score per domain dipisahkan dari Participation Score kumulatif; kontribusi lapangan/non-fisik berbobot setara dan dicatat dalam ledger audit append-only.
 - [ ] **Juri Warga (Sortisi):** Pemilihan acak anggota untuk mengaudit klaim kehadiran yang ditandai sistem (anti-kolusi).
 
 ## 🔵 FASE 3: PENGAWASAN DATA & KESEJAHTERAAN (OPEN DATA)
@@ -40,7 +40,8 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 ## 🟣 FASE 4: TATA KELOLA PARTAI (GOVERNANCE & RECALL)
 *Tujuan: Mencegah dinasti, korupsi internal, dan membangun demokrasi partai.*
 - [ ] **Voting Parameter & Kebijakan:** Anggota bisa memilih perubahan parameter atau agenda partai.
-- [x] **Panel Audit (Sortisi):** Pemilihan acak hingga lima anggota terverifikasi dengan minimal tiga butir SM-2 pada `reps >= 3`.
+- [x] **Panel Audit (Sortisi):** Pemilihan acak hingga lima anggota terverifikasi dengan `overall_mastery_level >= 4`.
+- [ ] **Sortisi Ber-seed Publik:** Publikasi seed dan snapshot kelayakan agar pengundian dapat direproduksi tanpa membuka data pribadi.
 - [ ] **Panel Etik & Editorial:** Pemilihan acak anggota untuk Panel Etik dan Panel Editorial.
 - [ ] **Kontrak Faksi Anggota Dewan:** Dasbor publik yang melacak janji kampanye anggota dewan.
 - [x] **Mekanisme Recall:** Pengajuan recall berbukti, voting anggota, dan pencabutan role saat dukungan mencapai 2/3 anggota aktif.

@@ -117,7 +117,7 @@ export async function forgotPassword(email: string): Promise<void> {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, request_id: crypto.randomUUID() }),
     },
   );
 
@@ -138,7 +138,7 @@ export async function resetPassword(input: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify({ ...input, request_id: crypto.randomUUID() }),
     },
   );
 

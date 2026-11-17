@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ResetPasswordTest extends TestCase
@@ -19,20 +20,26 @@ class ResetPasswordTest extends TestCase
             'password' => 'password-lama',
         ]);
         $token = Password::createToken($user);
+        $requestId = (string) Str::uuid();
 
-        $this->postJson('/api/auth/reset-password', [
+        $payload = [
             'token' => $token,
             'email' => $user->email,
             'password' => 'password-baru',
             'password_confirmation' => 'password-baru',
-        ])->assertOk()
+            'request_id' => $requestId,
+        ];
+        $this->postJson('/api/auth/reset-password', $payload)->assertOk()
             ->assertJson(['message' => 'Kata sandi berhasil diubah.']);
 
         $this->assertTrue(Hash::check('password-baru', $user->fresh()->password));
 
+        $this->postJson('/api/auth/reset-password', $payload)
+            ->assertOk()
+            ->assertJson(['message' => 'Kata sandi berhasil diubah.']);
         $this->postJson('/api/auth/reset-password', [
-            'token' => $token,
-            'email' => $user->email,
+            ...$payload,
+            'request_id' => (string) Str::uuid(),
             'password' => 'password-lain',
             'password_confirmation' => 'password-lain',
         ])->assertUnprocessable();
@@ -50,6 +57,7 @@ class ResetPasswordTest extends TestCase
             'email' => $user->email,
             'password' => 'password-baru',
             'password_confirmation' => 'password-baru',
+            'request_id' => (string) Str::uuid(),
         ])->assertUnprocessable()
             ->assertJson([
                 'message' => 'Tautan reset kata sandi tidak valid atau sudah kedaluwarsa.',
@@ -65,7 +73,28 @@ class ResetPasswordTest extends TestCase
             'email' => 'anggota@example.test',
             'password' => 'password-baru',
             'password_confirmation' => 'password-berbeda',
+            'request_id' => (string) Str::uuid(),
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_reset_password_request_id_cannot_be_reused_with_a_different_payload(): void
+    {
+        $user = User::factory()->create(['email' => 'anggota@example.test']);
+        $requestId = (string) Str::uuid();
+        $payload = [
+            'token' => Password::createToken($user),
+            'email' => $user->email,
+            'password' => 'password-baru',
+            'password_confirmation' => 'password-baru',
+            'request_id' => $requestId,
+        ];
+
+        $this->postJson('/api/auth/reset-password', $payload)->assertOk();
+        $this->postJson('/api/auth/reset-password', [
+            ...$payload,
+            'password' => 'password-lain',
+            'password_confirmation' => 'password-lain',
+        ])->assertConflict();
     }
 }

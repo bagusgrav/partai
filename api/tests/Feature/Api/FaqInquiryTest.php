@@ -34,7 +34,7 @@ class FaqInquiryTest extends TestCase
             ->assertJsonMissing(['question' => 'FAQ privat?']);
     }
 
-    public function test_a_public_inquiry_is_created_and_duplicate_request_ids_are_idempotent(): void
+    public function test_a_public_inquiry_is_created_and_request_id_rejects_different_payloads(): void
     {
         $requestId = (string) Str::uuid();
         $payload = [
@@ -53,6 +53,9 @@ class FaqInquiryTest extends TestCase
             ...$payload,
             'question' => 'Pertanyaan berbeda dengan ID yang sama.',
         ])
+            ->assertConflict();
+
+        $this->postJson('/api/inquiries', $payload)
             ->assertOk()
             ->assertJsonPath('status', 'already_processed');
 

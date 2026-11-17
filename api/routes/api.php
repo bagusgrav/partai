@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\InquiryController;
+use App\Http\Controllers\Api\MemberReputationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Api\SocialAssistanceController;
 use App\Http\Controllers\Api\SortitionController;
 use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
+use App\Http\Middleware\IdempotentPasswordRequest;
 use App\Models\WelfareData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,8 +46,10 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
-Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
-Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware([IdempotentPasswordRequest::class, 'throttle:5,1']);
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware([IdempotentPasswordRequest::class, 'throttle:5,1']);
 
 Route::get('/welfare/summary', [WelfareController::class, 'summary']);
 Route::get('/welfare/regions', [WelfareController::class, 'regions']);
@@ -59,32 +63,39 @@ Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
 Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('throttle:5,1');
+Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
 
 Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {
-    Route::post('/contracts', [FactionContractController::class, 'store']);
-    Route::patch('/contracts/{contract}', [FactionContractController::class, 'update']);
+    Route::post('/contracts', [FactionContractController::class, 'store'])->middleware('throttle:20,1');
+    Route::patch('/contracts/{contract}', [FactionContractController::class, 'update'])->middleware('throttle:20,1');
+});
+
+Route::middleware(['auth:sanctum', 'role:super_admin|pengurus|panelis'])->group(function () {
+    Route::post('/reputation/contributions', [MemberReputationController::class, 'storeContribution'])
+        ->middleware('throttle:10,1');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->middleware('throttle:30,1');
     Route::get('/reputation', ReputationController::class);
-    Route::post('/events', [EventController::class, 'store']);
+    Route::get('/reputation/me', [MemberReputationController::class, 'me']);
+    Route::post('/events', [EventController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/events/active', [EventController::class, 'active']);
     Route::get('/events/{id}/qr', [EventController::class, 'qr']);
-    Route::post('/attendance/claim', [AttendanceController::class, 'claim']);
+    Route::post('/attendance/claim', [AttendanceController::class, 'claim'])->middleware('throttle:20,1');
     Route::get('/attendance/pending', [AttendanceController::class, 'pending']);
-    Route::post('/attendance/attest', [AttendanceController::class, 'attest']);
+    Route::post('/attendance/attest', [AttendanceController::class, 'attest'])->middleware('throttle:20,1');
     Route::get('/review', [ReviewController::class, 'index']);
-    Route::post('/answer', [ReviewController::class, 'answer']);
+    Route::post('/answer', [ReviewController::class, 'answer'])->middleware('throttle:30,1');
     Route::get('/essay/question', [EssayController::class, 'question']);
-    Route::post('/essay/submit', [EssayController::class, 'submit']);
+    Route::post('/essay/submit', [EssayController::class, 'submit'])->middleware('throttle:10,1');
     Route::get('/essay/review', [EssayController::class, 'pending']);
-    Route::post('/essay/review', [EssayController::class, 'review']);
+    Route::post('/essay/review', [EssayController::class, 'review'])->middleware('throttle:20,1');
     Route::get('/votes/active', [VoteController::class, 'active']);
-    Route::post('/votes/submit', [VoteController::class, 'submit']);
-    Route::post('/recall/request', [RecallController::class, 'store']);
+    Route::post('/votes/submit', [VoteController::class, 'submit'])->middleware('throttle:10,1');
+    Route::post('/recall/request', [RecallController::class, 'store'])->middleware('throttle:5,1');
     Route::get('/recall/active', [RecallController::class, 'active']);
-    Route::post('/recall/vote', [RecallController::class, 'vote']);
+    Route::post('/recall/vote', [RecallController::class, 'vote'])->middleware('throttle:10,1');
     Route::get('/sortition/panels', [SortitionController::class, 'panels']);
 });

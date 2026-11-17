@@ -50,7 +50,7 @@ Invariant ini adalah batas arsitektur; perubahan yang menyentuhnya harus menjela
 1. **Laravel modular monolith:** backend adalah satu aplikasi Laravel. Jangan memecah fitur menjadi layanan jaringan tersendiri tanpa keputusan arsitektur.
 2. **Single Door Policy:** akses publik ke API melalui Cloudflare Tunnel `protocol: http2`; origin aplikasi hanya menerima koneksi lokal dari Tunnel/proxy. Jangan membuka port backend langsung ke internet.
 3. **SSO terpusat:** autentikasi pengguna memakai `id.akuhadir.my.id`. Jangan menambahkan form atau sistem login lokal baru di Next.js. Halaman pendaftaran anggota yang sudah ada bukan alasan untuk memperluas mekanisme login lokal; dokumentasikan dan rencanakan penyelarasan jalur token yang lama.
-4. **Idempotensi:** operasi tulis baru yang dapat dicoba ulang harus menerima UUID `request_id`, menyimpan hasil unik, mengembalikan hasil aman untuk retry, dan menolak penggunaan ulang ID dengan payload berbeda (`409`). Jangan menganggap seluruh endpoint tulis yang sudah ada telah memenuhi aturan; lihat daftar pengecualian di [referensi API](docs/api-reference.md).
+4. **Idempotensi:** setiap endpoint `POST` harus menerima UUID `request_id`, menyimpan atau memastikan hasil aman untuk retry, dan menolak penggunaan ulang ID dengan payload berbeda (`409`). Setiap endpoint `POST` juga harus memiliki rate limit yang sesuai. Lihat detail kontrak di [referensi API](docs/api-reference.md).
 5. **Retry frontend:** semua akses jaringan API dari frontend menggunakan `fetchWithRetry` di `web/src/lib/api/client.ts` dan memeriksa respons gagal secara eksplisit. Jangan retry operasi tulis dengan ID baru setelah timeout; ulangi memakai `request_id` yang sama.
 6. **SQLite operasional:** produksi memakai SQLite WAL di `/var/data/partai/database.sqlite`, di luar direktori kode. Pertahankan `synchronous=NORMAL`, `busy_timeout=5000`, dan foreign keys. Jangan memindahkan database produksi ke `/var/www/`.
 7. **Zero-RAM:** perlakukan ini sebagai sasaran footprint rendah, bukan klaim bahwa SQLite memakai nol memori. Pertahankan penggunaan memori yang terukur, hindari infrastruktur cache/database terpisah tanpa persetujuan, dan periksa dampak resource sebelum menambah komponen.
@@ -60,7 +60,7 @@ Invariant ini adalah batas arsitektur; perubahan yang menyentuhnya harus menjela
 
 ## Catatan implementasi saat ini
 
-Sebagian API legacy belum memenuhi semua invariant, termasuk beberapa operasi tulis tanpa `request_id` dan rute `/api/auth/guest` serta `/api/auth/register`. Dokumentasi mencatat perilaku aktual agar integrator tidak salah mengira; PR baru tidak boleh menambah pengecualian tanpa keputusan dan rencana transisi yang terdokumentasi.
+API masih memiliki endpoint guest/registrasi legacy yang bukan alur SSO; keduanya memerlukan `request_id` dan tidak boleh dipakai untuk menambahkan form login lokal. Penyelarasan token dengan SSO pusat tetap menjadi pekerjaan roadmap.
 
 ## Pelaporan isu
 

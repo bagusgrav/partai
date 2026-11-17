@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\MemberReputation;
 use App\Models\User;
 use App\Services\ReputationService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class ReputationTest extends TestCase
@@ -198,6 +201,162 @@ class ReputationTest extends TestCase
             'reputation_points' => 1000,
             'reputation_level' => 'Pengawal Demokrasi',
         ]);
+    }
+
+    public function test_verified_contributions_are_idempotent_equal_weight_and_separate_from_mastery(): void
+    {
+        $member = User::factory()->create(['role' => 'member', 'is_verified' => true]);
+        $panelist = User::factory()->create();
+        Role::findOrCreate('panelis', 'web');
+        $panelist->assignRole('panelis');
+        Sanctum::actingAs($panelist);
+
+        $fieldContribution = [
+            'request_id' => (string) Str::uuid(),
+            'user_id' => $member->id,
+            'category' => 'lapangan',
+            'source_type' => 'event',
+            'source_id' => (string) Str::uuid(),
+            'reason' => 'Kehadiran terverifikasi pada kegiatan warga.',
+        ];
+        $this->postJson('/api/reputation/contributions', $fieldContribution)
+            ->assertCreated()
+            ->assertJsonPath('participation_score', 1);
+        $this->postJson('/api/reputation/contributions', $fieldContribution)
+            ->assertOk()
+            ->assertJsonPath('status', 'already_processed');
+
+        $this->postJson('/api/reputation/contributions', [
+            ...$fieldContribution,
+            'request_id' => (string) Str::uuid(),
+            'category' => 'riset',
+            'source_id' => (string) Str::uuid(),
+            'reason' => 'Riset asinkron yang telah ditinjau.',
+        ])->assertCreated()
+            ->assertJsonPath('participation_score', 2);
+
+        foreach (['bantuan_hukum', 'logistik', 'editorial'] as $category) {
+            $this->postJson('/api/reputation/contributions', [
+                ...$fieldContribution,
+                'request_id' => (string) Str::uuid(),
+                'category' => $category,
+                'source_id' => (string) Str::uuid(),
+                'reason' => 'Kontribusi non-fisik yang telah ditinjau.',
+            ])->assertCreated();
+        }
+
+        $profile = MemberReputation::query()->where('user_id', $member->id)->firstOrFail();
+        $this->assertSame(array_fill_keys(ReputationService::DOMAINS, 0), $profile->mastery_scores);
+        $this->assertSame(5, $profile->participation_score);
+        $this->assertSame(0, $member->fresh()->reputation_points);
+        $this->assertDatabaseCount('reputation_ledgers', 5);
+
+        $this->getJson('/api/reputation/leaderboard-stats')
+            ->assertOk()
+            ->assertJsonPath('members_count', 1)
+            ->assertJsonPath('contributions.lapangan', 1)
+            ->assertJsonPath('contributions.non_fisik', 4)
+            ->assertJsonPath('contributions.total', 5)
+            ->assertJsonMissingPath('user_id')
+            ->assertJsonMissingPath('email');
+    }
+
+    public function test_reused_contribution_request_id_with_different_data_is_rejected(): void
+    {
+        $member = User::factory()->create(['role' => 'member', 'is_verified' => true]);
+        $panelist = User::factory()->create();
+        Role::findOrCreate('panelis', 'web');
+        $panelist->assignRole('panelis');
+        Sanctum::actingAs($panelist);
+
+        $requestId = (string) Str::uuid();
+        $payload = [
+            'request_id' => $requestId,
+            'user_id' => $member->id,
+            'category' => 'lapangan',
+            'source_type' => 'event',
+            'source_id' => (string) Str::uuid(),
+            'reason' => 'Kontribusi terverifikasi.',
+        ];
+
+        $this->postJson('/api/reputation/contributions', $payload)->assertCreated();
+        $this->postJson('/api/reputation/contributions', [
+            ...$payload,
+            'reason' => 'Alasan berbeda.',
+        ])->assertConflict();
+
+        $this->assertDatabaseCount('reputation_ledgers', 1);
+    }
+
+    public function test_mastery_levels_use_absolute_thresholds_and_ledger_hashes_are_immutable(): void
+    {
+        $member = User::factory()->create();
+        $reputation = app(ReputationService::class);
+
+        foreach (ReputationService::DOMAINS as $domain) {
+            $reputation->record([
+                'user_id' => $member->id,
+                'score_type' => 'mastery',
+                'domain' => $domain,
+                'source_type' => 'assessment',
+                'source_id' => (string) Str::uuid(),
+                'delta' => 79,
+                'reason' => 'Hasil asesmen domain.',
+                'request_id' => (string) Str::uuid(),
+            ]);
+        }
+
+        $profile = $reputation->recalculate($member->id);
+        $this->assertSame(3, $profile->overall_mastery_level);
+        $this->assertFalse($profile->eligible_roles['bakal_caleg']);
+
+        foreach (ReputationService::DOMAINS as $domain) {
+            $reputation->record([
+                'user_id' => $member->id,
+                'score_type' => 'mastery',
+                'domain' => $domain,
+                'source_type' => 'assessment',
+                'source_id' => (string) Str::uuid(),
+                'delta' => 1,
+                'reason' => 'Koreksi hasil asesmen.',
+                'request_id' => (string) Str::uuid(),
+            ]);
+        }
+
+        $profile = $reputation->recalculate($member->id);
+        $this->assertSame(4, $profile->overall_mastery_level);
+        $this->assertSame(80, $profile->mastery_scores['hukum']);
+        $this->assertTrue($profile->eligible_roles['panel_audit']);
+        $this->assertTrue($profile->eligible_roles['panel_etik']);
+        $this->assertTrue($profile->eligible_roles['bakal_caleg']);
+        $this->assertSame(0, $profile->participation_score);
+        $this->assertTrue($reputation->verifyLedger($member->id));
+
+        $this->expectException(QueryException::class);
+        DB::table('reputation_ledgers')->where('user_id', $member->id)->update(['reason' => 'Tried to edit']);
+    }
+
+    public function test_member_reputation_endpoints_require_authentication_and_contribution_requires_role(): void
+    {
+        $this->getJson('/api/reputation/me')->assertUnauthorized();
+
+        $member = User::factory()->create();
+        Sanctum::actingAs($member);
+        $this->getJson('/api/reputation/me')
+            ->assertOk()
+            ->assertJsonPath('mastery_scores.hak_konstitusional', 0)
+            ->assertJsonPath('overall_mastery_level', 1)
+            ->assertJsonPath('participation_score', 0)
+            ->assertJsonCount(0, 'ledger.data');
+
+        $this->postJson('/api/reputation/contributions', [
+            'request_id' => (string) Str::uuid(),
+            'user_id' => $member->id,
+            'category' => 'lapangan',
+            'source_type' => 'event',
+            'source_id' => (string) Str::uuid(),
+            'reason' => 'Kontribusi terverifikasi.',
+        ])->assertForbidden();
     }
 
     /**

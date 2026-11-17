@@ -26,6 +26,7 @@ const groupedLinks = {
     { href: "/data", label: "Data Publik" },
     { href: "/jemput-hak", label: "Jemput Hak" },
     { href: "/kontrak-faksi", label: "Kontrak Faksi" },
+    { href: "/reputasi", label: "Reputasi Anggota" },
     { href: "/info", label: "Info Indonesia" },
   ],
   Partisipasi: [

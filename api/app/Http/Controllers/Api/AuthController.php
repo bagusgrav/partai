@@ -17,6 +17,7 @@ class AuthController extends Controller
     public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate([
+            'request_id' => ['required', 'uuid'],
             'email' => ['required', 'string', 'email', 'max:255'],
         ]);
 
@@ -30,10 +31,12 @@ class AuthController extends Controller
     public function resetPassword(Request $request): JsonResponse
     {
         $validated = $request->validate([
+            'request_id' => ['required', 'uuid'],
             'token' => ['required', 'string'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+        unset($validated['request_id']);
 
         $status = Password::reset($validated, static function (User $user, string $password): void {
             $user->forceFill([
