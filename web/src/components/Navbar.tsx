@@ -16,6 +16,7 @@ const links = [
   { href: "/review", label: "Juri Warga" },
   { href: "/events", label: "Gerak Warga" },
   { href: "/manifesto", label: "Manifesto" },
+  { href: "/peta-jalan", label: "Peta Jalan" },
   { href: "/panduan", label: "Panduan" },
 ];
 

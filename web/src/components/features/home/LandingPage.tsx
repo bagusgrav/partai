@@ -160,6 +160,27 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="mx-auto w-full max-w-7xl px-6 py-16 sm:px-8 sm:py-20">
+        <div className="flex flex-col gap-6 rounded-3xl bg-primary px-6 py-8 text-white sm:px-10 sm:py-10 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-3xl">
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+              Bukan Sekadar Aplikasi, Ini Adalah Embrio Partai Masa Depan.
+            </h2>
+            <p className="mt-3 leading-7 text-white/80">
+              Kami sedang membangun fondasi menuju Partai Politik resmi yang
+              bebas dinasti dan korupsi.
+            </p>
+          </div>
+          <Link
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-white px-5 py-3 text-center font-bold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+            href="/peta-jalan"
+          >
+            Lihat Peta Jalan Kami
+            <span aria-hidden="true" className="ml-2">→</span>
+          </Link>
+        </div>
+      </section>
+
       <footer className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <p className="font-bold tracking-[0.12em] text-primary-hover">PARTAI</p>
         <p>Edukasi kewargaan dan pengawasan publik, bersama warga.</p>
