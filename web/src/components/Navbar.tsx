@@ -76,6 +76,8 @@ export default function Navbar() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationError, setNotificationError] = useState<string | null>(null);
+  const isAuthenticated =
+    currentUser !== null && currentUser.role !== "guest";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -232,13 +234,13 @@ export default function Navbar() {
           </div>
         </div>
         <div className="hidden flex-wrap items-center gap-2 md:flex">
-          {currentUser && (
+          {isAuthenticated && (
             <NotificationBellLink
               error={notificationError}
               unreadCount={unreadCount}
             />
           )}
-          {currentUser ? (
+          {isAuthenticated ? (
             <Link
               className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-text-main hover:bg-primary-light"
               href="/profil"
@@ -248,18 +250,22 @@ export default function Navbar() {
                 {currentUser.reputation_level}
               </span>
             </Link>
-          ) : profileError ? (
-            <span className="text-xs text-text-muted" title={profileError}>
-              Reputasi tidak tersedia
+          ) : (
+            <span className="text-sm font-semibold text-text-muted" title={profileError ?? undefined}>
+              Tamu
             </span>
-          ) : null}
-          <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
-          <a
-            className="whitespace-nowrap rounded-md border border-primary bg-transparent px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-            href="https://id.akuhadir.my.id"
-          >
-            Masuk
-          </a>
+          )}
+          {!isAuthenticated && (
+            <>
+              <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
+              <a
+                className="whitespace-nowrap rounded-md border border-primary bg-transparent px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
+                href="https://id.akuhadir.my.id"
+              >
+                Masuk
+              </a>
+            </>
+          )}
         </div>
         {isMobileMenuOpen && (
           <div
@@ -298,7 +304,7 @@ export default function Navbar() {
               ))}
             </div>
             <div className="mt-2 flex flex-col gap-2 border-t border-background pt-3">
-              {currentUser && (
+              {isAuthenticated && (
                 <Link
                   className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
                   href="/notifikasi"
@@ -328,7 +334,7 @@ export default function Navbar() {
                   )}
                 </Link>
               )}
-              {currentUser ? (
+              {isAuthenticated ? (
                 <Link
                   className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
                   href="/profil"
@@ -339,18 +345,22 @@ export default function Navbar() {
                     {currentUser.reputation_level}
                   </span>
                 </Link>
-              ) : profileError ? (
-                <p className="px-3 text-xs text-text-muted" title={profileError}>
-                  Reputasi tidak tersedia
+              ) : (
+                <p className="px-3 text-sm font-semibold text-text-muted" title={profileError ?? undefined}>
+                  Tamu
                 </p>
-              ) : null}
-              <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
-              <a
-                className="rounded-md border border-primary px-4 py-3 text-center text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                href="https://id.akuhadir.my.id"
-              >
-                Masuk
-              </a>
+              )}
+              {!isAuthenticated && (
+                <>
+                  <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
+                  <a
+                    className="rounded-md border border-primary px-4 py-3 text-center text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    href="https://id.akuhadir.my.id"
+                  >
+                    Masuk
+                  </a>
+                </>
+              )}
             </div>
           </div>
         )}
