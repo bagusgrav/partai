@@ -41,7 +41,8 @@ Tidak ada route `/api/auth/login` atau route exchange SSO dalam route API saat i
 | `GET /api/rights/check/{nik}` | Bearer; throttle 5/menit | Path: `nik` 16 digit dan harus sama dengan NIK akun | `{"program":"PKH\|BPNT\|PIP","status":"DITERIMA\|TIDAK_DITERIMA\|PROSES","period":"..."}`. Respons memakai `Cache-Control: no-store, private`; NIK tidak terdaftar `404`, NIK bukan milik akun `403`, format salah `422`. |
 | `GET /api/contracts` | Publik | Query opsional: `status` salah satu `BELUM_DIMULAI`, `SEDANG_BERJALAN`, `TERPENUHI`, `GAGAL` | Array kontrak berisi antara lain `id`, `politician_name`, `title`, `description`, `status`, `evidence_url`, `deadline`. |
 | `GET /api/faqs` | Publik | — | FAQ yang berstatus publik saja. |
-| `POST /api/inquiries` | Publik; throttle 5/menit | JSON: `request_id` (UUID), `question`; `name` dan `email` opsional | `201` untuk pertanyaan baru, `200` untuk retry identik, `409` bila ID sama dipakai dengan data berbeda. |
+| `GET /api/glossary` | Publik | Query opsional: `search` (maksimal 100 karakter; mencari istilah, definisi, dan kategori) | Daftar istilah glosarium berisi `id`, `term`, `definition`, dan `category`. |
+| `POST /api/inquiries` | Publik; throttle 5/menit | JSON: `request_id` (UUID), `question` (maksimal 5.000 karakter); `name` dan `email` opsional | `201` untuk pertanyaan baru, `200` untuk retry identik, `409` bila ID sama dipakai dengan data berbeda; input tidak valid menghasilkan `422`. |
 
 Data “Jemput Hak” mengikuti dataset yang tersedia dan tidak menggantikan keputusan resmi penyaluran bantuan sosial.
 

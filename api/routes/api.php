@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\GlossaryController;
 use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MemberReputationController;
@@ -71,6 +72,7 @@ Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
 Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('throttle:5,1');
+Route::get('/glossary', [GlossaryController::class, 'index']);
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
 Route::get('/education/overview', [CivicEducationController::class, 'overview'])->middleware('throttle:60,1');
 

@@ -85,7 +85,12 @@ class FaqInquiryTest extends TestCase
             'email' => 'email-tidak-valid',
         ])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['request_id', 'question', 'email']);
+            ->assertJsonValidationErrors(['request_id', 'question', 'email'])
+            ->assertJsonFragment([
+                'request_id' => ['ID pengiriman harus berupa UUID yang valid.'],
+                'question' => ['Pertanyaan wajib diisi.'],
+                'email' => ['Email harus menggunakan format yang valid.'],
+            ]);
     }
 
     public function test_public_inquiries_are_rate_limited_to_five_requests_per_minute(): void

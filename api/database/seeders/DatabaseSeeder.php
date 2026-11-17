@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionWelfareIndexSeeder::class);
         $this->call(FactionContractSeeder::class);
         $this->call(FaqSeeder::class);
+        $this->call(GlossaryTermSeeder::class);
         $this->call(CivicQuestionSeeder::class);
 
         // User::factory(10)->create();

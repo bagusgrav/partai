@@ -112,6 +112,12 @@ export default function TanyaJawabPage() {
             Temukan jawaban atas pertanyaan umum atau kirim pertanyaan baru
             kepada pengurus.
           </p>
+          <a
+            className="mt-7 inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            href="#inquiry-form"
+          >
+            Ajukan Pertanyaan
+          </a>
         </div>
       </section>
 
@@ -167,7 +173,7 @@ export default function TanyaJawabPage() {
           )}
         </section>
 
-        <section aria-labelledby="inquiry-heading">
+        <section aria-labelledby="inquiry-heading" id="inquiry-form">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="text-sm font-bold uppercase tracking-wide text-slate-500">
               Suara Anda

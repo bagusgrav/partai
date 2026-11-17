@@ -17,6 +17,16 @@ class InquiryController extends Controller
             'name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'question' => ['required', 'string', 'max:5000'],
+        ], [
+            'request_id.required' => 'ID pengiriman wajib diisi.',
+            'request_id.uuid' => 'ID pengiriman harus berupa UUID yang valid.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama maksimal 255 karakter.',
+            'email.email' => 'Email harus menggunakan format yang valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'question.required' => 'Pertanyaan wajib diisi.',
+            'question.string' => 'Pertanyaan harus berupa teks.',
+            'question.max' => 'Pertanyaan maksimal 5.000 karakter.',
         ]);
 
         $inquiry = Inquiry::query()->firstOrCreate(

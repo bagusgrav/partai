@@ -81,17 +81,6 @@ const navigationGroups: {
         icon: Map,
       },
       {
-        href: "/panduan",
-        label: "Panduan",
-        description: "Cara kerja & aturan main platform",
-        icon: ClipboardList,
-      },
-    ],
-  },
-  {
-    title: "Transparansi Data",
-    links: [
-      {
         href: "/data",
         label: "Data Publik",
         description: "Anggaran, audit, & log terbuka",
@@ -124,6 +113,29 @@ const navigationGroups: {
     ],
   },
   {
+    title: "Bantuan & Literasi",
+    links: [
+      {
+        href: "/panduan",
+        label: "Panduan",
+        description: "Memahami data, skor, dan cara bergabung",
+        icon: ClipboardList,
+      },
+      {
+        href: "/tanya-jawab",
+        label: "Tanya Jawab",
+        description: "FAQ & kirim pertanyaan publik",
+        icon: MessageCircleQuestion,
+      },
+      {
+        href: "/glosarium",
+        label: "Glosarium",
+        description: "Arti istilah data dan tata kelola",
+        icon: BookOpen,
+      },
+    ],
+  },
+  {
     title: "Partisipasi & Layanan",
     links: [
       {
@@ -137,12 +149,6 @@ const navigationGroups: {
         label: "Tata Kelola",
         description: "Struktur, sortisi, & konstitusi kode",
         icon: Network,
-      },
-      {
-        href: "/tanya-jawab",
-        label: "Tanya Jawab",
-        description: "FAQ & kirim pertanyaan publik",
-        icon: MessageCircleQuestion,
       },
     ],
   },

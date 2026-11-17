@@ -3,7 +3,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Panduan Penggunaan | PARTAI",
-  description: "Panduan lima langkah menggunakan platform PARTAI.",
+  description:
+    "Panduan membaca data publik, memahami skor reputasi, dan mendaftar menjadi anggota PARTAI.",
 };
 
 const steps = [
@@ -58,44 +59,206 @@ export default function GuideContent() {
             Panduan penggunaan
           </p>
           <h1 className="mt-5 text-3xl font-black tracking-tight text-text-main sm:text-4xl">
-            Lima langkah untuk ikut hadir
+            Panduan untuk semua warga
           </h1>
           <p className="mt-5 text-lg leading-8 text-text-muted">
-            Kenali fitur-fitur PARTAI dan mulai berpartisipasi dalam belajar,
-            aksi, pengawasan, serta tata kelola.
+            Panduan singkat untuk membaca data, memahami cara kerja skor, dan
+            mulai bergabung atau menggunakan fitur publik.
           </p>
         </header>
 
-        <ol className="mt-12 grid gap-5 md:grid-cols-2">
-          {steps.map((step) => (
-            <li
-              className="rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-7"
-              key={step.number}
+        <div className="mt-12 grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+          <nav
+            aria-label="Daftar isi panduan"
+            className="h-fit rounded-2xl border border-background bg-surface p-5 lg:sticky lg:top-24"
+          >
+            <h2 className="font-extrabold text-text-main">Daftar isi</h2>
+            <ol className="mt-3 space-y-2 text-sm">
+              <li>
+                <a className="font-semibold text-primary-hover underline underline-offset-4" href="#grafik">
+                  Membaca grafik
+                </a>
+              </li>
+              <li>
+                <a className="font-semibold text-primary-hover underline underline-offset-4" href="#skor">
+                  Memahami kedua skor
+                </a>
+              </li>
+              <li>
+                <a className="font-semibold text-primary-hover underline underline-offset-4" href="#keanggotaan">
+                  Mendaftar anggota
+                </a>
+              </li>
+              <li>
+                <a className="font-semibold text-primary-hover underline underline-offset-4" href="#langkah">
+                  Fitur lainnya
+                </a>
+              </li>
+            </ol>
+          </nav>
+
+          <div className="min-w-0 space-y-8">
+            <section
+              aria-labelledby="chart-guide-title"
+              className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
+              id="grafik"
             >
-              <div className="flex items-center gap-3">
-                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-sm font-black text-primary-hover">
-                  {step.number}
-                </span>
-                <p className="text-sm font-bold uppercase tracking-[0.12em] text-primary-hover">
-                  Menu: {step.menu}
-                </p>
-              </div>
-              <h2 className="mt-5 text-xl font-extrabold text-text-main">
-                {step.title}
-              </h2>
-              <p className="mt-3 leading-7 text-text-muted">{step.description}</p>
-              <Link
-                className="mt-5 inline-flex font-bold text-primary-hover underline decoration-primary underline-offset-4 transition hover:text-primary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                href={step.href}
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">
+                Data publik
+              </p>
+              <h2
+                className="mt-2 text-2xl font-extrabold text-text-main"
+                id="chart-guide-title"
               >
-                Buka {step.menu}
-                <span aria-hidden="true" className="ml-2">
-                  →
-                </span>
+                Cara membaca grafik di Info Indonesia
+              </h2>
+              <ol className="mt-4 list-inside list-decimal space-y-3 leading-7 text-text-muted">
+                <li>
+                  Pilih indikator dan wilayah yang ingin dibandingkan; grafik
+                  menampilkan perubahan dari waktu ke waktu.
+                </li>
+                <li>
+                  Arahkan kursor atau fokuskan grafik untuk membaca nilai dan
+                  periodenya. Perhatikan satuan, misalnya persen.
+                </li>
+                <li>
+                  Bandingkan garis wilayah dengan rata-rata nasional bila
+                  keduanya tersedia. Perbedaan skala atau periode dapat
+                  memengaruhi perbandingan.
+                </li>
+                <li>
+                  Periksa tahun pembaruan dan sumber BPS pada halaman. Data yang
+                  belum tersinkron dapat belum tersedia atau berupa simulasi.
+                </li>
+              </ol>
+              <Link
+                className="mt-5 inline-flex font-bold text-primary-hover underline underline-offset-4"
+                href="/info-indonesia"
+              >
+                Buka Info Indonesia
               </Link>
-            </li>
-          ))}
-        </ol>
+            </section>
+
+            <section
+              aria-labelledby="score-guide-title"
+              className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
+              id="skor"
+            >
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">
+                Reputasi anggota
+              </p>
+              <h2
+                className="mt-2 text-2xl font-extrabold text-text-main"
+                id="score-guide-title"
+              >
+                Mastery Score dan Participation Score
+              </h2>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <article className="rounded-xl bg-primary-light p-5">
+                  <h3 className="font-extrabold text-text-main">Mastery Score</h3>
+                  <p className="mt-2 leading-7 text-text-muted">
+                    Mengukur penguasaan materi kewargaan pada lima domain.
+                    Skor ini berhubungan dengan tingkat kapasitas dan ambang
+                    kelayakan peran tertentu.
+                  </p>
+                </article>
+                <article className="rounded-xl bg-slate-50 p-5">
+                  <h3 className="font-extrabold text-text-main">
+                    Participation Score
+                  </h3>
+                  <p className="mt-2 leading-7 text-text-muted">
+                    Mencatat kontribusi anggota yang telah diverifikasi, baik
+                    kerja lapangan maupun kontribusi non-fisik. Skor ini
+                    terpisah dari penguasaan materi dan tidak mengubah hak suara.
+                  </p>
+                </article>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-text-muted">
+                Singkatnya: Mastery mengukur apa yang dipelajari; Participation
+                mencatat kontribusi. Keduanya bukan ukuran nilai seseorang.
+              </p>
+            </section>
+
+            <section
+              aria-labelledby="registration-guide-title"
+              className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
+              id="keanggotaan"
+            >
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">
+                Bergabung
+              </p>
+              <h2
+                className="mt-2 text-2xl font-extrabold text-text-main"
+                id="registration-guide-title"
+              >
+                Cara mendaftar menjadi anggota
+              </h2>
+              <ol className="mt-4 list-inside list-decimal space-y-3 leading-7 text-text-muted">
+                <li>
+                  Buka formulir pendaftaran dan isi nama lengkap, email,
+                  password minimal 8 karakter, serta wilayah.
+                </li>
+                <li>
+                  NIK bersifat opsional. Tinjau kembali data sebelum mengirim
+                  formulir.
+                </li>
+                <li>
+                  Setelah pendaftaran berhasil, Anda akan diarahkan ke profil
+                  anggota. Gunakan email dan password untuk masuk kembali.
+                </li>
+              </ol>
+              <Link
+                className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 py-3 font-bold text-surface transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                href="/daftar"
+              >
+                Daftar sebagai Anggota
+              </Link>
+            </section>
+
+            <section
+              aria-labelledby="platform-guide-title"
+              className="scroll-mt-24"
+              id="langkah"
+            >
+              <h2
+                className="text-2xl font-extrabold text-text-main"
+                id="platform-guide-title"
+              >
+                Fitur lainnya
+              </h2>
+              <ol className="mt-5 grid gap-4 md:grid-cols-2">
+                {steps.map((step) => (
+                  <li
+                    className="rounded-2xl border border-background bg-surface p-6 shadow-sm"
+                    key={step.number}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-light text-sm font-black text-primary-hover">
+                        {step.number}
+                      </span>
+                      <p className="text-sm font-bold uppercase tracking-[0.12em] text-primary-hover">
+                        Menu: {step.menu}
+                      </p>
+                    </div>
+                    <h3 className="mt-5 text-xl font-extrabold text-text-main">
+                      {step.title}
+                    </h3>
+                    <p className="mt-3 leading-7 text-text-muted">{step.description}</p>
+                    <Link
+                      className="mt-5 inline-flex font-bold text-primary-hover underline decoration-primary underline-offset-4 transition hover:text-primary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                      href={step.href}
+                    >
+                      Buka {step.menu}
+                      <span aria-hidden="true" className="ml-2">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </div>
+        </div>
 
         <section className="mt-10 rounded-2xl border border-primary/10 bg-primary-light p-6 sm:p-8">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-primary-hover">

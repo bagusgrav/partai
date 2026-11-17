@@ -216,6 +216,13 @@ export default function WelfareIndexDashboard() {
                   ? "Belum tersedia"
                   : numberFormat.format(summary.average_ikk)}
               </strong>
+              {" · "}
+              <Link
+                className="font-semibold text-slate-700 underline underline-offset-2 hover:text-slate-950"
+                href="/glosarium#ikk"
+              >
+                Apa itu IKK?
+              </Link>
             </p>
           </div>
           {isLoading && (
@@ -473,6 +480,14 @@ export default function WelfareIndexDashboard() {
                       <div className="flex items-center justify-between gap-3 py-3" key={key}>
                         <dt className="text-sm text-slate-600">
                           {label}
+                          {label === "TPT" && (
+                            <Link
+                              className="ml-2 text-xs font-semibold text-slate-700 underline underline-offset-2 hover:text-slate-950"
+                              href="/glosarium#tpt"
+                            >
+                              Apa itu?
+                            </Link>
+                          )}
                           <span className="ml-1 text-xs text-slate-400">
                             (sub-skor {numberFormat.format(detail.sub_scores[key])})
                           </span>

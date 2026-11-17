@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useCallback,
   useEffect,
@@ -531,6 +532,12 @@ export default function EconomicDashboard() {
               title="Kurs USD/IDR"
             />
           </div>
+          <Link
+            className="inline-flex text-sm font-semibold text-primary-hover underline underline-offset-2 hover:text-primary"
+            href="/glosarium#inflasi"
+          >
+            Apa itu inflasi?
+          </Link>
           <p className="text-sm text-text-muted">
             Terakhir diperbarui: {formatDate(lastUpdated)}
           </p>
