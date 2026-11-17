@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(ItemSeeder::class);
         $this->call(SocialAssistanceSeeder::class);
+        $this->call(RegionWelfareIndexSeeder::class);
         $this->call(FactionContractSeeder::class);
         $this->call(FaqSeeder::class);
         $this->call(CivicQuestionSeeder::class);

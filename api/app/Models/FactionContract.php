@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'evidence_url',
     'deadline',
+    'region_code',
+    'province_name',
 ])]
 class FactionContract extends Model
 {

@@ -22,6 +22,8 @@ class EventController extends Controller
             'radius_m' => ['sometimes', 'integer', 'min:1'],
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
+            'region_code' => ['nullable', 'string', 'regex:/^\d{4}$/'],
+            'province_name' => ['nullable', 'string', 'max:255'],
             'request_id' => ['required', 'uuid'],
         ]);
         $coordinatorId = (string) $request->user()->getAuthIdentifier();
@@ -44,6 +46,8 @@ class EventController extends Controller
                 'radius_m' => $validated['radius_m'] ?? 100,
                 'starts_at' => $validated['starts_at'],
                 'ends_at' => $validated['ends_at'],
+                'region_code' => $validated['region_code'] ?? null,
+                'province_name' => $validated['province_name'] ?? null,
                 'coordinator_id' => $coordinatorId,
                 'status' => 'active',
                 'request_id' => $validated['request_id'],
@@ -83,6 +87,8 @@ class EventController extends Controller
                 'starts_at',
                 'ends_at',
                 'coordinator_id',
+                'region_code',
+                'province_name',
             ]);
 
         return response()->json(['events' => $events]);
@@ -124,6 +130,8 @@ class EventController extends Controller
             || (int) $event->radius_m !== (int) ($validated['radius_m'] ?? 100)
             || ! Carbon::parse($event->starts_at)->equalTo(Carbon::parse($validated['starts_at']))
             || ! Carbon::parse($event->ends_at)->equalTo(Carbon::parse($validated['ends_at']))
+            || $event->region_code !== ($validated['region_code'] ?? null)
+            || $event->province_name !== ($validated['province_name'] ?? null)
         ) {
             return response()->json([
                 'message' => 'The request_id has already been used for a different event.',

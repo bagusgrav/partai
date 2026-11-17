@@ -110,6 +110,18 @@ Mastery dicatat per domain (`hak_konstitusional`, `alasan_bernegara`, `keuangan_
 
 Status yang sah: `BELUM_DIMULAI`, `SEDANG_BERJALAN`, `TERPENUHI`, dan `GAGAL`.
 
+## Indeks Kerentanan Kesejahteraan (IKK)
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/welfare/ikk` | Publik, 60 permintaan/menit | Query opsional `province`, `tier`, `year`, `search`, `sort` (`ikk_desc`, `ikk_asc`, `poverty_desc`, `disaster_desc`), `page` | Ringkasan nasional tahun terpilih (rata-rata IKK, distribusi tier, bobot/rentang normalisasi), daftar wilayah berhalaman, dan daftar provinsi. |
+| `GET /api/welfare/ikk/{regionCode}` | Publik, 60 permintaan/menit | Kode BPS kabupaten/kota empat digit | Profil indikator, lima sub-skor 0–100, sitasi BPS/BNPB, kontrak aktif dan agenda aktif yang ditandai pada kabupaten/kota atau provinsi tersebut. |
+| `POST /api/welfare/ikk/ingest` | Bearer; role `super_admin` atau `pengurus`; 20 permintaan/menit | JSON: `request_id` UUID dan `rows` berisi indikator lengkap beserta sitasi BPS/BNPB | `201 {"status":"processed","records_saved":N}`; retry identik menghasilkan `already_processed`; pemakaian ID untuk batch berbeda menghasilkan `409`. |
+
+Metodologi komposit yang dipakai deterministik: kemiskinan 30% (acuan 0–35%), stunting 25% (0–45%), Gini 15% (0,250–0,550), TPT 15% (0–15%), dan risiko bencana BNPB 15% (0–100). Nilai normalisasi dibatasi pada 0–100. Tier: rendah `<30`, sedang `30–49,99`, tinggi `50–69,99`, kritis `>=70`. Data seeder offline adalah estimasi kurasi untuk CI dan fallback (bukan hasil tarik API langsung) dengan rujukan publikasi yang perlu dicocokkan ke tabel sumber sebelum dipakai mengambil keputusan. Command `welfare:sync-open-data` memakai baseline ini jika endpoint BPS/BNPB tidak dikonfigurasi atau tidak tersedia. Endpoint dapat diatur melalui `BPS_IKK_DATA_URL`, `BNPB_CKAN_DATA_URL`, serta `BNPB_CKAN_RESOURCE_ID`; keduanya harus mengembalikan objek JSON dengan `records`/`data` berupa baris terstruktur yang menggabungkan kode/tahun dan indikator terkait (BNPB CKAN dapat memakai `result.records`).
+
+Penandaan opsional `region_code` dan `province_name` pada event serta kontrak faksi menentukan keterkaitannya pada profil IKK; kedua field dapat diisi melalui API mutasi maupun panel admin. Resource Filament **Indeks Kerentanan (IKK)** dapat dibaca/audit oleh `panelis`; create/edit dan aksi sinkronisasi data terbuka dibatasi ke `super_admin` dan `pengurus`. Resource data lama `WelfareDataResource` tetap terpisah.
+
 ## Dukungan idempotensi dan kepatuhan
 
 Standar Thortech v2.0 mewajibkan UUID `request_id` untuk operasi tulis baru yang aman dicoba ulang. Dukungan yang terlihat saat ini:

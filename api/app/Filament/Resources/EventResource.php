@@ -39,6 +39,13 @@ class EventResource extends Resource
                     ->label('Deskripsi')
                     ->required()
                     ->columnSpanFull(),
+                TextInput::make('region_code')
+                    ->label('Kode BPS Wilayah (Opsional)')
+                    ->regex('/^\d{4}$/')
+                    ->maxLength(4),
+                TextInput::make('province_name')
+                    ->label('Provinsi (Opsional)')
+                    ->maxLength(255),
                 TextInput::make('location_lat')
                     ->label('Lintang')
                     ->numeric()
@@ -86,6 +93,8 @@ class EventResource extends Resource
             ->columns([
                 TextColumn::make('id')->label('ID')->searchable(),
                 TextColumn::make('title')->label('Judul')->searchable(),
+                TextColumn::make('region_code')->label('Kode BPS')->searchable(),
+                TextColumn::make('province_name')->label('Provinsi')->searchable(),
                 TextColumn::make('status')->label('Status')->badge(),
                 TextColumn::make('starts_at')->label('Waktu Mulai')->dateTime(),
                 TextColumn::make('ends_at')->label('Waktu Selesai')->dateTime(),

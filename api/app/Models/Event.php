@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'coordinator_id',
     'status',
     'request_id',
+    'region_code',
+    'province_name',
 ])]
 class Event extends Model
 {

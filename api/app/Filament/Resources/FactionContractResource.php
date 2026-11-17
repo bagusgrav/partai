@@ -77,6 +77,13 @@ class FactionContractResource extends Resource
                     ->required()
                     ->rows(5)
                     ->columnSpanFull(),
+                TextInput::make('region_code')
+                    ->label('Kode BPS Wilayah (Opsional)')
+                    ->regex('/^\d{4}$/')
+                    ->maxLength(4),
+                TextInput::make('province_name')
+                    ->label('Provinsi (Opsional)')
+                    ->maxLength(255),
                 Select::make('status')
                     ->label('Status')
                     ->options([
@@ -102,6 +109,8 @@ class FactionContractResource extends Resource
             ->columns([
                 TextColumn::make('politician_name')->label('Politisi')->searchable(),
                 TextColumn::make('title')->label('Janji')->searchable()->wrap(),
+                TextColumn::make('region_code')->label('Kode BPS')->searchable(),
+                TextColumn::make('province_name')->label('Provinsi')->searchable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()

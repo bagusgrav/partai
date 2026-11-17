@@ -39,6 +39,8 @@ class FactionContractController extends Controller
             'status' => ['sometimes', 'required', Rule::in(FactionContract::STATUSES)],
             'evidence_url' => ['nullable', 'url', 'max:255'],
             'deadline' => ['nullable', 'date_format:Y-m-d'],
+            'region_code' => ['nullable', 'string', 'regex:/^\d{4}$/'],
+            'province_name' => ['nullable', 'string', 'max:255'],
             'request_id' => ['required', 'uuid'],
         ]);
         $requestId = $validated['request_id'];
@@ -98,6 +100,8 @@ class FactionContractController extends Controller
             'status' => ['sometimes', 'required', Rule::in(FactionContract::STATUSES)],
             'evidence_url' => ['sometimes', 'nullable', 'url', 'max:255'],
             'deadline' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'region_code' => ['sometimes', 'nullable', 'string', 'regex:/^\d{4}$/'],
+            'province_name' => ['sometimes', 'nullable', 'string', 'max:255'],
             'request_id' => ['required', 'uuid'],
         ]);
         $requestId = $validated['request_id'];

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\SocialAssistanceController;
 use App\Http\Controllers\Api\SortitionController;
 use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
+use App\Http\Controllers\Api\WelfareIndexController;
 use App\Http\Middleware\IdempotentPasswordRequest;
 use App\Models\WelfareData;
 use Illuminate\Http\Request;
@@ -55,6 +56,10 @@ Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])
 Route::get('/welfare/summary', [WelfareController::class, 'summary']);
 Route::get('/welfare/regions', [WelfareController::class, 'regions']);
 Route::get('/welfare/region/{code}', [WelfareController::class, 'region']);
+Route::get('/welfare/ikk', [WelfareIndexController::class, 'index'])->middleware('throttle:60,1');
+Route::get('/welfare/ikk/{regionCode}', [WelfareIndexController::class, 'show'])->middleware('throttle:60,1');
+Route::post('/welfare/ikk/ingest', [WelfareIndexController::class, 'ingest'])
+    ->middleware(['auth:sanctum', 'role:super_admin|pengurus', 'throttle:20,1']);
 Route::get('/economic/summary', [EconomicController::class, 'summary']);
 Route::get('/economic/history/{type}', [EconomicController::class, 'history']);
 Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
