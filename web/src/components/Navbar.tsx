@@ -2,7 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import NavbarRegistrationCTA from "@/components/NavbarRegistrationCTA";
+import { usePathname } from "next/navigation";
+import {
+  Award,
+  BarChart3,
+  BookOpen,
+  CalendarDays,
+  ClipboardList,
+  Database,
+  FileCheck,
+  FileText,
+  HandHeart,
+  Home,
+  Map,
+  Menu,
+  MessageCircleQuestion,
+  Network,
+  Scale,
+  Vote,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import {
   getCurrentUser,
   getNotifications,
@@ -10,30 +30,123 @@ import {
 } from "@/lib/api";
 import type { RegisteredUser } from "@/types";
 
-const links = [
-  { href: "/", label: "Beranda" },
-  { href: "/belajar", label: "Belajar" },
-  { href: "/review", label: "Juri Warga" },
-  { href: "/events", label: "Gerak Warga" },
-  { href: "/manifesto", label: "Manifesto" },
-  { href: "/peta-jalan", label: "Peta Jalan" },
-  { href: "/panduan", label: "Panduan" },
-  { href: "/tanya-jawab", label: "Tanya Jawab" },
-];
+const ssoUrl = "https://id.akuhadir.my.id";
 
-const groupedLinks = {
-  "Transparansi Data": [
-    { href: "/data", label: "Data Publik" },
-    { href: "/jemput-hak", label: "Jemput Hak" },
-    { href: "/kontrak-faksi", label: "Kontrak Faksi" },
-    { href: "/reputasi", label: "Reputasi Anggota" },
-    { href: "/info", label: "Info Indonesia" },
-  ],
-  Partisipasi: [
-    { href: "/voting", label: "Voting" },
-    { href: "/recall", label: "Tata Kelola" },
-  ],
-};
+const navigationGroups: {
+  title: string;
+  links: {
+    href: string;
+    label: string;
+    description: string;
+    icon: LucideIcon;
+  }[];
+}[] = [
+  {
+    title: "Navigasi Utama",
+    links: [
+      {
+        href: "/",
+        label: "Beranda",
+        description: "Ringkasan gerakan & kabar terbaru",
+        icon: Home,
+      },
+      {
+        href: "/belajar",
+        label: "Belajar",
+        description: "Kurikulum & uji kapasitas warga",
+        icon: BookOpen,
+      },
+      {
+        href: "/review",
+        label: "Juri Warga",
+        description: "Panel pengawasan & etik acak",
+        icon: Scale,
+      },
+      {
+        href: "/events",
+        label: "Gerak Warga",
+        description: "Agenda aksi & kegiatan lapangan",
+        icon: CalendarDays,
+      },
+      {
+        href: "/manifesto",
+        label: "Manifesto",
+        description: "Prinsip dasar & arah perjuangan",
+        icon: FileText,
+      },
+      {
+        href: "/peta-jalan",
+        label: "Peta Jalan",
+        description: "Tahapan legalitas & pembangunan",
+        icon: Map,
+      },
+      {
+        href: "/panduan",
+        label: "Panduan",
+        description: "Cara kerja & aturan main platform",
+        icon: ClipboardList,
+      },
+    ],
+  },
+  {
+    title: "Transparansi Data",
+    links: [
+      {
+        href: "/data",
+        label: "Data Publik",
+        description: "Anggaran, audit, & log terbuka",
+        icon: Database,
+      },
+      {
+        href: "/jemput-hak",
+        label: "Jemput Hak",
+        description: "Cek status bansos & hak warga",
+        icon: HandHeart,
+      },
+      {
+        href: "/kontrak-faksi",
+        label: "Kontrak Faksi",
+        description: "Komitmen mengikat wakil rakyat",
+        icon: FileCheck,
+      },
+      {
+        href: "/reputasi",
+        label: "Skor Reputasi",
+        description: "Kapasitas intelektual & kontribusi",
+        icon: Award,
+      },
+      {
+        href: "/info",
+        label: "Info Indonesia",
+        description: "Data sosial-ekonomi & kerentanan",
+        icon: BarChart3,
+      },
+    ],
+  },
+  {
+    title: "Partisipasi & Layanan",
+    links: [
+      {
+        href: "/voting",
+        label: "Voting",
+        description: "Pengambilan keputusan demokratis",
+        icon: Vote,
+      },
+      {
+        href: "/recall",
+        label: "Tata Kelola",
+        description: "Struktur, sortisi, & konstitusi kode",
+        icon: Network,
+      },
+      {
+        href: "/tanya-jawab",
+        label: "Tanya Jawab",
+        description: "FAQ & kirim pertanyaan publik",
+        icon: MessageCircleQuestion,
+      },
+    ],
+  },
+];
 
 function NotificationBellLink({
   unreadCount,
@@ -45,7 +158,7 @@ function NotificationBellLink({
   return (
     <Link
       aria-label={`Notifikasi${unreadCount > 0 ? `, ${unreadCount} belum dibaca` : ""}`}
-      className="relative inline-flex size-10 items-center justify-center rounded-md text-text-main transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="relative inline-flex size-10 items-center justify-center rounded-md text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800"
       href="/notifikasi"
       title={error ?? "Notifikasi"}
     >
@@ -63,7 +176,7 @@ function NotificationBellLink({
         <path d="M10 21h4" />
       </svg>
       {unreadCount > 0 && (
-        <span className="absolute right-0 top-0 min-w-5 rounded-full bg-red-600 px-1 text-center text-xs font-bold leading-5 text-white">
+        <span className="absolute right-0 top-0 min-w-5 rounded-full bg-red-700 px-1 text-center text-xs font-bold leading-5 text-white">
           {unreadCount > 99 ? "99+" : unreadCount}
         </span>
       )}
@@ -71,10 +184,52 @@ function NotificationBellLink({
   );
 }
 
+function NavigationLink({
+  href,
+  label,
+  description,
+  icon: Icon,
+  pathname,
+  onNavigate,
+}: {
+  href: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  pathname: string;
+  onNavigate: () => void;
+}) {
+  const isActive =
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+
+  return (
+    <Link
+      aria-current={isActive ? "page" : undefined}
+      className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 ${
+        isActive
+          ? "bg-slate-100 font-semibold text-slate-950 before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-slate-950"
+          : "text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+      }`}
+      href={href}
+      onClick={onNavigate}
+    >
+      <Icon aria-hidden="true" className="size-[18px] shrink-0" strokeWidth={1.75} />
+      <span className="min-w-0">
+        <span className="block">{label}</span>
+        <span className="hidden text-xs font-normal text-slate-500 md:block">
+          {description}
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 export default function Navbar() {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const previousPathname = useRef(pathname);
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -83,33 +238,26 @@ export default function Navbar() {
     currentUser !== null && currentUser.role !== "guest";
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        event.target instanceof Node &&
-        !dropdownRef.current?.contains(event.target)
-      ) {
-        setDropdownOpen(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    if (previousPathname.current !== pathname) {
+      previousPathname.current = pathname;
+      setIsMenuOpen(false);
+    }
+  }, [pathname]);
 
   useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setDropdownOpen(null);
+        setIsMenuOpen(false);
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     let active = true;
@@ -167,64 +315,20 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-background/80 bg-surface/95 shadow-sm shadow-primary/5 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm shadow-slate-950/5 backdrop-blur">
       <nav
         aria-label="Navigasi utama"
-        className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-2 py-3 sm:px-6 xl:px-8"
+        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"
       >
         <Link
           aria-label="PARTAI, Beranda"
-          className="w-fit shrink-0 rounded-md text-lg font-black tracking-[0.16em] text-primary transition hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 sm:text-xl"
+          className="w-fit shrink-0 rounded-md text-lg font-black tracking-[0.16em] text-slate-950 transition hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:text-xl"
           href="/"
         >
           PARTAI
         </Link>
-        <div className="hidden min-w-0 flex-1 flex-wrap items-center gap-2 xl:flex xl:gap-4">
-          {links.map(({ href, label }) => (
-            <Link
-              className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-              href={href}
-              key={href}
-            >
-              {label}
-            </Link>
-          ))}
-          <div
-            className="flex flex-wrap items-center gap-2 xl:gap-4"
-            ref={dropdownRef}
-          >
-            {Object.entries(groupedLinks).map(([label, items]) => (
-              <details
-                className="relative"
-                key={label}
-                open={dropdownOpen === label}
-              >
-                <summary
-                  className="cursor-pointer list-none whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setDropdownOpen((open) => (open === label ? null : label));
-                  }}
-                >
-                  {label}
-                  <span aria-hidden="true" className="ml-2">▾</span>
-                </summary>
-                <div className="absolute left-0 top-full z-10 mt-2 min-w-44 rounded-md border border-background bg-surface p-2 shadow-lg">
-                  {items.map(({ href, label: itemLabel }) => (
-                    <Link
-                      className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-                      href={href}
-                      key={href}
-                    >
-                      {itemLabel}
-                    </Link>
-                  ))}
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-1 xl:hidden sm:gap-2">
+
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {isAuthenticated ? (
             <>
               <NotificationBellLink
@@ -232,165 +336,135 @@ export default function Navbar() {
                 unreadCount={unreadCount}
               />
               <Link
-                className="max-w-20 truncate rounded-md px-1 py-1 text-xs font-semibold text-text-main hover:bg-primary-light sm:max-w-32 sm:px-2 sm:text-sm"
+                className="max-w-24 truncate rounded-md px-2 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-100 sm:max-w-48 sm:text-sm"
                 href="/profil"
               >
-                Profil
+                <span className="hidden sm:inline">{currentUser.name}</span>
+                <span className="sm:hidden">Profil</span>
+                <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-800 md:inline-block">
+                  {currentUser.reputation_level}
+                </span>
               </Link>
             </>
           ) : (
             <>
               <span
-                className="whitespace-nowrap text-[10px] font-semibold text-text-muted sm:text-sm"
+                className="hidden whitespace-nowrap text-sm font-semibold text-slate-600 sm:inline"
                 title={profileError ?? undefined}
               >
                 Tamu
               </span>
-              <Link
-                className="whitespace-nowrap rounded-md bg-primary px-2 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
-                href="/daftar"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <a
+                className="whitespace-nowrap rounded-md bg-slate-950 px-2.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
+                href={ssoUrl}
               >
                 <span className="sm:hidden">Gabung</span>
                 <span className="hidden sm:inline">Gabung Anggota</span>
-              </Link>
+              </a>
               <a
-                className="whitespace-nowrap rounded-md border border-primary px-2 py-2 text-xs font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
-                href="https://id.akuhadir.my.id"
+                className="whitespace-nowrap rounded-md border border-slate-400 px-2.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
+                href={ssoUrl}
               >
                 Masuk
               </a>
             </>
           )}
-        </div>
-        <button
-          aria-controls="mobile-navigation"
-          aria-expanded={isMobileMenuOpen}
-          aria-label={isMobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-md text-text-main transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary xl:hidden"
-          onClick={() => setIsMobileMenuOpen((open) => !open)}
-          type="button"
-        >
-          <span aria-hidden="true" className="text-2xl leading-none">
-            {isMobileMenuOpen ? "×" : "☰"}
-          </span>
-        </button>
-        <div className="hidden flex-wrap items-center gap-2 xl:flex">
-          {isAuthenticated && (
-            <NotificationBellLink
-              error={notificationError}
-              unreadCount={unreadCount}
-            />
-          )}
-          {isAuthenticated ? (
-            <Link
-              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-text-main hover:bg-primary-light"
-              href="/profil"
-            >
-              <span>{currentUser.name}</span>
-              <span className="rounded-full bg-primary-light px-2 py-1 text-xs font-bold text-primary">
-                {currentUser.reputation_level}
-              </span>
-            </Link>
-          ) : (
-            <span className="text-sm font-semibold text-text-muted" title={profileError ?? undefined}>
-              Tamu
-            </span>
-          )}
-          {!isAuthenticated && (
-            <>
-              <NavbarRegistrationCTA onClick={() => setIsMobileMenuOpen(false)} />
-              <a
-                className="whitespace-nowrap rounded-md border border-primary bg-transparent px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50"
-                href="https://id.akuhadir.my.id"
-              >
-                Masuk
-              </a>
-            </>
-          )}
-        </div>
-        {isMobileMenuOpen && (
-          <div
-            className="basis-full border-t border-background pt-3 xl:hidden"
-            id="mobile-navigation"
+
+          <button
+            aria-controls="main-navigation-panel"
+            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-2 text-slate-800 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 sm:px-3"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            type="button"
           >
-            <div className="flex flex-col gap-1">
-              {links.map(({ href, label }) => (
-                <Link
-                  className="rounded-md px-3 py-3 text-sm font-semibold text-text-muted transition hover:bg-primary-light hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  href={href}
-                  key={href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {label}
-                </Link>
-              ))}
-              {Object.entries(groupedLinks).map(([label, items]) => (
-                <div className="px-3 py-2" key={label}>
-                  <p className="text-xs font-bold uppercase tracking-wide text-text-muted">
-                    {label}
-                  </p>
-                  <div className="mt-1 flex flex-col">
-                    {items.map(({ href, label: itemLabel }) => (
-                      <Link
-                        className="rounded-md py-2 text-sm font-semibold text-text-main hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        href={href}
-                        key={href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {itemLabel}
-                      </Link>
-                    ))}
-                  </div>
+            {isMenuOpen ? (
+              <X aria-hidden="true" className="size-5" strokeWidth={1.75} />
+            ) : (
+              <Menu aria-hidden="true" className="size-5" strokeWidth={1.75} />
+            )}
+            <span className="hidden text-sm font-semibold sm:inline">
+              {isMenuOpen ? "Tutup" : "Menu"}
+            </span>
+          </button>
+        </div>
+
+        {isMenuOpen && (
+          <button
+            aria-label="Tutup menu navigasi"
+            className="fixed inset-0 z-40 bg-slate-950/20 backdrop-blur-[1px]"
+            onClick={() => setIsMenuOpen(false)}
+            tabIndex={-1}
+            type="button"
+          />
+        )}
+        <div
+          className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200 bg-white shadow-xl shadow-slate-950/10"
+          hidden={!isMenuOpen}
+          id="main-navigation-panel"
+        >
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 sm:px-6 md:grid-cols-3 lg:gap-8 lg:px-8">
+            {navigationGroups.map(({ title, links }) => (
+              <section aria-label={title} key={title}>
+                <h2 className="mb-2 px-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                  {title}
+                </h2>
+                <div className="grid gap-1">
+                  {links.map((link) => (
+                    <NavigationLink
+                      {...link}
+                      key={link.href}
+                      onNavigate={() => setIsMenuOpen(false)}
+                      pathname={pathname}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="mt-2 flex flex-col gap-2 border-t border-background pt-3">
-              {isAuthenticated && (
-                <Link
-                  className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
-                  href="/notifikasi"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  title={notificationError ?? "Notifikasi"}
-                >
-                  <span className="flex items-center gap-2">
-                    <svg
-                      aria-hidden="true"
-                      className="size-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-                      <path d="M10 21h4" />
-                    </svg>
+              </section>
+            ))}
+
+            <div className="flex flex-col gap-2 border-t border-slate-200 pt-4 md:hidden">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+                    href="/notifikasi"
+                    onClick={() => setIsMenuOpen(false)}
+                    title={notificationError ?? "Notifikasi"}
+                  >
                     Notifikasi
-                  </span>
-                  {unreadCount > 0 && (
-                    <span className="rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </Link>
-              )}
-              {isAuthenticated && (
-                <Link
-                  className="flex items-center justify-between rounded-md px-3 py-3 text-sm font-semibold text-text-main hover:bg-primary-light"
-                  href="/profil"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span>{currentUser.name}</span>
-                  <span className="rounded-full bg-primary-light px-2 py-1 text-xs font-bold text-primary">
-                    {currentUser.reputation_level}
-                  </span>
-                </Link>
+                    {unreadCount > 0 && (
+                      <span className="ml-2 rounded-full bg-red-700 px-2 py-1 text-xs font-bold text-white">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+                    href="/profil"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {currentUser.name}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <a
+                    className="rounded-md bg-slate-950 px-4 py-3 text-center text-sm font-bold text-white hover:bg-slate-800"
+                    href={ssoUrl}
+                  >
+                    Gabung Anggota
+                  </a>
+                  <a
+                    className="rounded-md border border-slate-400 px-4 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-100"
+                    href={ssoUrl}
+                  >
+                    Masuk
+                  </a>
+                </>
               )}
             </div>
           </div>
-        )}
+        </div>
       </nav>
     </header>
   );
