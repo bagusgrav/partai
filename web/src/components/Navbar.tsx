@@ -18,6 +18,7 @@ const links = [
   { href: "/manifesto", label: "Manifesto" },
   { href: "/peta-jalan", label: "Peta Jalan" },
   { href: "/panduan", label: "Panduan" },
+  { href: "/tanya-jawab", label: "Tanya Jawab" },
 ];
 
 const groupedLinks = {

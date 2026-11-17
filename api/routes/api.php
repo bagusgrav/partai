@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\EconomicController;
 use App\Http\Controllers\Api\EssayController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\FactionContractController;
+use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GovernmentInsightController;
+use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
@@ -55,6 +57,8 @@ Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet'])
 Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
     ->middleware(['auth:sanctum', 'throttle:5,1']);
 Route::get('/contracts', [FactionContractController::class, 'index']);
+Route::get('/faqs', [FaqController::class, 'index']);
+Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {
     Route::post('/contracts', [FactionContractController::class, 'store']);

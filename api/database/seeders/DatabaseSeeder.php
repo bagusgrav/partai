@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ItemSeeder::class);
         $this->call(SocialAssistanceSeeder::class);
         $this->call(FactionContractSeeder::class);
+        $this->call(FaqSeeder::class);
 
         // User::factory(10)->create();
 
