@@ -266,24 +266,38 @@ test("landing page menampilkan judul dan ajakan belajar", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("navbar tidak menyebabkan overflow horizontal di layar laptop", async ({
+test("navbar tablet menggunakan menu vertikal tanpa overflow", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 1024, height: 768 });
-  await page.goto("/");
+  for (const width of [768, 1024]) {
+    await page.setViewportSize({ width, height: 768 });
+    await page.goto("/");
 
-  const pageWidth = await page.evaluate(
-    () => document.documentElement.scrollWidth <= window.innerWidth,
-  );
-  expect(pageWidth).toBe(true);
+    await expect(
+      page.getByRole("button", { name: "Buka menu navigasi" }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
 
-  await page.getByText("Data & Info").click();
-  await expect(page.getByRole("link", { name: "Data Publik" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Info Indonesia" })).toBeVisible();
+    await page.getByRole("button", { name: "Buka menu navigasi" }).click();
+    await expect(
+      page.locator("#mobile-navigation").getByRole("link", { name: "Data Publik" }),
+    ).toBeVisible();
+  }
 });
 
 test("menu navbar mobile memuat navigasi dan kedua CTA", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
+  await page.route("http://127.0.0.1:8000/api/user", async (route) => {
+    await route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ message: "Unauthenticated." }),
+    });
+  });
   await page.goto("/");
 
   const menuButton = page.getByRole("button", { name: "Buka menu navigasi" });
@@ -292,13 +306,13 @@ test("menu navbar mobile memuat navigasi dan kedua CTA", async ({ page }) => {
 
   const mobileNavigation = page.locator("#mobile-navigation");
   await expect(mobileNavigation.getByRole("link", { name: "Data Publik" })).toBeVisible();
-  await expect(mobileNavigation.getByRole("link", { name: "Daftar Anggota" })).toBeVisible();
-  await expect(mobileNavigation.getByRole("link", { name: "Masuk Pengurus" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Gabung", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Masuk", exact: true })).toBeVisible();
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
   ).toBe(true);
 
-  await mobileNavigation.getByRole("link", { name: "Daftar Anggota" }).click();
+  await page.getByRole("link", { name: "Gabung", exact: true }).click();
   await expect(page).toHaveURL(/\/daftar$/);
   await expect(page.getByRole("button", { name: "Buka menu navigasi" })).toHaveAttribute(
     "aria-expanded",
