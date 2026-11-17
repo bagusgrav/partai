@@ -42,6 +42,8 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
 
 Route::get('/welfare/summary', [WelfareController::class, 'summary']);
 Route::get('/welfare/regions', [WelfareController::class, 'regions']);

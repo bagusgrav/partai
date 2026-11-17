@@ -108,6 +108,43 @@ export async function registerMember(
   localStorage.removeItem(GUEST_REQUEST_ID_KEY);
 }
 
+export async function forgotPassword(email: string): Promise<void> {
+  const response = await fetchWithRetry(
+    `${API_BASE_URL}/auth/forgot-password`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    },
+  );
+
+  await ensureSuccessfulResponse(response);
+}
+
+export async function resetPassword(input: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}): Promise<void> {
+  const response = await fetchWithRetry(
+    `${API_BASE_URL}/auth/reset-password`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    },
+  );
+
+  await ensureSuccessfulResponse(response);
+}
+
 export async function getCurrentUser(): Promise<RegisteredUser> {
   const response = await fetchWithRetry(`${API_BASE_URL}/user`, {
     method: "GET",
