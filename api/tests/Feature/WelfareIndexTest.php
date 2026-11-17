@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\RegionWelfareIndexResource;
+use App\Models\EconomicIndicatorObservation;
 use App\Models\Event;
 use App\Models\FactionContract;
 use App\Models\RegionWelfareIndex;
 use App\Models\User;
+use App\Models\WelfareData;
 use App\Services\WelfareIndexService;
 use App\Services\WelfareOpenDataAdapter;
 use Database\Seeders\RegionWelfareIndexSeeder;
@@ -199,6 +201,80 @@ class WelfareIndexTest extends TestCase
             ->assertSuccessful();
 
         $this->assertGreaterThanOrEqual(16, RegionWelfareIndex::query()->count());
+    }
+
+    public function test_economic_observations_can_seed_ikk_for_34_provinces_and_national(): void
+    {
+        $indicators = [
+            'kemiskinan' => 10.0,
+            'tpt' => 5.0,
+            'gini' => 0.35,
+            'stunting' => 20.0,
+        ];
+
+        foreach (array_merge(
+            [['9999', 'Nasional (Indonesia)']],
+            array_map(
+                static fn (int $number): array => [sprintf('%02d00', $number), "Provinsi {$number}"],
+                range(11, 44),
+            ),
+        ) as [$regionCode, $regionName]) {
+            foreach ($indicators as $indicator => $value) {
+                EconomicIndicatorObservation::query()->create([
+                    'indicator_name' => $indicator,
+                    'region_code' => $regionCode,
+                    'region_name' => $regionName,
+                    'period_year' => 2024,
+                    'period_month' => null,
+                    'value' => $value,
+                    'unit' => $indicator === 'gini' ? 'rasio' : 'persen',
+                    'source' => 'BPS WebAPI',
+                ]);
+            }
+        }
+
+        WelfareData::query()->create([
+            'region_code' => '11',
+            'region_name' => 'Provinsi 11',
+            'indicator' => 'bencana',
+            'value' => 12,
+            'unit' => 'kejadian',
+            'year' => 2024,
+            'source' => 'BNPB',
+        ]);
+
+        $this->artisan('welfare:sync-economic-indicators')
+            ->expectsOutputToContain('Synchronized 35 IKK rows')
+            ->assertSuccessful();
+
+        $this->assertSame(35, RegionWelfareIndex::query()->where('period_year', 2024)->count());
+        $this->assertDatabaseHas('region_welfare_indices', [
+            'region_code' => '9999',
+            'region_name' => 'Nasional (Indonesia)',
+            'period_year' => 2024,
+        ]);
+    }
+
+    public function test_economic_ikk_sync_does_not_seed_partial_province_or_national_data(): void
+    {
+        foreach (['kemiskinan', 'tpt', 'gini', 'stunting'] as $indicator) {
+            EconomicIndicatorObservation::query()->create([
+                'indicator_name' => $indicator,
+                'region_code' => '1100',
+                'region_name' => 'Aceh',
+                'period_year' => 2024,
+                'period_month' => null,
+                'value' => 1,
+                'unit' => 'persen',
+                'source' => 'BPS WebAPI',
+            ]);
+        }
+
+        $this->artisan('welfare:sync-economic-indicators')
+            ->expectsOutputToContain('Expected at least 34 complete province rows')
+            ->assertFailed();
+
+        $this->assertDatabaseCount('region_welfare_indices', 0);
     }
 
     public function test_open_data_adapter_joins_normalized_bps_and_bnpb_records(): void

@@ -416,14 +416,15 @@ export default function EconomicDashboard() {
             loading: false,
           });
         }
-      } catch {
+      } catch (requestError) {
         if (isCurrent) {
           setIndicatorHistory({
             regionCode: selectedRegionCode,
             type: selectedIndicator,
             data: [],
-            error:
-              "Data indikator untuk wilayah ini sedang dalam proses sinkronisasi.",
+            error: requestError instanceof Error
+              ? `Gagal memuat data indikator: ${requestError.message}`
+              : "Data indikator untuk wilayah ini gagal dimuat.",
             loading: false,
           });
         }

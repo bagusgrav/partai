@@ -11,6 +11,8 @@ cd api
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
+python3 scripts/fetch_gini_stunting.py
+php artisan welfare:sync-economic-indicators --year=2024
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

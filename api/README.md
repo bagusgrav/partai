@@ -29,6 +29,22 @@ In addition, [Laracasts](https://laracasts.com) contains thousands of video tuto
 
 You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
+## BPS Economic Indicators and IKK
+
+Set `BPS_API_KEY` before fetching Gini Ratio and stunting observations for 2021-2024. The fetch script defaults to BPS variable IDs `168` and `419`; override them with `BPS_GINI_VARIABLE_ID` or `BPS_STUNTING_VARIABLE_ID` if the IDs differ for the configured API. It requires all four years and at least 34 provinces per year, then imports the observations into `economic_indicator_observations`:
+
+```sh
+python scripts/fetch_gini_stunting.py
+```
+
+After annual observations for `kemiskinan`, `tpt`, `gini`, and `stunting` are present for at least 34 provinces and the national region (`9999`), calculate and upsert IKK with:
+
+```sh
+php artisan welfare:sync-economic-indicators --year=2024
+```
+
+The command refuses to write a partial province/national dataset. BNPB event counts are used to derive the relative disaster-risk input when available; the resulting citations identify when BNPB data is unavailable.
+
 ## Agentic Development
 
 Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:

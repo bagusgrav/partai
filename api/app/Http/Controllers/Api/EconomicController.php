@@ -35,7 +35,7 @@ class EconomicController extends Controller
             ->values();
 
         $grouped = EconomicIndicatorObservation::query()
-            ->where('indicator_name', $indicatorType)
+            ->whereIn('indicator_name', ['inflasi', 'kemiskinan', 'tpt'])
             ->where('region_code', '9999')
             ->orderBy('period_year')
             ->orderBy('period_month')

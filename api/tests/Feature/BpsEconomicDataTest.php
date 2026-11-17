@@ -122,12 +122,15 @@ class BpsEconomicDataTest extends TestCase
     {
         $this->travelTo(now()->setDate(2024, 3, 1));
 
-        foreach ([2 => 2.75, 1 => 2.57] as $month => $value) {
+        foreach ([
+            ['indicator_name' => 'inflasi', 'period_month' => 2, 'value' => 2.75],
+            ['indicator_name' => 'inflasi', 'period_month' => 1, 'value' => 2.57],
+            ['indicator_name' => 'kemiskinan', 'period_month' => null, 'value' => 9.1],
+            ['indicator_name' => 'tpt', 'period_month' => null, 'value' => 5.3],
+        ] as $observation) {
             EconomicIndicatorObservation::query()->create([
-                'indicator_name' => 'inflasi',
                 'period_year' => 2024,
-                'period_month' => $month,
-                'value' => $value,
+                ...$observation,
                 'unit' => 'persen',
                 'source' => 'BPS WebAPI',
             ]);
@@ -148,6 +151,8 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonCount(2, 'indicators.inflasi')
             ->assertJsonPath('indicators.inflasi.0.period_month', 1)
             ->assertJsonPath('indicators.inflasi.1.value', 2.75)
+            ->assertJsonPath('indicators.kemiskinan.0.value', 9.1)
+            ->assertJsonPath('indicators.tpt.0.value', 5.3)
             ->assertJsonPath('indicators.kurs_usd.0.period_year', 2024)
             ->assertJsonPath('indicators.kurs_usd.0.value', 16325.75);
     }
@@ -205,6 +210,7 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonPath('data.0.period_month', null)
             ->assertJsonPath('data.0.region_name', 'DKI Jakarta')
             ->assertJsonPath('data.0.value', 4.2)
+            ->assertJsonPath('indicators.tpt.0.value', 5.3)
             ->assertJsonCount(2, 'indicators.kemiskinan')
             ->assertJsonPath('indicators.kemiskinan.0.period_year', 2022)
             ->assertJsonPath('indicators.kemiskinan.1.period_year', 2024);
