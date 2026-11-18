@@ -12,3 +12,4 @@ export * from "./reputation";
 export * from "./rights";
 export * from "./voting";
 export * from "./welfare";
+export * from "./finance";

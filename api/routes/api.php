@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MemberReputationController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PartyFinanceController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
@@ -76,6 +77,15 @@ Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('thro
 Route::get('/glossary', [GlossaryController::class, 'index']);
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
 Route::get('/education/overview', [CivicEducationController::class, 'overview'])->middleware('throttle:60,1');
+
+Route::get('/finance/summary', [PartyFinanceController::class, 'summary'])->middleware('throttle:60,1');
+Route::get('/finance/ledger', [PartyFinanceController::class, 'ledger'])->middleware('throttle:60,1');
+Route::post('/finance/donations', [PartyFinanceController::class, 'submitDonation'])->middleware('throttle:10,1');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/finance/my-dues', [PartyFinanceController::class, 'getMyDues']);
+    Route::post('/finance/my-dues', [PartyFinanceController::class, 'submitMyDues'])->middleware('throttle:10,1');
+});
 
 Route::get('/bureaucracy/scorecards', [BureaucracyWatchController::class, 'scorecards'])->middleware('throttle:60,1');
 Route::get('/bureaucracy/reports', [BureaucracyWatchController::class, 'publicReports'])->middleware('throttle:60,1');
