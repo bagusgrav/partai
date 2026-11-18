@@ -363,7 +363,7 @@ export default function Navbar() {
             <>
               <a
                 className="whitespace-nowrap rounded-md bg-slate-950 px-2.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
-                href={ssoUrl}
+                href="/daftar"
               >
                 <span className="sm:hidden">Gabung</span>
                 <span className="hidden sm:inline">Gabung Anggota</span>
@@ -458,7 +458,7 @@ export default function Navbar() {
                 <>
                   <a
                     className="rounded-md bg-slate-950 px-4 py-3 text-center text-sm font-bold text-white hover:bg-slate-800"
-                    href={ssoUrl}
+                    href="/daftar"
                   >
                     Gabung Anggota
                   </a>
