@@ -25,7 +25,7 @@ return [
             'year' => env('BPS_POVERTY_YEAR', 2024),
         ],
         'stunting' => [
-            'variable_id' => env('BPS_STUNTING_VARIABLE_ID'),
+            'variable_id' => env('BPS_STUNTING_VARIABLE_ID', 419),
             'period_id' => env('BPS_STUNTING_PERIOD_ID'),
             'year' => env('BPS_STUNTING_YEAR', 2024),
         ],

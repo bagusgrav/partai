@@ -255,7 +255,7 @@ class WelfareIndexTest extends TestCase
         ]);
     }
 
-    public function test_economic_ikk_sync_does_not_seed_partial_province_or_national_data(): void
+    public function test_economic_ikk_sync_warns_and_succeeds_by_default_for_partial_data(): void
     {
         foreach (['kemiskinan', 'tpt', 'gini', 'stunting'] as $indicator) {
             EconomicIndicatorObservation::query()->create([
@@ -272,9 +272,22 @@ class WelfareIndexTest extends TestCase
 
         $this->artisan('welfare:sync-economic-indicators')
             ->expectsOutputToContain('Expected at least 34 complete province rows')
-            ->assertFailed();
+            ->assertSuccessful();
 
         $this->assertDatabaseCount('region_welfare_indices', 0);
+    }
+
+    public function test_economic_ikk_sync_fails_for_incomplete_data_only_in_strict_mode(): void
+    {
+        $warning = 'Expected at least 34 complete province rows and one national row for 2024; found 0 provinces and no national row.';
+
+        $this->artisan('welfare:sync-economic-indicators')
+            ->expectsOutputToContain($warning)
+            ->assertSuccessful();
+
+        $this->artisan('welfare:sync-economic-indicators', ['--strict' => true])
+            ->expectsOutputToContain($warning)
+            ->assertFailed();
     }
 
     public function test_open_data_adapter_joins_normalized_bps_and_bnpb_records(): void

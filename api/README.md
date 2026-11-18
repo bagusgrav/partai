@@ -31,7 +31,7 @@ You can also watch bite-sized lessons with real-world projects on [Laravel Learn
 
 ## BPS Economic Indicators and IKK
 
-Set `BPS_API_KEY` before fetching Gini Ratio and stunting observations for 2021-2024. The fetch script defaults to BPS variable IDs `168` and `419`; override them with `BPS_GINI_VARIABLE_ID` or `BPS_STUNTING_VARIABLE_ID` if the IDs differ for the configured API. It requires all four years and at least 34 provinces per year, then imports the observations into `economic_indicator_observations`:
+Set `BPS_API_KEY` before fetching Gini Ratio and stunting observations for 2021-2024. The fetch script defaults to BPS variable IDs `2103` and `419`; override them with `BPS_GINI_VARIABLE_ID` or `BPS_STUNTING_VARIABLE_ID` if the IDs differ for the configured API. It imports available observations and warns about missing years or regions; pass `--strict` to return a failure when warnings occur:
 
 ```sh
 python scripts/fetch_gini_stunting.py
@@ -43,7 +43,7 @@ After annual observations for `kemiskinan`, `tpt`, `gini`, and `stunting` are pr
 php artisan welfare:sync-economic-indicators --year=2024
 ```
 
-The command refuses to write a partial province/national dataset. BNPB event counts are used to derive the relative disaster-risk input when available; the resulting citations identify when BNPB data is unavailable.
+The command refuses to write a partial province/national dataset. Incomplete data is a warning with a successful exit by default; pass `--strict` to fail manual audits. BNPB event counts are used to derive the relative disaster-risk input when available; the resulting citations identify when BNPB data is unavailable.
 
 ## Agentic Development
 

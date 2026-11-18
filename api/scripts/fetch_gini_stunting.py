@@ -83,6 +83,39 @@ def normalized_name(value: object) -> str:
     return re.sub(r"[^a-z0-9]", "", str(value).lower())
 
 
+def select_aggregate_dimension(values: list, dimension_name: str) -> list:
+    dimensions = [value for value in values if isinstance(value, dict)]
+    if len(dimensions) <= 1:
+        return dimensions
+
+    def rank(dimension: dict) -> int | None:
+        label = normalized_name(dimension.get("label", ""))
+        if dimension_name == "turvar":
+            if "total" in label or ("perkotaan" in label and "perdesaan" in label) or "gabungan" in label:
+                return 0
+        elif dimension_name == "turtahun":
+            if any(name in label for name in ("tahunan", "annual", "yearly")):
+                return 0
+            if (
+                "semesterii" in label
+                or "semester2" in label
+                or "semesterdua" in label
+                or "akhir" in label and "tahun" in label
+                or "desember" in label
+                or label.startswith(("s2", "sem2"))
+            ):
+                return 1
+        return None
+
+    ranked = [(rank(dimension), dimension) for dimension in dimensions]
+    matches = [(score, dimension) for score, dimension in ranked if score is not None]
+    if not matches:
+        return dimensions
+
+    best_rank = min(score for score, _ in matches)
+    return [dimension for score, dimension in matches if score == best_rank][:1]
+
+
 def fetch_provinces() -> tuple[dict[str, tuple[str, str]], dict[str, tuple[str, str]]]:
     payload = request_json(api_path("domain", "type", "prov", "key", API_KEY))
     data = payload.get("data")
@@ -159,6 +192,8 @@ def values_for_year(
         raise RuntimeError(f"BPS returned an invalid {indicator_name} table for {year}")
 
     verticals, variables, derived_variables, periods, derived_periods = dimensions
+    derived_variables = select_aggregate_dimension(derived_variables, "turvar")
+    derived_periods = select_aggregate_dimension(derived_periods, "turtahun")
     values_by_region = {}
     for vertical in verticals:
         if not isinstance(vertical, dict):

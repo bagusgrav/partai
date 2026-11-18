@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class SyncWelfareFromEconomicIndicators extends Command
 {
-    protected $signature = 'welfare:sync-economic-indicators {--year=2024 : Observation year to aggregate}';
+    protected $signature = 'welfare:sync-economic-indicators {--year=2024 : Observation year to aggregate} {--strict : Fail when the observation set is incomplete}';
 
     protected $description = 'Recalculate IKK from BPS economic observations for provinces and Indonesia';
 
@@ -102,7 +102,7 @@ class SyncWelfareFromEconomicIndicators extends Command
         );
 
         if ($provinceCount < 34 || ! $hasNational) {
-            $this->error(sprintf(
+            $this->warn(sprintf(
                 'Expected at least 34 complete province rows and one national row for %d; found %d provinces%s.',
                 $year,
                 $provinceCount,
@@ -110,10 +110,10 @@ class SyncWelfareFromEconomicIndicators extends Command
             ));
 
             if ($missing !== []) {
-                $this->line('Incomplete indicator rows: '.implode(', ', $missing));
+                $this->warn('Incomplete indicator rows: '.implode(', ', $missing));
             }
 
-            return self::FAILURE;
+            return $this->option('strict') ? self::FAILURE : self::SUCCESS;
         }
 
         $count = $service->upsert($records);
