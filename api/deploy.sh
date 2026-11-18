@@ -12,8 +12,12 @@ composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
 if python3 scripts/fetch_gini_stunting.py --check-config; then
-    python3 scripts/fetch_gini_stunting.py
-    php artisan welfare:sync-economic-indicators --year=2024
+    if ! python3 scripts/fetch_gini_stunting.py; then
+        echo "Warning: BPS sync incomplete; continuing deployment."
+    fi
+    if ! php artisan welfare:sync-economic-indicators --year=2024; then
+        echo "Warning: IKK sync incomplete; continuing deployment."
+    fi
 else
     echo "⚠ BPS_API_KEY is not configured; skipping BPS indicator fetch and IKK sync."
 fi

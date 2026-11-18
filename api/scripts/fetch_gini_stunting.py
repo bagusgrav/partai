@@ -44,7 +44,7 @@ API_URL = environment_value(
 ).rstrip("/")
 API_KEY = environment_value("BPS_API_KEY")
 INDICATORS = {
-    "gini": environment_value("BPS_GINI_VARIABLE_ID", "168"),
+    "gini": environment_value("BPS_GINI_VARIABLE_ID", "2103"),
     "stunting": environment_value("BPS_STUNTING_VARIABLE_ID", "419"),
 }
 
@@ -133,13 +133,6 @@ def fetch_years(variable_id: str) -> dict[int, str]:
         if isinstance(metadata, dict) and str(metadata.get("pages", "")).isdigit():
             pages = max(1, int(metadata["pages"]))
         page += 1
-    if not years:
-        raise RuntimeError(f"BPS has no observations from {START_YEAR} to {END_YEAR} for variable {variable_id}")
-    missing_years = sorted(set(range(START_YEAR, END_YEAR + 1)) - years.keys())
-    if missing_years:
-        raise RuntimeError(
-            f"BPS variable {variable_id} is missing required years: {', '.join(map(str, missing_years))}"
-        )
     return years
 
 
@@ -226,43 +219,80 @@ def values_for_year(
 
 
 def main() -> int:
-    if sys.argv[1:] == ["--check-config"]:
+    arguments = sys.argv[1:]
+    if arguments == ["--check-config"]:
         return 0 if API_KEY else 1
-    if sys.argv[1:]:
-        print("Usage: fetch_gini_stunting.py [--check-config]", file=sys.stderr)
+    if any(argument not in {"--strict"} for argument in arguments):
+        print("Usage: fetch_gini_stunting.py [--strict] [--check-config]", file=sys.stderr)
         return 2
+
+    strict = "--strict" in arguments
+    records = []
+    warnings = []
+
     if not API_KEY:
-        print("BPS_API_KEY must be configured in the environment.", file=sys.stderr)
-        return 1
+        warnings.append("BPS_API_KEY is not configured; no BPS indicators were fetched.")
+    else:
+        try:
+            provinces_by_id, provinces_by_name = fetch_provinces()
+        except (OSError, RuntimeError, urllib.error.URLError) as error:
+            warnings.append(f"Unable to fetch BPS provinces: {redact(str(error))}")
+        else:
+            for name, variable_id in INDICATORS.items():
+                if not variable_id.isdigit():
+                    warnings.append(f"Invalid BPS variable ID for {name}: {variable_id}")
+                    continue
+
+                try:
+                    years = fetch_years(variable_id)
+                except (OSError, RuntimeError, urllib.error.URLError) as error:
+                    warnings.append(
+                        f"Unable to fetch BPS periods for {name} (variable {variable_id}): {redact(str(error))}"
+                    )
+                    continue
+
+                if not years:
+                    warnings.append(
+                        f"BPS has no observations from {START_YEAR} to {END_YEAR} for variable {variable_id}"
+                    )
+                    continue
+
+                missing_years = sorted(set(range(START_YEAR, END_YEAR + 1)) - years.keys())
+                if missing_years:
+                    warnings.append(
+                        f"BPS variable {variable_id} is missing years: {', '.join(map(str, missing_years))}"
+                    )
+
+                for year, period_id in sorted(years.items()):
+                    try:
+                        records.extend(
+                            values_for_year(
+                                variable_id,
+                                year,
+                                period_id,
+                                provinces_by_id,
+                                provinces_by_name,
+                                name,
+                            )
+                        )
+                    except (OSError, RuntimeError, urllib.error.URLError) as error:
+                        warnings.append(
+                            f"Unable to fetch BPS {name} observations for {year}: {redact(str(error))}"
+                        )
 
     try:
-        provinces_by_id, provinces_by_name = fetch_provinces()
-        records = []
-        for name, variable_id in INDICATORS.items():
-            if not variable_id.isdigit():
-                raise RuntimeError(f"Invalid BPS variable ID for {name}")
-            years = fetch_years(variable_id)
-            for year, period_id in sorted(years.items()):
-                records.extend(
-                    values_for_year(
-                        variable_id,
-                        year,
-                        period_id,
-                        provinces_by_id,
-                        provinces_by_name,
-                        name,
-                    )
-                )
-
+        importer_command = ["php", "artisan", "bps:import-economic-indicators", "--stdin"]
+        if strict:
+            importer_command.append("--strict")
         result = subprocess.run(
-            ["php", "artisan", "bps:import-economic-indicators", "--stdin"],
+            importer_command,
             cwd=API_DIR,
-            input=json.dumps(records).encode(),
+            input=json.dumps({"records": records, "warnings": warnings}).encode(),
             check=False,
         )
         return result.returncode
-    except (OSError, RuntimeError, subprocess.SubprocessError) as error:
-        print(str(error), file=sys.stderr)
+    except (OSError, subprocess.SubprocessError) as error:
+        print(f"BPS import failed: {redact(str(error))}", file=sys.stderr)
         return 1
 
 
