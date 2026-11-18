@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MemberReputationController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OrganizationStructureController;
 use App\Http\Controllers\Api\PartyFinanceController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
@@ -73,6 +74,11 @@ Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
     ->middleware(['auth:sanctum', 'throttle:5,1']);
 Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
+Route::get('/organization/tree', [OrganizationStructureController::class, 'tree'])->middleware('throttle:60,1');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/organization/eligibility', [OrganizationStructureController::class, 'eligibility']);
+    Route::post('/organization/seats/{seat}/apply', [OrganizationStructureController::class, 'apply'])->middleware('throttle:10,1');
+});
 Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('throttle:5,1');
 Route::get('/glossary', [GlossaryController::class, 'index']);
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);

@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/juri-warga", destination: "/review" },
       { source: "/info-indonesia", destination: "/info" },
-      { source: "/tata-kelola", destination: "/recall" },
     ];
   },
   turbopack: {

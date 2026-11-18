@@ -13,3 +13,4 @@ export * from "./rights";
 export * from "./voting";
 export * from "./welfare";
 export * from "./finance";
+export * from "./organization";

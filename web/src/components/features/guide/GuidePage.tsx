@@ -99,6 +99,59 @@ export default function GuideContent() {
 
           <div className="min-w-0 space-y-8">
             <section
+              aria-labelledby="journey-guide-title"
+              className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
+              id="perjalanan"
+            >
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">
+                Kitab perjalanan anggota
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold text-text-main" id="journey-guide-title">
+                Calon Anggota → Anggota Terverifikasi → Pemegang Mandat
+              </h2>
+              <ol className="mt-5 grid gap-4 md:grid-cols-3">
+                {[
+                  ["1", "Calon Anggota", "Daftar melalui SSO, lengkapi identitas, lalu ikuti edukasi kewargaan."],
+                  ["2", "Anggota Terverifikasi", "Bangun Mastery dan Participation melalui pembelajaran serta kontribusi terverifikasi."],
+                  ["3", "Pemegang Mandat", "Ajukan diri ke kursi terbuka bila ambang Mastery, domain, dan partisipasi terpenuhi."],
+                ].map(([number, title, description]) => (
+                  <li className="rounded-xl bg-primary-light p-5" key={number}>
+                    <span className="text-sm font-black text-primary-hover">{number}</span>
+                    <h3 className="mt-2 font-extrabold text-text-main">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-text-muted">{description}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            <section className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8" id="anti-oligarki">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">Anti-oligarki</p>
+              <h2 className="mt-2 text-2xl font-extrabold text-text-main">Zero Leverage: Keuangan Tidak Membeli Hak</h2>
+              <p className="mt-4 leading-7 text-text-muted">
+                Mastery Score mengukur penguasaan, Participation Score mencatat kontribusi terverifikasi, dan keuangan partai hanya tunduk pada transparansi serta plafon UU Parpol. Sumbangan individu dibatasi Rp1 miliar/tahun dan badan usaha Rp7,5 miliar/tahun; donasi anonim dilarang. Ledger hash append-only menjaga jejak, tetapi nominal tidak menambah hak suara atau kelayakan kursi.
+              </p>
+              <Link className="mt-5 inline-flex font-bold text-primary-hover underline underline-offset-4" href="/tata-kelola">Cek kursi dan ambang kapasitas</Link>
+            </section>
+
+            <section className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8" id="pengawasan">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">Pengawasan publik</p>
+              <h2 className="mt-2 text-2xl font-extrabold text-text-main">Peta layanan kewargaan</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {[
+                  ["/belajar", "Edukasi kewargaan"],
+                  ["/info-indonesia", "IKK dan indikator wilayah"],
+                  ["/data", "Kawal anggaran dan data"],
+                  ["/pengawasan-birokrasi", "Pengawasan birokrasi"],
+                  ["/jemput-hak", "Jemput hak"],
+                  ["/kontrak-faksi", "Kontrak faksi"],
+                  ["/tata-kelola", "Siapa menjawab apa"],
+                  ["/tanya-jawab", "Pertanyaan dan FAQ bersitasi"],
+                ].map(([href, label]) => (
+                  <Link className="rounded-xl border border-background px-4 py-3 font-bold text-primary-hover hover:bg-primary-light" href={href} key={href}>{label} →</Link>
+                ))}
+              </div>
+            </section>
+            <section
               aria-labelledby="chart-guide-title"
               className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
               id="grafik"
