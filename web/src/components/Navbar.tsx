@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Award,
   BarChart3,
@@ -25,13 +25,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import {
+  AUTH_STATE_CHANGED_EVENT,
   getCurrentUser,
   getNotifications,
+  logoutMember,
   NOTIFICATIONS_UPDATED_EVENT,
 } from "@/lib/api";
 import type { RegisteredUser } from "@/types";
-
-const ssoUrl = "https://id.akuhadir.my.id";
 
 const navigationGroups: {
   title: string;
@@ -241,10 +241,14 @@ function NavigationLink({
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const previousPathname = useRef(pathname);
   const [currentUser, setCurrentUser] = useState<RegisteredUser | null>(null);
+  const [authResolved, setAuthResolved] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationError, setNotificationError] = useState<string | null>(null);
   const isAuthenticated =
@@ -274,27 +278,65 @@ export default function Navbar() {
 
   useEffect(() => {
     let active = true;
+    let requestNumber = 0;
 
-    getCurrentUser()
-      .then((user) => {
-        if (active) {
-          setCurrentUser(user);
-        }
-      })
-      .catch((loadError: unknown) => {
-        if (active) {
-          setProfileError(
-            loadError instanceof Error
-              ? loadError.message
-              : "Reputasi tidak dapat dimuat.",
-          );
-        }
-      });
+    const loadCurrentUser = () => {
+      const currentRequest = ++requestNumber;
+      setAuthResolved(false);
+
+      getCurrentUser()
+        .then((user) => {
+          if (active && currentRequest === requestNumber) {
+            setCurrentUser(user);
+            setProfileError(null);
+          }
+        })
+        .catch((loadError: unknown) => {
+          if (active && currentRequest === requestNumber) {
+            setCurrentUser(null);
+            setProfileError(
+              loadError instanceof Error
+                ? loadError.message
+                : "Sesi pengguna tidak dapat dimuat.",
+            );
+          }
+        })
+        .finally(() => {
+          if (active && currentRequest === requestNumber) {
+            setAuthResolved(true);
+          }
+        });
+    };
+
+    loadCurrentUser();
+    window.addEventListener(AUTH_STATE_CHANGED_EVENT, loadCurrentUser);
+    window.addEventListener("storage", loadCurrentUser);
 
     return () => {
       active = false;
+      window.removeEventListener(AUTH_STATE_CHANGED_EVENT, loadCurrentUser);
+      window.removeEventListener("storage", loadCurrentUser);
     };
   }, []);
+
+  async function handleLogout(): Promise<void> {
+    setIsLoggingOut(true);
+    setLogoutError(null);
+
+    try {
+      await logoutMember();
+      router.push("/");
+      router.refresh();
+    } catch (logoutFailure: unknown) {
+      setLogoutError(
+        logoutFailure instanceof Error
+          ? logoutFailure.message
+          : "Keluar gagal. Sesi lokal telah dihapus.",
+      );
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -342,7 +384,9 @@ export default function Navbar() {
         </Link>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          {isAuthenticated ? (
+          {!authResolved ? (
+            <span aria-label="Memeriksa sesi" className="size-10" role="status" />
+          ) : isAuthenticated ? (
             <>
               <NotificationBellLink
                 error={notificationError}
@@ -358,23 +402,31 @@ export default function Navbar() {
                   {currentUser.reputation_level}
                 </span>
               </Link>
+              <button
+                className="whitespace-nowrap rounded-md border border-slate-400 px-2.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:px-3 sm:text-sm"
+                disabled={isLoggingOut}
+                onClick={() => void handleLogout()}
+                type="button"
+              >
+                {isLoggingOut ? "Keluar..." : "Keluar"}
+              </button>
             </>
           ) : (
             <>
-              <a
+              <Link
                 className="whitespace-nowrap rounded-md bg-slate-950 px-2.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
                 href="/daftar"
               >
                 <span className="sm:hidden">Gabung</span>
                 <span className="hidden sm:inline">Gabung Anggota</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 className="whitespace-nowrap rounded-md border border-slate-400 px-2.5 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-800 focus-visible:ring-offset-2 sm:px-3 sm:text-sm"
-                href={ssoUrl}
+                href="/masuk"
                 title={profileError ?? undefined}
               >
                 Masuk
-              </a>
+              </Link>
             </>
           )}
 
@@ -431,7 +483,7 @@ export default function Navbar() {
             ))}
 
             <div className="flex flex-col gap-2 border-t border-slate-200 pt-4 md:hidden">
-              {isAuthenticated ? (
+              {authResolved && isAuthenticated ? (
                 <>
                   <Link
                     className="rounded-md px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100"
@@ -453,27 +505,43 @@ export default function Navbar() {
                   >
                     {currentUser.name}
                   </Link>
+                  <button
+                    className="rounded-md border border-slate-300 px-3 py-2 text-left text-sm font-semibold text-slate-800 hover:bg-slate-100 disabled:cursor-wait disabled:opacity-60"
+                    disabled={isLoggingOut}
+                    onClick={() => void handleLogout()}
+                    type="button"
+                  >
+                    {isLoggingOut ? "Keluar..." : "Keluar"}
+                  </button>
                 </>
-              ) : (
+              ) : authResolved ? (
                 <>
-                  <a
+                  <Link
                     className="rounded-md bg-slate-950 px-4 py-3 text-center text-sm font-bold text-white hover:bg-slate-800"
                     href="/daftar"
                   >
                     Gabung Anggota
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     className="rounded-md border border-slate-400 px-4 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-100"
-                    href={ssoUrl}
+                    href="/masuk"
                   >
                     Masuk
-                  </a>
+                  </Link>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       </nav>
+      {logoutError && (
+        <p
+          className="mx-auto max-w-7xl px-4 pb-2 text-right text-xs text-red-700 sm:px-6 lg:px-8"
+          role="alert"
+        >
+          {logoutError}
+        </p>
+      )}
     </header>
   );
 }

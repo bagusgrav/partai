@@ -37,7 +37,11 @@ export interface EducationOverview {
   }>;
   distribution: Record<
     CivicDomain,
-    { count: number; levels: Record<MasteryLevel, number> }
+    {
+      count: number;
+      levels: Record<MasteryLevel, number>;
+      mastery_points: number;
+    }
   >;
   daily_digest: {
     date: string;

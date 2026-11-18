@@ -27,6 +27,7 @@ class CivicEducationTest extends TestCase
             ->assertOk()
             ->assertJsonPath('daily_digest.featured_question.id', $question->id)
             ->assertJsonPath('distribution.hak_konstitusional.count', 1)
+            ->assertJsonPath('distribution.hak_konstitusional.mastery_points', 5)
             ->assertJsonCount(1, 'preview_questions')
             ->assertJsonMissingPath('preview_questions.0.correct_option')
             ->assertJsonMissingPath('daily_digest.featured_question.correct_option');
@@ -195,16 +196,21 @@ class CivicEducationTest extends TestCase
         }
     }
 
-    public function test_seeder_publishes_fifteen_questions_across_all_domains_and_levels(): void
+    public function test_seeder_publishes_fifty_questions_across_all_domains_and_levels(): void
     {
         $this->seed(CivicQuestionSeeder::class);
+        $this->seed(CivicQuestionSeeder::class);
 
-        $this->assertDatabaseCount('civic_questions', 15);
+        $this->assertDatabaseCount('civic_questions', 50);
         foreach (['hak_konstitusional', 'alasan_bernegara', 'keuangan_negara', 'hukum', 'politik_bernegara'] as $domain) {
-            $this->assertSame(3, CivicQuestion::query()->where('domain', $domain)->count());
+            $this->assertSame(10, CivicQuestion::query()->where('domain', $domain)->count());
+            $this->assertSame(
+                4,
+                CivicQuestion::query()->where('domain', $domain)->distinct()->count('mastery_level'),
+            );
         }
         $this->assertGreaterThanOrEqual(4, CivicQuestion::query()->distinct()->count('mastery_level'));
-        $this->assertSame(15, CivicQuestion::query()->where('source_citation', '!=', '')->count());
+        $this->assertSame(50, CivicQuestion::query()->where('source_citation', '!=', '')->count());
     }
 
     /**

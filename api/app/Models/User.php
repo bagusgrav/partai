@@ -28,7 +28,7 @@ use Spatie\Permission\Traits\HasRoles;
     'cluster_id',
     'is_verified',
 ])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'nik', 'nik_hash'])]
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
@@ -44,9 +44,21 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'is_verified' => 'boolean',
+            'nik' => 'encrypted',
             'reputation_points' => 'integer',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            if ($user->isDirty('nik')) {
+                $user->nik_hash = $user->nik === null
+                    ? null
+                    : hash('sha256', $user->nik);
+            }
+        });
     }
 
     public function sendPasswordResetNotification(#[\SensitiveParameter] $token): void

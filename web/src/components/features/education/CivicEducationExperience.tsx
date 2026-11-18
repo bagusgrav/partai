@@ -253,26 +253,37 @@ export default function CivicEducationExperience() {
                   className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
                   role="status"
                 >
-                  Materi belum tersedia, silakan hubungi admin.
+                  Materi Segera Hadir. Bank soal kewargaan sedang disiapkan.
                 </p>
               )}
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {CIVIC_DOMAINS.map((domain) => {
-                  const score = Math.max(0, Math.min(100, masteryScores[domain] ?? 0));
+              {totalMaterialCount > 0 && (
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {CIVIC_DOMAINS.filter(
+                    (domain) => (overview.distribution[domain]?.count ?? 0) > 0,
+                  ).map((domain) => {
+                  const domainOverview = overview.distribution[domain];
+                  const progressCapacity = Math.max(
+                    1,
+                    Math.min(100, domainOverview.mastery_points),
+                  );
+                  const score = Math.max(
+                    0,
+                    Math.min(
+                      100,
+                      Math.round(
+                        (masteryScores[domain] ?? 0) / progressCapacity * 100,
+                      ),
+                    ),
+                  );
                   const levelReached = score >= 80 ? 4 : score >= 60 ? 3 : score >= 40 ? 2 : score > 0 ? 1 : 0;
-                  const materialCount = overview.distribution[domain]?.count ?? 0;
                   return (
                     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" key={domain}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="font-bold">{DOMAIN_LABELS[domain]}</h3>
-                          {totalMaterialCount > 0 && (
-                            <p className="mt-1 text-xs text-slate-500">
-                              {materialCount > 0
-                                ? `${materialCount} materi tersedia`
-                                : "Belum ada materi pada domain ini."}
-                            </p>
-                          )}
+                          <p className="mt-1 text-xs text-slate-500">
+                            {domainOverview.count} materi tersedia
+                          </p>
                         </div>
                         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
                           {score}/100
@@ -297,8 +308,9 @@ export default function CivicEducationExperience() {
                       </ol>
                     </article>
                   );
-                })}
-              </div>
+                  })}
+                </div>
+              )}
             </section>
 
             <section
@@ -332,7 +344,7 @@ export default function CivicEducationExperience() {
                     <a className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-700" href={SSO_URL}>
                       Masuk
                     </a>
-                    <a className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-white" href={SSO_URL}>
+                    <a className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-white" href="/daftar">
                       Gabung Anggota
                     </a>
                   </div>
@@ -467,7 +479,7 @@ export default function CivicEducationExperience() {
                       </a>
                       <a
                         className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-white"
-                        href={SSO_URL}
+                        href="/daftar"
                       >
                         Gabung Anggota
                       </a>

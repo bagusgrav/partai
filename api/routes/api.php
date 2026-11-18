@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\PartyFinanceController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\SessionController;
 use App\Http\Controllers\Api\SocialAssistanceController;
 use App\Http\Controllers\Api\SortitionController;
 use App\Http\Controllers\Api\VoteController;
@@ -52,6 +53,7 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('/auth/login', [SessionController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware([IdempotentPasswordRequest::class, 'throttle:5,1']);
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])
@@ -76,6 +78,7 @@ Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/organization/tree', [OrganizationStructureController::class, 'tree'])->middleware('throttle:60,1');
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/logout', [SessionController::class, 'logout']);
     Route::get('/organization/eligibility', [OrganizationStructureController::class, 'eligibility']);
     Route::post('/organization/seats/{seat}/apply', [OrganizationStructureController::class, 'apply'])->middleware('throttle:10,1');
 });

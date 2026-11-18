@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -98,7 +99,20 @@ class AuthController extends Controller
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('users', 'nik')->ignore($existing?->id),
+                function (string $attribute, mixed $value, \Closure $fail) use ($existing): void {
+                    if (! is_string($value) || $value === '') {
+                        return;
+                    }
+
+                    $query = DB::table('users')->where('nik_hash', hash('sha256', $value));
+                    if ($existing !== null) {
+                        $query->where('id', '!=', $existing->id);
+                    }
+
+                    if ($query->exists()) {
+                        $fail('NIK sudah terdaftar.');
+                    }
+                },
             ],
         ]);
 

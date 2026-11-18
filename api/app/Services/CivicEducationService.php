@@ -28,6 +28,11 @@ class CivicEducationService
             ->groupBy('domain', 'mastery_level')
             ->get()
             ->groupBy('domain');
+        $masteryPoints = (clone $published)
+            ->selectRaw('domain, SUM(mastery_points) as total')
+            ->groupBy('domain')
+            ->get()
+            ->keyBy('domain');
 
         $domains = [];
         foreach (ReputationService::DOMAINS as $domain) {
@@ -38,6 +43,7 @@ class CivicEducationService
             $domains[$domain] = [
                 'count' => array_sum($levels),
                 'levels' => $levels,
+                'mastery_points' => (int) ($masteryPoints->get($domain)?->total ?? 0),
             ];
         }
 

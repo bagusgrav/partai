@@ -223,12 +223,23 @@ export default function RegistrationForm() {
             {isSubmitting ? "Mendaftarkan..." : "Daftar sebagai Anggota"}
           </button>
 
-          <p className="text-center text-sm text-text-muted">
-            Kembali ke{" "}
-            <Link className="font-semibold text-primary hover:underline" href="/">
-              beranda
-            </Link>
-          </p>
+          <div className="flex flex-col items-center gap-3 text-center text-sm text-text-muted sm:flex-row sm:justify-between">
+            <p>
+              Sudah menjadi anggota?{" "}
+              <Link
+                className="font-semibold text-primary hover:underline"
+                href="/masuk"
+              >
+                Masuk
+              </Link>
+            </p>
+            <p>
+              Kembali ke{" "}
+              <Link className="font-semibold text-primary hover:underline" href="/">
+                beranda
+              </Link>
+            </p>
+          </div>
         </form>
       </section>
     </main>
