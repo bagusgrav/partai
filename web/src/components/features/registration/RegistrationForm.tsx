@@ -208,11 +208,17 @@ export default function RegistrationForm() {
             </label>
             <input
               className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-text-main outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              aria-describedby="nik-privacy"
               id="nik"
               maxLength={255}
               name="nik"
               type="text"
             />
+            <p className="mt-2 text-xs leading-5 text-text-muted" id="nik-privacy">
+              NIK Anda dienkripsi secara aman dan rahasia. Kami berkomitmen
+              melindungi data pribadi Anda sesuai UU No. 27 Tahun 2022 tentang
+              Pelindungan Data Pribadi (UU PDP).
+            </p>
           </div>
 
           <button

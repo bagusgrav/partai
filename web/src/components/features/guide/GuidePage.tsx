@@ -90,6 +90,11 @@ export default function GuideContent() {
                 </a>
               </li>
               <li>
+                <a className="font-semibold text-primary-hover underline underline-offset-4" href="#privasi">
+                  Privasi data
+                </a>
+              </li>
+              <li>
                 <a className="font-semibold text-primary-hover underline underline-offset-4" href="#langkah">
                   Fitur lainnya
                 </a>
@@ -266,6 +271,29 @@ export default function GuideContent() {
               >
                 Daftar sebagai Anggota
               </Link>
+            </section>
+
+            <section
+              aria-labelledby="privacy-guide-title"
+              className="scroll-mt-24 rounded-2xl border border-background bg-surface p-6 shadow-sm sm:p-8"
+              id="privasi"
+            >
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-primary-hover">
+                Privasi dan keamanan
+              </p>
+              <h2
+                className="mt-2 text-2xl font-extrabold text-text-main"
+                id="privacy-guide-title"
+              >
+                Data pribadi dijaga dengan enkripsi
+              </h2>
+              <p className="mt-4 leading-7 text-text-muted">
+                PARTAI berkomitmen melindungi privasi warga. Data sensitif yang
+                diberikan, termasuk NIK, dienkripsi saat disimpan untuk membantu
+                menjaga kerahasiaannya. Pengelolaan data pribadi dilakukan
+                dengan memperhatikan UU No. 27 Tahun 2022 tentang Pelindungan
+                Data Pribadi (UU PDP).
+              </p>
             </section>
 
             <section

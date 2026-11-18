@@ -40,9 +40,11 @@ export default function ResetPasswordForm() {
       });
       setSuccess(true);
       window.setTimeout(() => window.location.assign(LOGIN_URL), 1500);
-    } catch {
+    } catch (submitError: unknown) {
       setError(
-        "Kata sandi gagal diubah. Periksa kembali tautan dan isian Anda, lalu coba lagi.",
+        submitError instanceof Error
+          ? submitError.message
+          : "Kata sandi gagal diubah. Periksa kembali tautan dan isian Anda, lalu coba lagi.",
       );
     } finally {
       setIsSubmitting(false);

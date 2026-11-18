@@ -63,6 +63,9 @@ export default function ProfileDashboard() {
         <h1 className="mt-2 text-3xl font-black tracking-tight text-text-main">
           Profil Saya
         </h1>
+        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+          Data Terlindungi
+        </span>
 
         {isLoading ? (
           <p className="mt-8 rounded-2xl bg-background p-5 text-text-muted">

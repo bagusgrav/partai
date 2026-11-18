@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\MemberVerificationMail;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -114,6 +116,8 @@ class AuthController extends Controller
                     }
                 },
             ],
+        ], [
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         if ($existing !== null) {
@@ -143,9 +147,36 @@ class AuthController extends Controller
             return $this->duplicateRegistrationResponse($existing, $validated);
         }
 
+        $this->sendVerificationEmail($user);
+
         return response()->json([
             'token' => $user->createToken('member-session')->plainTextToken,
         ], 201);
+    }
+
+    public function verifyEmail(Request $request, string $id, string $hash): JsonResponse
+    {
+        $user = User::query()->findOrFail($id);
+
+        abort_unless(hash_equals(sha1($user->email), $hash), 403);
+
+        if (! $user->is_verified || $user->email_verified_at === null) {
+            $user->forceFill([
+                'email_verified_at' => now(),
+                'is_verified' => true,
+            ])->save();
+        }
+
+        return response()->json([
+            'message' => 'Alamat email berhasil diverifikasi.',
+        ]);
+    }
+
+    private function sendVerificationEmail(User $user): void
+    {
+        if ($user->email_verified_at === null) {
+            Mail::to($user->email)->send(new MemberVerificationMail($user));
+        }
     }
 
     /**
@@ -164,6 +195,8 @@ class AuthController extends Controller
                 'message' => 'The request_id has already been used for a different registration.',
             ], 409);
         }
+
+        $this->sendVerificationEmail($user);
 
         return response()->json([
             'token' => $user->createToken('member-session')->plainTextToken,

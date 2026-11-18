@@ -66,6 +66,29 @@ class ResetPasswordTest extends TestCase
         $this->assertTrue(Hash::check('password-lama', $user->fresh()->password));
     }
 
+    public function test_expired_token_is_rejected_without_changing_password(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'anggota@example.test',
+            'password' => 'password-lama',
+        ]);
+        $token = Password::createToken($user);
+        $this->travel(config('auth.passwords.users.expire') + 1)->minutes();
+
+        $this->postJson('/api/auth/reset-password', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'password-baru',
+            'password_confirmation' => 'password-baru',
+            'request_id' => (string) Str::uuid(),
+        ])->assertUnprocessable()
+            ->assertJson([
+                'message' => 'Tautan reset kata sandi tidak valid atau sudah kedaluwarsa.',
+            ]);
+
+        $this->assertTrue(Hash::check('password-lama', $user->fresh()->password));
+    }
+
     public function test_password_confirmation_is_required_and_must_match(): void
     {
         $this->postJson('/api/auth/reset-password', [

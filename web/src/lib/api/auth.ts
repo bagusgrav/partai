@@ -11,6 +11,50 @@ export const AUTH_STATE_CHANGED_EVENT = "partai:auth-state-changed";
 export const SSO_URL = "/masuk";
 let guestTokenPromise: Promise<string> | null = null;
 
+async function ensureAuthSuccessfulResponse(response: Response): Promise<void> {
+  if (response.ok) {
+    return;
+  }
+
+  let payload: unknown;
+
+  try {
+    payload = await response.clone().json();
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) {
+      throw error;
+    }
+
+    await ensureSuccessfulResponse(response);
+    return;
+  }
+
+  if (typeof payload === "object" && payload !== null) {
+    if ("message" in payload && typeof payload.message === "string") {
+      throw new Error(payload.message);
+    }
+
+    if (
+      "errors" in payload &&
+      typeof payload.errors === "object" &&
+      payload.errors !== null
+    ) {
+      const firstError = Object.values(payload.errors).find(
+        (messages): messages is string[] =>
+          Array.isArray(messages) &&
+          messages.length > 0 &&
+          typeof messages[0] === "string",
+      )?.[0];
+
+      if (firstError) {
+        throw new Error(firstError);
+      }
+    }
+  }
+
+  await ensureSuccessfulResponse(response);
+}
+
 function saveSessionToken(token: string): void {
   localStorage.setItem(GUEST_TOKEN_KEY, token);
   localStorage.removeItem(GUEST_REQUEST_ID_KEY);
@@ -110,6 +154,39 @@ export async function registerMember(
     body: JSON.stringify({ ...input, request_id: requestId }),
   });
 
+  if (!response.ok) {
+    let payload: unknown;
+
+    try {
+      payload = await response.clone().json();
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
+
+      await ensureSuccessfulResponse(response);
+    }
+
+    if (
+      typeof payload === "object" &&
+      payload !== null &&
+      "errors" in payload &&
+      typeof payload.errors === "object" &&
+      payload.errors !== null
+    ) {
+      const firstError = Object.values(payload.errors).find(
+        (messages): messages is string[] =>
+          Array.isArray(messages) &&
+          messages.length > 0 &&
+          typeof messages[0] === "string",
+      )?.[0];
+
+      if (firstError) {
+        throw new Error(firstError);
+      }
+    }
+  }
+
   await ensureSuccessfulResponse(response);
 
   const payload: unknown = await response.json();
@@ -188,7 +265,7 @@ export async function forgotPassword(email: string): Promise<void> {
     },
   );
 
-  await ensureSuccessfulResponse(response);
+  await ensureAuthSuccessfulResponse(response);
 }
 
 export async function resetPassword(input: {
@@ -209,7 +286,7 @@ export async function resetPassword(input: {
     },
   );
 
-  await ensureSuccessfulResponse(response);
+  await ensureAuthSuccessfulResponse(response);
 }
 
 export async function getCurrentUser(): Promise<RegisteredUser> {

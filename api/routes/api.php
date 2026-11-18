@@ -54,6 +54,9 @@ Route::get('/user', function (Request $request) {
 Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
 Route::post('/auth/login', [SessionController::class, 'login'])->middleware('throttle:10,1');
+Route::get('/auth/verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('auth.verify-email');
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware([IdempotentPasswordRequest::class, 'throttle:5,1']);
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword'])
