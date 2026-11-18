@@ -19,6 +19,7 @@ import {
   MessageCircleQuestion,
   Network,
   Scale,
+  ShieldCheck,
   Vote,
   X,
   type LucideIcon,
@@ -85,6 +86,12 @@ const navigationGroups: {
         label: "Data Publik",
         description: "Anggaran, audit, & log terbuka",
         icon: Database,
+      },
+      {
+        href: "/pengawasan-birokrasi",
+        label: "Pengawasan Birokrasi",
+        description: "Rapor instansi & lapor maladministrasi",
+        icon: ShieldCheck,
       },
       {
         href: "/jemput-hak",

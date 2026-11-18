@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BureaucracyWatchController;
 use App\Http\Controllers\Api\CivicEducationController;
 use App\Http\Controllers\Api\EconomicController;
 use App\Http\Controllers\Api\EssayController;
@@ -75,6 +76,11 @@ Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('thro
 Route::get('/glossary', [GlossaryController::class, 'index']);
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
 Route::get('/education/overview', [CivicEducationController::class, 'overview'])->middleware('throttle:60,1');
+
+Route::get('/bureaucracy/scorecards', [BureaucracyWatchController::class, 'scorecards'])->middleware('throttle:60,1');
+Route::get('/bureaucracy/reports', [BureaucracyWatchController::class, 'publicReports'])->middleware('throttle:60,1');
+Route::post('/bureaucracy/reports', [BureaucracyWatchController::class, 'store'])->middleware('throttle:5,1');
+Route::get('/bureaucracy/reports/track/{ticketCode}', [BureaucracyWatchController::class, 'track'])->middleware('throttle:15,1');
 
 Route::middleware(['auth:sanctum', 'role:super_admin|pengurus'])->group(function () {
     Route::post('/contracts', [FactionContractController::class, 'store'])->middleware('throttle:20,1');
