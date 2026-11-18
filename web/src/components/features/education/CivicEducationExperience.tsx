@@ -101,6 +101,10 @@ export default function CivicEducationExperience() {
     : overview?.preview_questions ?? [];
   const question = questions[currentIndex];
   const context = overview?.daily_digest.context;
+  const totalMaterialCount = CIVIC_DOMAINS.reduce(
+    (total, domain) => total + (overview?.distribution[domain]?.count ?? 0),
+    0,
+  );
 
   function startPractice(): void {
     arenaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -244,18 +248,31 @@ export default function CivicEducationExperience() {
                   <p className="text-sm text-slate-500">Masuk sebagai anggota untuk menyimpan progres.</p>
                 )}
               </div>
+              {totalMaterialCount === 0 && (
+                <p
+                  className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+                  role="status"
+                >
+                  Materi belum tersedia, silakan hubungi admin.
+                </p>
+              )}
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {CIVIC_DOMAINS.map((domain) => {
                   const score = Math.max(0, Math.min(100, masteryScores[domain] ?? 0));
                   const levelReached = score >= 80 ? 4 : score >= 60 ? 3 : score >= 40 ? 2 : score > 0 ? 1 : 0;
+                  const materialCount = overview.distribution[domain]?.count ?? 0;
                   return (
                     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" key={domain}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="font-bold">{DOMAIN_LABELS[domain]}</h3>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {overview.distribution[domain]?.count ?? 0} materi tersedia
-                          </p>
+                          {totalMaterialCount > 0 && (
+                            <p className="mt-1 text-xs text-slate-500">
+                              {materialCount > 0
+                                ? `${materialCount} materi tersedia`
+                                : "Belum ada materi pada domain ini."}
+                            </p>
+                          )}
                         </div>
                         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
                           {score}/100
