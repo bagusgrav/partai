@@ -58,6 +58,11 @@ const indicatorTabByType: Record<EconomicIndicatorType, IndicatorTab> = {
     label: "Pengangguran",
     description: "Persentase angkatan kerja yang tidak memiliki pekerjaan.",
   },
+  gini: {
+    type: "gini",
+    label: "Gini",
+    description: "Mengukur ketimpangan distribusi pengeluaran penduduk.",
+  },
 };
 const indicatorTabs = Object.values(indicatorTabByType);
 
@@ -323,7 +328,6 @@ export default function EconomicDashboard() {
   } | null>(null);
   const [regions, setRegions] = useState<EconomicIndicatorRegion[]>([]);
   const [selectedRegionCode, setSelectedRegionCode] = useState("9999");
-  const [regionSearch, setRegionSearch] = useState("Nasional (Indonesia)");
   const [news, setNews] = useState<GovernmentInsight[]>([]);
   const [cabinet, setCabinet] = useState<GovernmentInsight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -443,9 +447,23 @@ export default function EconomicDashboard() {
     const observations = indicators[name] ?? [];
     return observations[observations.length - 1];
   };
+  const selectedRegion = regions
+    .flatMap((province) => [
+      { ...province, provinceName: province.region_name },
+      ...(province.children ?? []).map((region) => ({
+        ...region,
+        provinceName: province.region_name,
+      })),
+    ])
+    .find((region) => region.region_code === selectedRegionCode);
   const selectedRegionName =
-    regions.find((region) => region.region_code === selectedRegionCode)
-      ?.region_name ?? "Nasional (Indonesia)";
+    selectedRegionCode === "9999"
+      ? "Nasional (Indonesia)"
+      : selectedRegion
+        ? selectedRegion.region_code.endsWith("00")
+          ? selectedRegion.region_name
+          : `${selectedRegion.region_name}, ${selectedRegion.provinceName}`
+        : "Wilayah terpilih";
   const currentIndicatorHistory =
     indicatorHistory?.regionCode === selectedRegionCode &&
     indicatorHistory.type === selectedIndicator
@@ -546,35 +564,28 @@ export default function EconomicDashboard() {
               className="mb-2 block text-sm font-semibold text-text-main"
               htmlFor="inflation-region"
             >
-              Cari dan pilih provinsi
+              Pilih provinsi atau kabupaten/kota
             </label>
-            <input
-              autoComplete="off"
+            <select
               className="w-full rounded-xl border border-slate-300 bg-surface px-4 py-3 text-sm text-text-main shadow-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               id="inflation-region"
-              list="inflation-region-options"
-              onChange={(event) => {
-                const searchValue = event.currentTarget.value;
-                setRegionSearch(searchValue);
-                const selectedRegion = regions.find(
-                  (region) => region.region_name === searchValue,
-                );
-
-                if (searchValue === "Nasional (Indonesia)") {
-                  setSelectedRegionCode("9999");
-                } else if (selectedRegion) {
-                  setSelectedRegionCode(selectedRegion.region_code);
-                }
-              }}
-              placeholder="Ketik nama provinsi"
-              value={regionSearch}
-            />
-            <datalist id="inflation-region-options">
-              <option value="Nasional (Indonesia)" />
-              {regions.map((region) => (
-                <option key={region.region_code} value={region.region_name} />
+              onChange={(event) => setSelectedRegionCode(event.currentTarget.value)}
+              value={selectedRegionCode}
+            >
+              <option value="9999">Nasional (Indonesia)</option>
+              {regions.map((province) => (
+                <optgroup key={province.region_code} label={province.region_name}>
+                  <option value={province.region_code}>
+                    Semua wilayah di {province.region_name}
+                  </option>
+                  {(province.children ?? []).map((region) => (
+                    <option key={region.region_code} value={region.region_code}>
+                      {region.region_name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
-            </datalist>
+            </select>
           </div>
           <div
             aria-label="Pilih indikator ekonomi"

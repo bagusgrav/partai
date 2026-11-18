@@ -14,7 +14,7 @@ class EconomicController extends Controller
     public function indicators(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'type' => ['nullable', 'string', 'in:inflasi,kemiskinan,tpt'],
+            'type' => ['nullable', 'string', 'in:inflasi,kemiskinan,tpt,gini'],
             'region_code' => ['nullable', 'string', 'regex:/^\d{4}$/'],
         ]);
         $indicatorType = $validated['type'] ?? 'inflasi';
@@ -35,7 +35,7 @@ class EconomicController extends Controller
             ->values();
 
         $grouped = EconomicIndicatorObservation::query()
-            ->whereIn('indicator_name', ['inflasi', 'kemiskinan', 'tpt'])
+            ->whereIn('indicator_name', ['inflasi', 'kemiskinan', 'tpt', 'gini'])
             ->where('region_code', '9999')
             ->orderBy('period_year')
             ->orderBy('period_month')
@@ -81,14 +81,34 @@ class EconomicController extends Controller
 
     public function regions(): JsonResponse
     {
-        $regions = EconomicIndicatorObservation::query()
+        $regionRows = EconomicIndicatorObservation::query()
             ->select('region_code')
             ->selectRaw('MIN(region_name) AS region_name')
             ->where('region_code', '!=', '9999')
-            ->where('region_code', 'like', '__00')
+            ->where('region_code', 'like', '____')
             ->groupBy('region_code')
             ->orderBy('region_name')
             ->get();
+
+        $childrenByProvince = $regionRows
+            ->filter(static fn ($region): bool => substr($region->region_code, 2) !== '00')
+            ->groupBy(static fn ($region): string => substr($region->region_code, 0, 2));
+        $regions = $regionRows
+            ->filter(static fn ($region): bool => substr($region->region_code, 2) === '00')
+            ->map(static function ($province) use ($childrenByProvince): array {
+                return [
+                    'region_code' => $province->region_code,
+                    'region_name' => $province->region_name,
+                    'children' => $childrenByProvince
+                        ->get(substr($province->region_code, 0, 2), collect())
+                        ->map(static fn ($region): array => [
+                            'region_code' => $region->region_code,
+                            'region_name' => $region->region_name,
+                        ])
+                        ->values(),
+                ];
+            })
+            ->values();
 
         return response()->json([
             'regions' => $regions,

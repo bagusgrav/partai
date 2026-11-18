@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('fetch:bps-data')->daily()->withoutOverlapping();
 Schedule::command('bps:fetch-economic-data')->monthlyOn(1, '01:00')->withoutOverlapping();
+Schedule::command('bps:fetch-regional-economic-data')->monthlyOn(1, '01:30')->withoutOverlapping();
 Schedule::command('fetch:bnpb-data')->daily()->withoutOverlapping();
 Schedule::command('fetch:news-insight')->hourly()->withoutOverlapping();
 Schedule::command('fetch:exchange-rate')->daily()->withoutOverlapping();

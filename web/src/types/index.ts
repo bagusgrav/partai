@@ -241,7 +241,7 @@ export interface EconomicIndicatorsResponse {
   last_updated: string | null;
 }
 
-export type EconomicIndicatorType = "inflasi" | "kemiskinan" | "tpt";
+export type EconomicIndicatorType = "inflasi" | "kemiskinan" | "tpt" | "gini";
 
 export interface EconomicIndicatorDataPoint {
   period_year: number;
@@ -253,6 +253,7 @@ export interface EconomicIndicatorDataPoint {
 export interface EconomicIndicatorRegion {
   region_code: string;
   region_name: string;
+  children?: EconomicIndicatorRegion[];
 }
 
 export interface EconomicIndicatorRegionsResponse {

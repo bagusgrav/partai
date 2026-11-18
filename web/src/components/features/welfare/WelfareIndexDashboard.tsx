@@ -192,6 +192,10 @@ export default function WelfareIndexDashboard() {
           secara terbuka. Skor lebih tinggi menunjukkan kerentanan yang lebih
           mendesak; setiap nilai disertai tahun dan sitasi sumber.
         </p>
+        <p className="mt-4 rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          Data IKK level kabupaten/kota sedang dalam proses perluasan cakupan
+          indikator BPS.
+        </p>
       </header>
 
       {error && (

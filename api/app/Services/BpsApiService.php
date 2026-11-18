@@ -81,10 +81,280 @@ class BpsApiService
     }
 
     /**
+     * @return list<array{region_code: string, region_name: string}>
+     */
+    public function getRegencyDomains(): array
+    {
+        $apiKey = config('bps.api_key');
+        $baseUrl = rtrim((string) config('bps.api_url'), '/');
+
+        if (! is_string($apiKey) || trim($apiKey) === '') {
+            throw new RuntimeException('BPS_API_KEY belum dikonfigurasi.');
+        }
+
+        if ($baseUrl === '') {
+            throw new RuntimeException('URL API BPS tidak valid.');
+        }
+
+        $regencies = [];
+        $page = 1;
+        $totalPages = 1;
+
+        do {
+            $path = "{$baseUrl}/list/domain/type/all";
+
+            if ($page > 1) {
+                $path .= "/page/{$page}";
+            }
+
+            $payload = $this->requestJson(
+                $path.'/key/'.rawurlencode($apiKey),
+                'daftar domain kabupaten/kota BPS',
+            );
+            $data = $payload['data'] ?? null;
+            $domains = is_array($data) ? ($data[1] ?? null) : null;
+
+            if (! is_array($domains)) {
+                throw new RuntimeException('BPS mengembalikan daftar domain dengan format tidak valid.');
+            }
+
+            foreach ($domains as $domain) {
+                if (! is_array($domain)) {
+                    continue;
+                }
+
+                $code = (string) ($domain['domain_id'] ?? '');
+                $name = trim((string) ($domain['domain_name'] ?? ''));
+
+                if (preg_match('/^\d{4}$/D', $code) === 1
+                    && ! str_ends_with($code, '00')
+                    && $name !== '') {
+                    $regencies[$code] = [
+                        'region_code' => $code,
+                        'region_name' => $name,
+                    ];
+                }
+            }
+
+            $metadata = is_array($data) ? ($data[0] ?? null) : null;
+            $totalPages = is_array($metadata) && is_numeric($metadata['pages'] ?? null)
+                ? max(1, (int) $metadata['pages'])
+                : 1;
+            $page++;
+        } while ($page <= $totalPages);
+
+        if ($regencies === []) {
+            throw new RuntimeException('BPS tidak mengembalikan domain kabupaten/kota 4 digit.');
+        }
+
+        ksort($regencies);
+
+        return array_values($regencies);
+    }
+
+    /**
+     * @return list<array{indicator_name: string, region_code: string, region_name: string, period_year: int, period_month: null, value: float, unit: string, source: string}>
+     */
+    public function fetchRegionalEconomicIndicators(): array
+    {
+        $apiKey = config('bps.api_key');
+        $baseUrl = rtrim((string) config('bps.api_url'), '/');
+        $indicators = config('bps.regional_indicators', []);
+
+        if (! is_string($apiKey) || trim($apiKey) === '') {
+            throw new RuntimeException('BPS_API_KEY belum dikonfigurasi.');
+        }
+
+        if ($baseUrl === '' || ! is_array($indicators)) {
+            throw new RuntimeException('URL API atau daftar indikator BPS tidak valid.');
+        }
+
+        $domains = $this->getRegencyDomains();
+        $startYear = (int) config('bps.regional_history_start_year', 2021);
+        $currentYear = (int) now()->format('Y');
+        $observations = [];
+
+        foreach ($indicators as $indicatorName => $variableId) {
+            if (! in_array($indicatorName, ['inflasi', 'kemiskinan', 'tpt', 'gini'], true)) {
+                continue;
+            }
+
+            if (! is_numeric($variableId)) {
+                throw new RuntimeException("var_id BPS untuk indikator {$indicatorName} tidak valid.");
+            }
+
+            $periods = $this->fetchPeriods(
+                $baseUrl,
+                '0000',
+                (string) $variableId,
+                $apiKey,
+                allowUnavailable: true,
+            );
+
+            foreach ($periods as $period) {
+                $year = (int) $period['year'];
+
+                if ($year < $startYear || $year > $currentYear) {
+                    continue;
+                }
+
+                foreach ($domains as $domain) {
+                    $value = $this->fetchRegionalValue(
+                        $baseUrl,
+                        $apiKey,
+                        $domain,
+                        (string) $variableId,
+                        (string) $period['id'],
+                        $year,
+                        $indicatorName,
+                    );
+
+                    if ($value === null) {
+                        continue;
+                    }
+
+                    $observations[] = [
+                        'indicator_name' => $indicatorName,
+                        'region_code' => $domain['region_code'],
+                        'region_name' => $domain['region_name'],
+                        'period_year' => $year,
+                        'period_month' => null,
+                        'value' => $value,
+                        'unit' => $indicatorName === 'gini' ? 'rasio' : 'persen',
+                        'source' => 'BPS WebAPI',
+                    ];
+                }
+            }
+        }
+
+        return $observations;
+    }
+
+    /**
+     * @param  array{region_code: string, region_name: string}  $domain
+     */
+    private function fetchRegionalValue(
+        string $baseUrl,
+        string $apiKey,
+        array $domain,
+        string $variableId,
+        string $periodId,
+        int $year,
+        string $indicatorName,
+    ): ?float {
+        $url = "{$baseUrl}/list/model/data/domain/".rawurlencode($domain['region_code'])
+            .'/var/'.rawurlencode($variableId)
+            .'/th/'.rawurlencode($periodId)
+            .'/key/'.rawurlencode($apiKey);
+        $description = "data {$indicatorName} BPS {$domain['region_code']} tahun {$year}";
+        $payload = $this->requestJson(
+            $url,
+            $description,
+            ['vervar' => $domain['region_code']],
+            allowUnavailable: true,
+        );
+        $value = $this->regionalValueFromPayload($payload, $domain['region_code'], $variableId, $periodId);
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        $payload = $this->requestJson($url, $description, allowUnavailable: true);
+
+        return $this->regionalValueFromPayload($payload, $domain['region_code'], $variableId, $periodId);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function regionalValueFromPayload(
+        array $payload,
+        string $regionCode,
+        string $variableId,
+        string $periodId,
+    ): ?float {
+        $dataContent = $payload['datacontent'] ?? null;
+
+        if (($payload['status'] ?? null) === 'UNAVAILABLE'
+            || ($payload['data-availability'] ?? null) !== 'available'
+            || ! is_array($dataContent)
+            || $dataContent === []) {
+            return null;
+        }
+
+        $dimensions = [];
+
+        foreach (['vervar', 'var', 'turvar', 'tahun', 'turtahun'] as $name) {
+            $values = $payload[$name] ?? [];
+            $dimensions[$name] = is_array($values) && $values !== [] ? $values : [['val' => '']];
+        }
+
+        $regionValues = array_values(array_filter(
+            $dimensions['vervar'],
+            static fn ($value): bool => is_array($value)
+                && (string) ($value['val'] ?? '') === $regionCode,
+        ));
+
+        if ($regionValues === []
+            && count($dimensions['vervar']) === 1
+            && (string) ($dimensions['vervar'][0]['val'] ?? '') === '') {
+            $regionValues = $dimensions['vervar'];
+        }
+
+        $variableValues = array_values(array_filter(
+            $dimensions['var'],
+            static fn ($value): bool => is_array($value)
+                && (string) ($value['val'] ?? '') === $variableId,
+        ));
+        $periodValues = array_values(array_filter(
+            $dimensions['tahun'],
+            static fn ($value): bool => is_array($value)
+                && (string) ($value['val'] ?? '') === $periodId,
+        ));
+
+        if ($periodValues === [] && count($dimensions['tahun']) === 1) {
+            $periodValues = $dimensions['tahun'];
+        }
+
+        $candidates = [];
+
+        foreach ($regionValues as $region) {
+            foreach ($variableValues as $variable) {
+                foreach ($dimensions['turvar'] as $derivedVariable) {
+                    foreach ($periodValues as $period) {
+                        foreach ($dimensions['turtahun'] as $derivedPeriod) {
+                            if (! is_array($derivedVariable) || ! is_array($derivedPeriod)) {
+                                continue;
+                            }
+
+                            $key = implode('', array_map(
+                                static fn (array $dimension): string => (string) ($dimension['val'] ?? ''),
+                                [$region, $variable, $derivedVariable, $period, $derivedPeriod],
+                            ));
+                            $value = $dataContent[$key] ?? null;
+
+                            if (is_numeric($value) && is_finite((float) $value)) {
+                                $candidates[] = (float) $value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return count($candidates) === 1 ? $candidates[0] : null;
+    }
+
+    /**
      * @return list<array{id: string, year: string}>
      */
-    private function fetchPeriods(string $baseUrl, string $domain, string $variableId, string $apiKey): array
-    {
+    private function fetchPeriods(
+        string $baseUrl,
+        string $domain,
+        string $variableId,
+        string $apiKey,
+        bool $allowUnavailable = false,
+    ): array {
         $periods = [];
         $page = 1;
         $totalPages = 1;
@@ -96,11 +366,24 @@ class BpsApiService
                 $url .= "/page/{$page}";
             }
 
-            $payload = $this->requestJson($url.'/key/'.rawurlencode($apiKey), 'daftar periode inflasi BPS');
+            $payload = $this->requestJson(
+                $url.'/key/'.rawurlencode($apiKey),
+                'daftar periode inflasi BPS',
+                allowUnavailable: $allowUnavailable,
+            );
+
+            if (($payload['status'] ?? null) === 'UNAVAILABLE') {
+                return [];
+            }
+
             $data = $payload['data'] ?? null;
             $rows = is_array($data) ? ($data[1] ?? null) : null;
 
             if (! is_array($rows)) {
+                if ($allowUnavailable) {
+                    return [];
+                }
+
                 throw new RuntimeException('BPS mengembalikan daftar periode inflasi dengan format tidak valid.');
             }
 
@@ -122,7 +405,7 @@ class BpsApiService
             $page++;
         } while ($page <= $totalPages);
 
-        if ($periods === []) {
+        if ($periods === [] && ! $allowUnavailable) {
             throw new RuntimeException('BPS tidak menyediakan periode untuk var_id inflasi yang dikonfigurasi.');
         }
 
@@ -232,8 +515,12 @@ class BpsApiService
     /**
      * @return array<string, mixed>
      */
-    private function requestJson(string $url, string $description): array
-    {
+    private function requestJson(
+        string $url,
+        string $description,
+        array $query = [],
+        bool $allowUnavailable = false,
+    ): array {
         try {
             $response = Http::withHeaders([
                 'User-Agent' => 'PARTAI-CivicTech/1.0 (https://akuhadir.my.id; bagusgrav@gmail.com)',
@@ -243,7 +530,7 @@ class BpsApiService
                 ->connectTimeout(5)
                 ->timeout(30)
                 ->retry([200, 500], throw: false)
-                ->get($url);
+                ->get($url, $query);
         } catch (ConnectionException $exception) {
             Log::error($this->redactApiKey($exception->getMessage()), ['description' => $description]);
 
@@ -251,6 +538,10 @@ class BpsApiService
         }
 
         if (! $response->successful()) {
+            if ($allowUnavailable && in_array($response->status(), [400, 404, 422], true)) {
+                return ['status' => 'UNAVAILABLE'];
+            }
+
             Log::error("BPS API request failed with HTTP {$response->status()}.", [
                 'description' => $description,
                 'status' => $response->status(),

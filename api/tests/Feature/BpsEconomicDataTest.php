@@ -72,6 +72,71 @@ class BpsEconomicDataTest extends TestCase
         ) && $request->hasHeader('Accept', 'application/json'));
     }
 
+    public function test_regional_bps_indicators_use_four_digit_domains_and_are_saved_idempotently(): void
+    {
+        $this->travelTo(now()->setDate(2024, 11, 1));
+        config([
+            'bps.api_key' => 'test-key',
+            'bps.api_url' => 'https://bps.test/v1/api',
+            'bps.economic_history_start_year' => 2024,
+        ]);
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://bps.test/v1/api/list/domain/type/all/key/test-key' => Http::response([
+                'status' => 'OK',
+                'data' => [
+                    ['page' => 1, 'pages' => 1],
+                    [
+                        ['domain_id' => '11', 'domain_name' => 'Aceh'],
+                        ['domain_id' => '1100', 'domain_name' => 'Provinsi Aceh'],
+                        ['domain_id' => '1101', 'domain_name' => 'Kabupaten Simeulue'],
+                    ],
+                ],
+            ]),
+            'https://bps.test/v1/api/list/model/th/domain/0000/var/104/key/test-key' => Http::response([], 404),
+            'https://bps.test/v1/api/list/model/th/domain/0000/var/192/key/test-key' => Http::response([
+                'status' => 'OK',
+                'data' => [
+                    ['page' => 1, 'pages' => 1],
+                    [['th_id' => 7, 'th' => '2024']],
+                ],
+            ]),
+            'https://bps.test/v1/api/list/model/th/domain/0000/var/543/key/test-key' => Http::response([], 404),
+            'https://bps.test/v1/api/list/model/th/domain/0000/var/2103/key/test-key' => Http::response([], 404),
+            'https://bps.test/v1/api/list/model/data/domain/1101/var/192/th/7/key/test-key?vervar=1101' => Http::response([
+                'status' => 'OK',
+                'data-availability' => 'available',
+                'datacontent' => [],
+            ]),
+            'https://bps.test/v1/api/list/model/data/domain/1101/var/192/th/7/key/test-key' => Http::response([
+                'status' => 'OK',
+                'data-availability' => 'available',
+                'vervar' => [['val' => '1101', 'label' => 'Kabupaten Simeulue']],
+                'var' => [['val' => '192']],
+                'turvar' => [['val' => '0']],
+                'tahun' => [['val' => '7']],
+                'turtahun' => [['val' => '0']],
+                'datacontent' => ['1101192070' => 8.25],
+            ]),
+        ]);
+
+        $this->artisan('bps:fetch-regional-economic-data')->assertSuccessful();
+        $this->artisan('bps:fetch-regional-economic-data')->assertSuccessful();
+
+        $this->assertDatabaseCount('economic_indicator_observations', 1);
+        $this->assertDatabaseHas('economic_indicator_observations', [
+            'indicator_name' => 'kemiskinan',
+            'region_code' => '1101',
+            'region_name' => 'Kabupaten Simeulue',
+            'period_year' => 2024,
+            'period_month' => null,
+            'value' => 8.25,
+            'source' => 'BPS WebAPI',
+        ]);
+        Http::assertSent(fn ($request): bool => str_contains($request->url(), 'domain/1101/')
+            && str_contains($request->url(), 'vervar=1101'));
+    }
+
     public function test_bps_http_failures_are_logged_with_status_and_response_body(): void
     {
         config([
@@ -271,5 +336,52 @@ class BpsEconomicDataTest extends TestCase
             ->assertJsonPath('regions.0.region_name', 'DKI Jakarta')
             ->assertJsonPath('regions.1.region_code', '3200')
             ->assertJsonPath('regions.1.region_name', 'Jawa Barat');
+    }
+
+    public function test_economy_regions_returns_regencies_nested_under_their_province(): void
+    {
+        foreach ([
+            ['region_code' => '3100', 'region_name' => 'DKI Jakarta'],
+            ['region_code' => '3171', 'region_name' => 'Jakarta Selatan'],
+            ['region_code' => '3200', 'region_name' => 'Jawa Barat'],
+            ['region_code' => '3273', 'region_name' => 'Kota Bandung'],
+        ] as $region) {
+            EconomicIndicatorObservation::query()->create([
+                'indicator_name' => 'inflasi',
+                ...$region,
+                'period_year' => 2024,
+                'period_month' => 1,
+                'value' => 2.5,
+                'unit' => 'persen',
+                'source' => 'BPS WebAPI',
+            ]);
+        }
+
+        $this->getJson('/api/economy/regions')
+            ->assertOk()
+            ->assertJsonCount(2, 'regions')
+            ->assertJsonPath('regions.0.region_code', '3100')
+            ->assertJsonPath('regions.0.children.0.region_code', '3171')
+            ->assertJsonPath('regions.1.region_code', '3200')
+            ->assertJsonPath('regions.1.children.0.region_name', 'Kota Bandung');
+    }
+
+    public function test_economy_indicators_accept_gini_for_regency_city_regions(): void
+    {
+        EconomicIndicatorObservation::query()->create([
+            'indicator_name' => 'gini',
+            'region_code' => '3171',
+            'region_name' => 'Jakarta Selatan',
+            'period_year' => 2024,
+            'period_month' => null,
+            'value' => 0.41,
+            'unit' => 'rasio',
+            'source' => 'BPS WebAPI',
+        ]);
+
+        $this->getJson('/api/economy/indicators?type=gini&region_code=3171')
+            ->assertOk()
+            ->assertJsonPath('data.0.value', 0.41)
+            ->assertJsonPath('data.0.region_name', 'Jakarta Selatan');
     }
 }
