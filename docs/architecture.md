@@ -401,7 +401,7 @@ Reputation ledger dirancang append-only melalui guard model dan trigger SQLite, 
 ## Known gaps dan risiko
 
 1. **SSO belum terintegrasi**: kontrak pusat ada, tetapi implementasi lokal guest/register/login/reset memakai Sanctum; belum ada SSO exchange/validator yang terlihat.
-2. **Privasi NIK tidak seragam**: `users.nik` terenkripsi, sedangkan NIK dataset bansos tersimpan plain text; NIK juga dikirim pada path URL.
+2. **Privasi NIK tidak seragam**: `users.nik` terenkripsi, sedangkan NIK dataset bansos tersimpan plain text. Endpoint `/api/rights/check` mengambil NIK dari user terautentikasi dan tidak mengirim NIK pada path URL.
 3. **Deployment tidak terbukti**: file workflow/config tersedia, tetapi status host, secrets, Tunnel, Vercel, cron, dan hasil rilis belum diperiksa.
 4. **Panduan deployment bertentangan**: `docs/github-actions.md`, `docs/deployment.md`, workflow, dan skrip deploy memiliki perbedaan nilai/path/service; skrip melakukan `git reset --hard`.
 5. **Tidak ada rencana recovery teruji**: tidak ditemukan automated backup, retensi, restore test, atau rollback migrasi/rilis.

@@ -152,7 +152,7 @@ Perhatikan ketidaksesuaian dokumen operasi: workflow mengeksekusi `api/deploy.sh
 
 ## Kontribusi dan invariant
 
-Mulai dari [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), [docs/api-reference.md](docs/api-reference.md), dan [docs/architecture.md](docs/architecture.md). Perubahan yang menyentuh perilaku perlu tes yang sesuai serta pembaruan kontrak/dokumen.
+Mulai dari [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), [docs/api-reference.md](docs/api-reference.md), dan [docs/architecture.md](docs/architecture.md). [ARCHITECTURE.md](ARCHITECTURE.md) adalah pointer root ke blueprint kanonis; [MEMORY.md](MEMORY.md) merangkum invariant, keputusan, dan serah-terima sesi. Perubahan yang menyentuh perilaku perlu tes yang sesuai serta pembaruan kontrak/dokumen.
 
 - Pertahankan Laravel sebagai modular monolith dan satu pintu ingress API.
 - Gunakan UUID untuk identitas data baru bila tidak ada alasan kompatibilitas lain.
