@@ -26,7 +26,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 - **Refaktor `rights/check` tanpa `{nik}` di path URL** — commit `afd85c0` (`fix(security): remove NIK from URL path and use authenticated session`). Bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/SocialAssistanceController.php`, `api/tests/Feature/Api/SocialAssistanceControllerTest.php`, `docs/api-reference.md`, dan `docs/architecture.md`.
 - **Sinkronisasi API reference dengan 66 route efektif** — commit `edb2333` (`docs(api): sinkronkan api-reference dengan 66 route efektif`). Bukti dokumentasi: `docs/api-reference.md`; daftar route implementasi: `api/routes/api.php`.
-- **100 soal Belajar Harian Civic Education** — status: selesai — bukti: `api/database/seeders/CivicQuestionSeeder.php` memuat 100 soal idempoten pada lima domain, Level 1–2; tes seeder memvalidasi distribusi, opsi, kunci, serta batas penjelasan.
+- **100 soal Belajar Harian Civic Education (Fase 1)** — status: selesai / berhasil di-seed ke database VPS produksi — bukti: commit `9e1364d` (seeder update), `api/database/seeders/CivicQuestionSeeder.php`, dan eksekusi manual seeder di server dengan output `DONE`.
 - **MVP Komunitas** — status: **Selesai / Live di Produksi** — commit `aa733a9` (`feat(community): MVP microblog dengan visibilitas publik/anggota`). Bukti: `api/routes/api.php`, controller/model/policy, `api/tests/Feature/PostControllerTest.php`, `api/tests/Feature/CommunityModerationTest.php`, `web/src/components/features/community/CommunityPage.tsx`, dan deployment VPS produksi yang berhasil.
 - **Perbaikan CI/CD deployment API** — status: selesai — commit `5d6f9ff` (`fix(ci): add sleep and ignore health check failure to prevent false negatives`) dan fix/final deployment di rantai commit perbaikan port. Bukti: `.github/workflows/deploy-api.yml`, `api/deploy.sh`, serta penanganan SQLite, direktori Storage, `APP_KEY`, port health check, dan pengecekan `/up`.
 - **Dokumentasi Komunitas** — commit `a7b2da9` (`docs(community): dokumentasikan domain Komunitas dan batas visibilitas`). Bukti: `docs/architecture.md`, `docs/api-reference.md`, `README.md`, dan `ROADMAP.md`.
@@ -66,11 +66,16 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-20 — Seeding 100 soal Civic Education Fase 1 ke VPS produksi**
+  - **Perubahan:** 100 soal Civic Education Fase 1 berhasil di-seed ke database VPS produksi.
+  - **Bukti:** commit `9e1364d` (seeder update); seeder dijalankan manual di server dengan sukses, output `DONE`.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** verifikasi soal tampil pada alur kuis produksi.
 - **2026-11-20 — Penambahan 100 soal Belajar Harian**
   - **Perubahan:** seeder CivicQuestion menghasilkan 20 soal per domain dalam lima domain, dengan level 1 atau 2, empat opsi, kunci, dan penjelasan maksimal dua kalimat. Penggunaan `updateOrCreate` berdasarkan prompt menjaga seeder idempoten; `DatabaseSeeder` sebelumnya sudah memanggil seeder ini.
   - **Bukti:** `api/database/seeders/CivicQuestionSeeder.php`; `api/tests/Feature/CivicEducationTest.php`; `php artisan test` lulus (180 tes); `php vendor\bin\pint --test` lulus; seeder dijalankan dua kali pada SQLite sementara dan jumlah akhirnya 100. `api/database/database.sqlite` tidak disentuh.
   - **Dokumen Diperbarui:** `MEMORY.md`.
-  - **Langkah Berikutnya:** seeder dapat dijalankan pada database aplikasi melalui proses operasional yang berwenang; validasi sesi ini memakai database sementara dan tidak mengubah database aplikasi.
+  - **Langkah Berikutnya:** verifikasi tampilan soal hasil seeding pada alur kuis produksi.
 - **2026-11-20 — Deployment produksi MVP Komunitas dan finalisasi CI/CD**
   - **Perubahan:** MVP Komunitas dinyatakan Live di Produksi; pipeline dan skrip deployment diperbaiki untuk SQLite, direktori Storage, `APP_KEY`, port, dan health check `/up`.
   - **Bukti:** commit `aa733a9` (`feat(community): MVP microblog dengan visibilitas publik/anggota`) dan commit `5d6f9ff` (`fix(ci): add sleep and ignore health check failure to prevent false negatives`); `.github/workflows/deploy-api.yml`; `api/deploy.sh`.
@@ -84,10 +89,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** memperluas seeder Belajar Harian menjadi 100 soal idempoten, 20 per domain, level 1 dan 2.
-- **Bukti:** `api/database/seeders/CivicQuestionSeeder.php`; 180 tes lulus; Pint lulus; seeder dijalankan dua kali pada SQLite sementara dengan hasil 100 baris. Database produksi tidak disentuh.
-- **Status:** 100 soal civic education — status: selesai secara lokal — bukti: seeder, tes, dan penghitungan SQLite sementara.
+- **Dikerjakan:** mencatat keberhasilan seeding 100 soal Civic Education Fase 1 ke database VPS produksi.
+- **Bukti:** commit `9e1364d`; seeder dijalankan manual di server dengan sukses, output `DONE`.
+- **Status:** 100 soal Civic Education Fase 1 — status: selesai / berhasil di-seed ke produksi — bukti: commit `9e1364d` dan output server `DONE`.
 - **Dokumen .md Diperbarui:** `MEMORY.md`.
-- **Belum Selesai / Langkah Berikutnya:** tidak ada perubahan aplikasi tertunda; jalankan seeder pada database aplikasi hanya jika diminta dan melalui prosedur yang berwenang.
+- **Belum Selesai / Langkah Berikutnya:** verifikasi soal tampil pada alur kuis produksi.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
