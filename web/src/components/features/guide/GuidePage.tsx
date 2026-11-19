@@ -231,6 +231,35 @@ export default function GuideContent() {
                   </p>
                 </article>
               </div>
+              <div className="mt-6">
+                <h3 className="font-extrabold text-text-main">
+                  Tangga poin reputasi anggota
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-text-muted">
+                  Level mengikuti total poin reputasi anggota, terpisah dari
+                  Mastery Score dan Participation Score.
+                </p>
+                <ol className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {[
+                    ["0–99 poin", "Warga Baru"],
+                    ["100–499 poin", "Warga Aktif"],
+                    ["500–999 poin", "Penggerak"],
+                    ["1.000+ poin", "Pengawal Demokrasi"],
+                  ].map(([points, level]) => (
+                    <li
+                      className="flex items-center justify-between gap-4 rounded-xl border border-background bg-white p-4"
+                      key={level}
+                    >
+                      <span className="text-sm font-semibold text-text-muted">
+                        {points}
+                      </span>
+                      <span className="text-right font-extrabold text-text-main">
+                        {level}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
               <p className="mt-4 text-sm leading-6 text-text-muted">
                 Singkatnya: Mastery mengukur apa yang dipelajari; Participation
                 mencatat kontribusi. Keduanya bukan ukuran nilai seseorang.
