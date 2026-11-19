@@ -25,7 +25,18 @@ class AppServiceProvider extends ServiceProvider
     {
         Event::listen(ReputationActivity::class, AwardReputationPoints::class);
 
-        if (DB::connection()->getDriverName() === 'sqlite') {
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        $connection = DB::connection();
+        $databasePath = $connection->getConfig('database');
+
+        if (
+            $connection->getDriverName() === 'sqlite'
+            && $databasePath !== ':memory:'
+            && file_exists($databasePath)
+        ) {
             DB::statement('PRAGMA journal_mode=WAL;');
             DB::statement('PRAGMA synchronous=NORMAL;');
             DB::statement('PRAGMA busy_timeout=5000;');

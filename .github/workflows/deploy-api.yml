@@ -30,6 +30,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
+      - name: Create SQLite database file
+        run: touch api/database/database.sqlite
+
       - name: Install Composer dependencies
         working-directory: api
         run: composer install
