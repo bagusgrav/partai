@@ -9,12 +9,43 @@ on:
       - '.github/workflows/deploy-api.yml'
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: sqlite3, pdo_sqlite
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: ${{ runner.os }}-composer-${{ hashFiles('api/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        working-directory: api
+        run: composer install
+
+      - name: Run PHPUnit tests
+        working-directory: api
+        run: php artisan test
+
+      - name: Check code formatting
+        working-directory: api
+        run: vendor/bin/pint --test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Execute Deploy Script on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
