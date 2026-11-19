@@ -17,11 +17,9 @@ export class RightsCheckError extends Error {
   }
 }
 
-export async function checkSocialAssistance(
-  nik: string,
-): Promise<SocialAssistanceStatus> {
+export async function checkSocialAssistance(): Promise<SocialAssistanceStatus> {
   const response = await fetchWithRetry(
-    `${API_BASE_URL}/rights/check/${encodeURIComponent(nik)}`,
+    `${API_BASE_URL}/rights/check`,
     {
       method: "GET",
       headers: await getHeaders(),

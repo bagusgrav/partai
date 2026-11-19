@@ -75,7 +75,7 @@ Route::get('/economy/indicators', [EconomicController::class, 'indicators']);
 Route::get('/economy/regions', [EconomicController::class, 'regions']);
 Route::get('/insights/news', [GovernmentInsightController::class, 'news']);
 Route::get('/insights/cabinet', [GovernmentInsightController::class, 'cabinet']);
-Route::get('/rights/check/{nik}', [SocialAssistanceController::class, 'check'])
+Route::get('/rights/check', [SocialAssistanceController::class, 'check'])
     ->middleware(['auth:sanctum', 'throttle:5,1']);
 Route::get('/contracts', [FactionContractController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);

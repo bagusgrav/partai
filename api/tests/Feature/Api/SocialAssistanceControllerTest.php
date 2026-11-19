@@ -29,7 +29,7 @@ class SocialAssistanceControllerTest extends TestCase
             'region_code' => '3201',
         ]);
 
-        $this->getJson('/api/rights/check/3201010101010001')
+        $this->getJson('/api/rights/check')
             ->assertOk()
             ->assertJson([
                 'program' => 'PKH',
@@ -47,36 +47,36 @@ class SocialAssistanceControllerTest extends TestCase
             'nik_verified_at' => now(),
         ]));
 
-        $this->getJson('/api/rights/check/3201010101010001')
+        $this->getJson('/api/rights/check')
             ->assertNotFound()
             ->assertJsonPath('message', 'NIK tidak terdaftar sebagai penerima bansos')
             ->assertHeader('Cache-Control', 'no-store, private');
     }
 
-    public function test_it_rejects_nik_values_that_are_not_sixteen_digits(): void
+    public function test_it_rejects_an_invalid_nik_on_the_authenticated_account(): void
     {
-        Sanctum::actingAs(User::factory()->create());
+        Sanctum::actingAs(User::factory()->create([
+            'nik' => '12345',
+            'nik_verified_at' => now(),
+        ]));
 
-        $this->getJson('/api/rights/check/12345')
+        $this->getJson('/api/rights/check')
             ->assertUnprocessable()
             ->assertJsonPath('message', 'NIK harus terdiri dari 16 digit angka.');
-
-        $this->getJson('/api/rights/check/123456789012345a')
-            ->assertUnprocessable();
     }
 
     public function test_it_rejects_unauthenticated_checks(): void
     {
-        $this->getJson('/api/rights/check/3201010101010001')->assertUnauthorized();
+        $this->getJson('/api/rights/check')->assertUnauthorized();
     }
 
     public function test_missing_and_unverified_niks_return_the_same_forbidden_response(): void
     {
         Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
-        $unverifiedResponse = $this->getJson('/api/rights/check/3201010101010001');
+        $unverifiedResponse = $this->getJson('/api/rights/check');
 
         Sanctum::actingAs(User::factory()->create(['nik' => null]));
-        $missingNikResponse = $this->getJson('/api/rights/check/3201010101010001');
+        $missingNikResponse = $this->getJson('/api/rights/check');
 
         $expected = [
             'message' => 'NIK belum terverifikasi.',
@@ -92,27 +92,6 @@ class SocialAssistanceControllerTest extends TestCase
             ->assertHeader('Cache-Control', 'no-store, private');
     }
 
-    public function test_it_cannot_check_another_users_nik(): void
-    {
-        Sanctum::actingAs(User::factory()->create([
-            'nik' => '3201010101010001',
-            'nik_verified_at' => now(),
-        ]));
-        SocialAssistance::query()->create([
-            'nik' => '3201010101010002',
-            'name' => 'Nama Rahasia',
-            'program' => 'PKH',
-            'status' => 'DITERIMA',
-            'period' => '2026',
-            'region_code' => '3201',
-        ]);
-
-        $this->getJson('/api/rights/check/3201010101010002')
-            ->assertForbidden()
-            ->assertJsonMissingPath('program')
-            ->assertHeader('Cache-Control', 'no-store, private');
-    }
-
     public function test_it_limits_checks_to_five_requests_per_minute(): void
     {
         RateLimiter::clear('127.0.0.1');
@@ -122,10 +101,10 @@ class SocialAssistanceControllerTest extends TestCase
         ]));
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
-            $this->getJson('/api/rights/check/3201010101010001')->assertNotFound();
+            $this->getJson('/api/rights/check')->assertNotFound();
         }
 
-        $this->getJson('/api/rights/check/3201010101010001')->assertTooManyRequests();
+        $this->getJson('/api/rights/check')->assertTooManyRequests();
     }
 
     public function test_seeder_creates_a_repeatable_set_of_synthetic_sixteen_digit_niks(): void

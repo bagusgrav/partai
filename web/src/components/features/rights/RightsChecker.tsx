@@ -26,7 +26,6 @@ const statusStyles: Record<SocialAssistanceStatus["status"], string> = {
 };
 
 export default function RightsChecker() {
-  const [nik, setNik] = useState("");
   const [result, setResult] = useState<SocialAssistanceStatus | null>(null);
   const [notRegistered, setNotRegistered] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,14 +37,9 @@ export default function RightsChecker() {
     setNotRegistered(false);
     setError(null);
 
-    if (!/^[0-9]{16}$/.test(nik)) {
-      setError("Masukkan NIK yang terdiri dari 16 digit angka.");
-      return;
-    }
-
     setIsLoading(true);
     try {
-      setResult(await checkSocialAssistance(nik));
+      setResult(await checkSocialAssistance());
     } catch (requestError) {
       if (requestError instanceof RightsCheckError && requestError.status === 404) {
         setNotRegistered(true);
@@ -71,35 +65,11 @@ export default function RightsChecker() {
           Cek Status Bansos Anda
         </h1>
         <p className="mt-3 text-base leading-7 text-text-muted">
-          Masukkan NIK yang terdaftar pada akun Anda untuk memeriksa status bantuan sosial.
+          NIK diambil dari akun Anda yang sedang masuk, sehingga tidak perlu
+          dimasukkan kembali untuk memeriksa status bantuan sosial.
         </p>
 
         <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label
-              className="mb-2 block text-sm font-bold text-text-main"
-              htmlFor="nik"
-            >
-              Nomor Induk Kependudukan (NIK)
-            </label>
-            <input
-              autoComplete="off"
-              className="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-lg tracking-[0.12em] text-text-main outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-              id="nik"
-              inputMode="numeric"
-              maxLength={16}
-              onChange={(event) =>
-                setNik(event.target.value.replace(/\D/g, "").slice(0, 16))
-              }
-              pattern="[0-9]{16}"
-              placeholder="Masukkan 16 digit NIK"
-              required
-              value={nik}
-            />
-            <p className="mt-2 text-sm text-text-muted">
-              {nik.length}/16 digit. NIK hanya digunakan untuk memeriksa data akun Anda.
-            </p>
-          </div>
           <button
             className="min-h-12 w-full rounded-xl bg-primary px-5 py-3 text-base font-bold text-white transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isLoading}

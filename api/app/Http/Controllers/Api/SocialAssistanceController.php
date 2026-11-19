@@ -9,28 +9,22 @@ use Illuminate\Http\Request;
 
 class SocialAssistanceController extends Controller
 {
-    public function check(Request $request, string $nik): JsonResponse
+    public function check(Request $request): JsonResponse
     {
-        if (! preg_match('/^[0-9]{16}$/', $nik)) {
-            return response()->json([
-                'message' => 'NIK harus terdiri dari 16 digit angka.',
-            ], 422)->header('Cache-Control', 'no-store, private');
-        }
-
         $user = $request->user();
-        $userNik = $user->nik;
+        $nik = $user->nik;
 
-        if (! is_string($userNik) || $user->nik_verified_at === null) {
+        if (! is_string($nik) || $user->nik_verified_at === null) {
             return response()->json([
                 'message' => 'NIK belum terverifikasi.',
                 'code' => 'nik_not_verified',
             ], 403)->header('Cache-Control', 'no-store, private');
         }
 
-        if (! hash_equals($userNik, $nik)) {
+        if (! preg_match('/^[0-9]{16}$/', $nik)) {
             return response()->json([
-                'message' => 'Anda hanya dapat memeriksa NIK yang terdaftar pada akun Anda.',
-            ], 403)->header('Cache-Control', 'no-store, private');
+                'message' => 'NIK harus terdiri dari 16 digit angka.',
+            ], 422)->header('Cache-Control', 'no-store, private');
         }
 
         $assistance = SocialAssistance::query()
