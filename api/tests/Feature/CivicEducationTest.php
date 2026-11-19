@@ -196,21 +196,24 @@ class CivicEducationTest extends TestCase
         }
     }
 
-    public function test_seeder_publishes_fifty_questions_across_all_domains_and_levels(): void
+    public function test_seeder_publishes_one_hundred_questions_across_all_domains_and_levels(): void
     {
         $this->seed(CivicQuestionSeeder::class);
         $this->seed(CivicQuestionSeeder::class);
 
-        $this->assertDatabaseCount('civic_questions', 50);
+        $this->assertDatabaseCount('civic_questions', 100);
         foreach (['hak_konstitusional', 'alasan_bernegara', 'keuangan_negara', 'hukum', 'politik_bernegara'] as $domain) {
-            $this->assertSame(10, CivicQuestion::query()->where('domain', $domain)->count());
-            $this->assertSame(
-                4,
-                CivicQuestion::query()->where('domain', $domain)->distinct()->count('mastery_level'),
-            );
+            $this->assertSame(20, CivicQuestion::query()->where('domain', $domain)->count());
         }
-        $this->assertGreaterThanOrEqual(4, CivicQuestion::query()->distinct()->count('mastery_level'));
-        $this->assertSame(50, CivicQuestion::query()->where('source_citation', '!=', '')->count());
+        $this->assertSame([1, 2], CivicQuestion::query()->distinct()->orderBy('mastery_level')->pluck('mastery_level')->all());
+        $this->assertSame(100, CivicQuestion::query()->where('source_citation', '!=', '')->count());
+
+        foreach (CivicQuestion::query()->get() as $question) {
+            $this->assertCount(4, $question->options);
+            $this->assertContains($question->correct_option, array_column($question->options, 'key'));
+            preg_match_all('/[.!?](?=\s+[A-Z“"]|$)/u', trim($question->explanation), $sentences);
+            $this->assertLessThanOrEqual(2, count($sentences[0]), $question->prompt);
+        }
     }
 
     /**
