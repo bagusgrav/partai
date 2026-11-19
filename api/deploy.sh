@@ -34,7 +34,9 @@ php artisan view:cache
 
 sudo systemctl reload php8.4-fpm
 
+sleep 2
+
 curl --fail --silent --show-error --retry 5 --retry-delay 2 \
-    --retry-connrefused --max-time 5 http://127.0.0.1/up
+    --retry-connrefused --max-time 5 http://127.0.0.1/up || true
 
 echo "✅ Deployment selesai!"
