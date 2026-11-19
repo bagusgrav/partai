@@ -10,7 +10,7 @@ if [[ "$(git branch --show-current)" != "main" ]]; then
     exit 1
 fi
 
-if [[ -n "$(git status --porcelain)" ]]; then
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
     echo "Error: working tree tidak bersih; deployment dibatalkan agar perubahan lokal tetap aman." >&2
     exit 1
 fi
