@@ -7,20 +7,21 @@ perintah. Perintah di bawah adalah panduan manual dan belum dijalankan.
 ## 1. Siapkan VPS Debian 12
 
 1. Perbarui paket. Debian 12 bawaan dapat menyediakan PHP lebih lama dari
-   persyaratan aplikasi (`^8.3`); bila PHP 8.3 tidak tersedia, tambahkan
+   persyaratan aplikasi (`^8.3`); bila PHP 8.4 tidak tersedia, tambahkan
    repositori PHP yang Anda percayai mengikuti instruksi dan verifikasi kunci
    repositorinya sebelum memasang paket. Lalu pasang Nginx, Git, SQLite,
-   PHP 8.3 CLI, PHP 8.4-FPM, serta ekstensi PHP yang dibutuhkan Laravel:
+   PHP 8.4 CLI dan FPM, serta ekstensi PHP yang dibutuhkan Laravel:
 
    ```bash
    sudo apt update
    sudo apt install -y nginx git sqlite3 unzip \
-     php8.3-cli php8.4-fpm php8.3-sqlite3 php8.3-mbstring \
-     php8.3-xml php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl
+     php8.4-cli php8.4-fpm php8.4-sqlite3 php8.4-mbstring \
+     php8.4-xml php8.4-curl php8.4-zip php8.4-bcmath php8.4-intl curl
    ```
 
 2. Pasang Composer mengikuti petunjuk instalasi resmi Composer, lalu pastikan
-   `php -v`, `composer --version`, `nginx -v`, dan `sqlite3 --version` berhasil.
+   `php -v` melaporkan PHP 8.4, serta `composer --version`, `nginx -v`, dan
+   `sqlite3 --version` berhasil.
 3. Pasang `cloudflared` dari repositori paket Cloudflare untuk Debian, lalu
    verifikasi dengan `cloudflared --version`. Jangan menaruh token atau berkas
    kredensial Tunnel di repository.
@@ -165,24 +166,68 @@ jalankan migrasi melalui skrip deployment.
 Di repository GitHub, buka **Settings → Secrets and variables → Actions** dan
 buat repository secrets berikut:
 
-- `SSH_HOST`: hostname atau alamat IP VPS.
-- `SSH_USER`: `root`.
+- `SSH_HOST`: hostname atau alamat IP VPS yang menjalankan aplikasi.
+- `SSH_USER`: `deploy`.
 - `SSH_KEY`: private SSH key yang pasangannya sudah ada pada
-  `~root/.ssh/authorized_keys` di VPS.
+  `~deploy/.ssh/authorized_keys` di VPS.
 
-Batasi akses key untuk deployment, jangan menaruh private key di file
-repository, dan jangan mencetak nilainya ke log. Workflow terhubung ke VPS
-sebagai `root`. Skrip
-[deploy.sh](../api/deploy.sh) adalah skrip deployment di server. Workflow
-[deploy-api.yml](../.github/workflows/deploy-api.yml) menggunakan ketiga
-secrets tersebut dan memanggil skrip di VPS. Lihat panduan
-[github-actions.md](./github-actions.md) untuk langkah pengaturan.
+Gunakan key khusus deployment dengan akses terbatas. Jangan menaruh private key
+di repository atau mencetak nilainya ke log. Workflow
+[deploy-api.yml](../.github/workflows/deploy-api.yml) berjalan pada push ke
+`main` yang mengubah `api/**` atau file workflow; workflow terhubung sebagai
+`deploy` dan memanggil [deploy.sh](../api/deploy.sh) di
+`/var/www/thortech/partai`. Akun tersebut harus dapat menjalankan Composer,
+PHP 8.4 CLI, `curl`, menarik branch `main`, dan menjalankan
+`sudo systemctl reload php8.4-fpm` tanpa prompt password. Berikan izin sudo
+minimum yang diperlukan. Detail secrets juga tersedia di
+[github-actions.md](./github-actions.md).
 
-Untuk deployment manual, masuk ke VPS sebagai pengguna deployment, masuk ke
-`/var/www/thortech/partai/api`, lalu jalankan `bash deploy.sh`. Skrip melakukan `git pull origin
-main`, instalasi dependency produksi, migrasi paksa, cache Laravel, dan reload
-PHP-FPM. Jalankan hanya setelah konfigurasi `.env`, database, dan akses sudo
-siap.
+Untuk deployment manual, masuk ke VPS sebagai `deploy`, lalu jalankan
+`cd /var/www/thortech/partai && bash api/deploy.sh`. Skrip memastikan branch
+aktif adalah `main` dan working tree bersih, kemudian menjalankan
+`git pull --ff-only origin main`, instalasi dependency produksi, migrasi paksa,
+cache Laravel, reload PHP-FPM 8.4, dan health check
+`http://127.0.0.1:8000/up`. Pull fast-forward-only tidak membuang commit lokal;
+skrip membatalkan rilis bila mendeteksi perubahan lokal. Skrip tidak
+membersihkan file untracked atau ignored, termasuk `.env`, database, dan
+`storage/logs`. Siapkan konfigurasi `.env`, database, permission, dan akses
+sudo sebelum menjalankan.
+
+### Rollback manual bila deployment gagal
+
+Sebelum rilis, catat commit aplikasi terakhir yang sehat dan buat backup SQLite
+yang konsisten sebelum migrasi, menggunakan prosedur di bagian database.
+Jika health check gagal, periksa log workflow, PHP-FPM, Nginx, dan Laravel.
+Jangan mengulang deploy sebelum penyebab kegagalan dipahami.
+
+Untuk mengembalikan kode aplikasi, sebagai `deploy` pastikan tidak ada
+perubahan lokal, lalu pindah sementara ke commit sehat yang dicatat:
+
+```bash
+cd /var/www/thortech/partai
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Working tree tidak bersih; batalkan rollback dan amankan perubahan lokal." >&2
+  exit 1
+fi
+git switch --detach <KNOWN_GOOD_COMMIT>
+cd api
+composer install --no-dev --optimize-autoloader
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+sudo systemctl reload php8.4-fpm
+curl --fail --show-error http://127.0.0.1:8000/up
+```
+
+Jalankan rollback kode hanya jika status bersih; jangan memakai `reset --hard`
+atau `git clean`. Setelah pemulihan sementara, kembali ke branch `main` dan
+lakukan rollback rilis permanen melalui commit/revert yang ditinjau sebelum
+deployment berikutnya. Rollback kode tidak membatalkan migrasi atau memulihkan
+data. Jangan menjalankan `migrate:rollback` atau memulihkan backup database
+secara otomatis: tinjau kompatibilitas migrasi dan dampak data, hentikan
+penulisan bila perlu, dan restore hanya dari backup terverifikasi dengan
+persetujuan operator.
 
 ## 5. Aktifkan Laravel Scheduler
 
