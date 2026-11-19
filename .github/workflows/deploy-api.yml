@@ -37,6 +37,12 @@ jobs:
         working-directory: api
         run: composer install
 
+      - name: Create environment file
+        run: cp api/.env.example api/.env
+
+      - name: Create Laravel storage directories
+        run: mkdir -p api/storage/framework/views api/storage/framework/cache api/storage/framework/sessions api/storage/logs
+
       - name: Run PHPUnit tests
         working-directory: api
         run: php artisan test
