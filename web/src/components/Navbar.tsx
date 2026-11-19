@@ -14,6 +14,7 @@ import {
   FileText,
   HandHeart,
   Home,
+  MessageCircle,
   Map,
   Menu,
   MessageCircleQuestion,
@@ -68,6 +69,12 @@ const navigationGroups: {
         label: "Gerak Warga",
         description: "Agenda aksi & kegiatan lapangan",
         icon: CalendarDays,
+      },
+      {
+        href: "/komunitas",
+        label: "Komunitas",
+        description: "Berbagi gagasan dalam feed teks",
+        icon: MessageCircle,
       },
       {
         href: "/manifesto",

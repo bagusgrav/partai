@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\MemberReputationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrganizationStructureController;
 use App\Http\Controllers\Api\PartyFinanceController;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\PostReportController;
 use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
@@ -89,6 +91,9 @@ Route::post('/inquiries', [InquiryController::class, 'store'])->middleware('thro
 Route::get('/glossary', [GlossaryController::class, 'index']);
 Route::get('/reputation/leaderboard-stats', [MemberReputationController::class, 'leaderboardStats']);
 Route::get('/education/overview', [CivicEducationController::class, 'overview'])->middleware('throttle:60,1');
+Route::get('/posts', [PostController::class, 'publicIndex'])->middleware('throttle:60,1');
+Route::get('/posts/members', [PostController::class, 'memberIndex'])
+    ->middleware(['auth:sanctum', 'throttle:60,1']);
 
 Route::get('/finance/summary', [PartyFinanceController::class, 'summary'])->middleware('throttle:60,1');
 Route::get('/finance/ledger', [PartyFinanceController::class, 'ledger'])->middleware('throttle:60,1');
@@ -115,6 +120,10 @@ Route::middleware(['auth:sanctum', 'role:super_admin|pengurus|panelis'])->group(
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/posts', [PostController::class, 'store'])->middleware('throttle:10,1');
+    Route::patch('/posts/{post}', [PostController::class, 'update'])->middleware('throttle:10,1');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->middleware('throttle:10,1');
+    Route::post('/posts/{post}/report', [PostReportController::class, 'store'])->middleware('throttle:5,1');
     Route::get('/education/session', [CivicEducationController::class, 'session']);
     Route::post('/education/answers', [CivicEducationController::class, 'answer'])->middleware('throttle:30,1');
     Route::get('/notifications', [NotificationController::class, 'index']);
