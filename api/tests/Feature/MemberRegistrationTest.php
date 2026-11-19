@@ -25,6 +25,7 @@ class MemberRegistrationTest extends TestCase
             'password' => 'rahasia-anggota',
             'cluster_id' => '32',
             'nik' => '3201010101010001',
+            'nik_verified_at' => '2026-11-18T12:00:00Z',
         ]);
 
         $response->assertCreated()->assertJsonStructure(['token']);
@@ -37,6 +38,7 @@ class MemberRegistrationTest extends TestCase
         $this->assertSame('member', $user->role);
         $this->assertSame('32', $user->cluster_id);
         $this->assertSame('3201010101010001', $user->nik);
+        $this->assertNull($user->nik_verified_at);
         $this->assertFalse($user->is_verified);
         $this->assertTrue(Hash::check('rahasia-anggota', $user->password));
 

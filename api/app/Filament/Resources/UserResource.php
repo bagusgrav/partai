@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -43,6 +44,17 @@ class UserResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                TextInput::make('nik')
+                    ->label('NIK')
+                    ->disabled()
+                    ->dehydrated(false),
+                Toggle::make('nik_verified')
+                    ->label('NIK sudah diverifikasi')
+                    ->helperText('Aktifkan setelah identitas anggota dicocokkan.')
+                    ->disabled(fn (?User $record): bool => $record?->nik === null)
+                    ->afterStateHydrated(function (Toggle $component, ?User $record): void {
+                        $component->state($record?->nik_verified_at !== null);
+                    }),
             ]);
     }
 
@@ -67,6 +79,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->label('Nama'),
                 TextColumn::make('email')->label('Alamat Email'),
+                TextColumn::make('nik_verified_at')->label('NIK Diverifikasi')->dateTime(),
                 TextColumn::make('created_at')->label('Terdaftar Pada')->dateTime(),
             ])
             ->actions([

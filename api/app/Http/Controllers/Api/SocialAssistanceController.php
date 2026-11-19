@@ -17,9 +17,17 @@ class SocialAssistanceController extends Controller
             ], 422)->header('Cache-Control', 'no-store, private');
         }
 
-        $userNik = $request->user()->nik;
+        $user = $request->user();
+        $userNik = $user->nik;
 
-        if (! is_string($userNik) || ! hash_equals($userNik, $nik)) {
+        if (! is_string($userNik) || $user->nik_verified_at === null) {
+            return response()->json([
+                'message' => 'NIK belum terverifikasi.',
+                'code' => 'nik_not_verified',
+            ], 403)->header('Cache-Control', 'no-store, private');
+        }
+
+        if (! hash_equals($userNik, $nik)) {
             return response()->json([
                 'message' => 'Anda hanya dapat memeriksa NIK yang terdaftar pada akun Anda.',
             ], 403)->header('Cache-Control', 'no-store, private');

@@ -16,7 +16,10 @@ class SocialAssistanceControllerTest extends TestCase
 
     public function test_it_returns_the_program_status_and_period_for_a_registered_nik(): void
     {
-        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+        Sanctum::actingAs(User::factory()->create([
+            'nik' => '3201010101010001',
+            'nik_verified_at' => now(),
+        ]));
         SocialAssistance::query()->create([
             'nik' => '3201010101010001',
             'name' => 'Nama Rahasia',
@@ -39,7 +42,10 @@ class SocialAssistanceControllerTest extends TestCase
 
     public function test_it_returns_not_found_for_an_unregistered_nik(): void
     {
-        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+        Sanctum::actingAs(User::factory()->create([
+            'nik' => '3201010101010001',
+            'nik_verified_at' => now(),
+        ]));
 
         $this->getJson('/api/rights/check/3201010101010001')
             ->assertNotFound()
@@ -64,9 +70,34 @@ class SocialAssistanceControllerTest extends TestCase
         $this->getJson('/api/rights/check/3201010101010001')->assertUnauthorized();
     }
 
-    public function test_it_cannot_check_another_users_nik(): void
+    public function test_missing_and_unverified_niks_return_the_same_forbidden_response(): void
     {
         Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+        $unverifiedResponse = $this->getJson('/api/rights/check/3201010101010001');
+
+        Sanctum::actingAs(User::factory()->create(['nik' => null]));
+        $missingNikResponse = $this->getJson('/api/rights/check/3201010101010001');
+
+        $expected = [
+            'message' => 'NIK belum terverifikasi.',
+            'code' => 'nik_not_verified',
+        ];
+        $unverifiedResponse
+            ->assertForbidden()
+            ->assertExactJson($expected)
+            ->assertHeader('Cache-Control', 'no-store, private');
+        $missingNikResponse
+            ->assertForbidden()
+            ->assertExactJson($expected)
+            ->assertHeader('Cache-Control', 'no-store, private');
+    }
+
+    public function test_it_cannot_check_another_users_nik(): void
+    {
+        Sanctum::actingAs(User::factory()->create([
+            'nik' => '3201010101010001',
+            'nik_verified_at' => now(),
+        ]));
         SocialAssistance::query()->create([
             'nik' => '3201010101010002',
             'name' => 'Nama Rahasia',
@@ -85,7 +116,10 @@ class SocialAssistanceControllerTest extends TestCase
     public function test_it_limits_checks_to_five_requests_per_minute(): void
     {
         RateLimiter::clear('127.0.0.1');
-        Sanctum::actingAs(User::factory()->create(['nik' => '3201010101010001']));
+        Sanctum::actingAs(User::factory()->create([
+            'nik' => '3201010101010001',
+            'nik_verified_at' => now(),
+        ]));
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->getJson('/api/rights/check/3201010101010001')->assertNotFound();

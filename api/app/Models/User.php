@@ -25,6 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
     'registration_request_id',
     'role',
     'nik',
+    'nik_verified_at',
     'cluster_id',
     'is_verified',
 ])]
@@ -43,6 +44,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'nik_verified_at' => 'datetime',
             'is_verified' => 'boolean',
             'nik' => 'encrypted',
             'reputation_points' => 'integer',

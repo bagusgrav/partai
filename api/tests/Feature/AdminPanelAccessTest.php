@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\ItemResource;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Models\Item;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -76,5 +78,37 @@ class AdminPanelAccessTest extends TestCase
         $this->assertTrue(UserResource::canDelete($userRecord));
         $this->assertTrue(ItemResource::canDelete($item));
         $this->assertTrue(ItemResource::canDeleteAny());
+    }
+
+    public function test_super_admin_can_verify_an_account_nik_in_the_user_editor(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::create(['name' => 'super_admin', 'guard_name' => 'web']));
+        $this->actingAs($admin);
+
+        $member = User::factory()->create(['nik' => '3201010101010001']);
+
+        Livewire::test(EditUser::class, ['record' => $member->getRouteKey()])
+            ->fillForm(['nik_verified' => true])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertNotNull($member->fresh()->nik_verified_at);
+    }
+
+    public function test_user_editor_cannot_verify_an_account_without_a_nik(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(Role::create(['name' => 'super_admin', 'guard_name' => 'web']));
+        $this->actingAs($admin);
+
+        $member = User::factory()->create(['nik' => null]);
+
+        Livewire::test(EditUser::class, ['record' => $member->getRouteKey()])
+            ->fillForm(['nik_verified' => true])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertNull($member->fresh()->nik_verified_at);
     }
 }
