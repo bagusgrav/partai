@@ -19,6 +19,7 @@ git pull --ff-only origin main
 
 cd api
 composer install --no-dev --optimize-autoloader
+bash scripts/backup-db.sh
 php artisan migrate --force
 php artisan optimize:clear
 if python3 scripts/fetch_gini_stunting.py --check-config; then

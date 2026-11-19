@@ -195,8 +195,10 @@ sudo sebelum menjalankan.
 
 ### Rollback manual bila deployment gagal
 
-Sebelum rilis, catat commit aplikasi terakhir yang sehat dan buat backup SQLite
-yang konsisten sebelum migrasi, menggunakan prosedur di bagian database.
+Sebelum rilis, catat commit aplikasi terakhir yang sehat. Skrip deployment
+membuat dan memverifikasi backup SQLite secara otomatis sebelum migrasi.
+Untuk menjalankan backup manual dan prosedur restore terperinci, lihat
+[backup-restore.md](./backup-restore.md).
 Jika health check gagal, periksa log workflow, PHP-FPM, Nginx, dan Laravel.
 Jangan mengulang deploy sebelum penyebab kegagalan dipahami.
 
