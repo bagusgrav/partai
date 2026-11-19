@@ -153,6 +153,7 @@ Semua path API di bawah relatif terhadap prefix `/api`. Akses final dan middlewa
 | Kegiatan | `/events`, `/events/active`, `/events/{id}/qr`, `/attendance/claim`, `/attendance/pending`, `/attendance/attest` | `EventController`, `AttendanceController`, `AttendanceService` |
 | Reputasi dan tata kelola | `/reputation*`, `/reputation/contributions`, `/votes/*`, `/recall/*`, `/sortition/panels` | `ReputationService`, `VoteService`, controller domain terkait |
 | Informasi organisasi | `/contracts`, `/faqs`, `/inquiries`, `/glossary`, `/organization/*`, `/finance/*`, `/bureaucracy/*`, `/notifications` | Controller/model per domain; cek middleware role dan rate limit pada route sumber |
+| Komunitas | `/posts`, `/posts/members`, `/posts/{post}`, `/posts/{post}/report` | `PostController`, `PostReportController`, model `Post`/`PostReport`/`PostModerationLog`, panel moderasi Filament |
 
 Panel administrasi Filament menggunakan path `/admin` dan guard web di [`api/app/Providers/Filament/AdminPanelProvider.php`](../api/app/Providers/Filament/AdminPanelProvider.php). Akses panel memerlukan salah satu role `super_admin`, `pengurus`, `panelis`; hak tiap resource dapat lebih sempit.
 
@@ -211,6 +212,31 @@ erDiagram
         string title
         string status
     }
+    POSTS {
+        uuid id PK
+        uuid user_id FK
+        text body
+        string visibility
+        string status
+        string request_id UK
+        timestamp created_at
+        timestamp edited_at
+        timestamp deleted_at
+    }
+    POST_REPORTS {
+        uuid id PK
+        uuid post_id FK
+        uuid reporter_id FK
+        string reason
+        string status
+    }
+    POST_MODERATION_LOGS {
+        uuid id PK
+        uuid post_id FK
+        uuid actor_id FK
+        string action
+        text note
+    }
     SOCIAL_ASSISTANCES {
         uuid id PK
         string nik UK
@@ -226,9 +252,16 @@ erDiagram
     USERS ||--o| MEMBER_REPUTATIONS : has_profile
     USERS ||--o{ REPUTATION_LEDGERS : earns
     USERS o|--o{ FACTION_CONTRACTS : politician
+    USERS ||--o{ POSTS : writes
+    POSTS ||--o{ POST_REPORTS : receives
+    USERS ||--o{ POST_REPORTS : reports
+    POSTS ||--o{ POST_MODERATION_LOGS : moderated
+    USERS ||--o{ POST_MODERATION_LOGS : acts
 ```
 
 `SocialAssistance` tidak memiliki foreign key ke `User`; API mencari berdasarkan NIK, lalu menguji bahwa NIK request sama dengan NIK akun. Hubungan tersebut adalah lookup berbasis nilai, bukan relasi Eloquent. Model inti tambahan mencakup `CivicQuestion`/jadwal soal, esai, voting/recall, data ekonomi/wilayah, laporan birokrasi, keuangan partai, dan pengajuan kursi organisasi; lihat migrasi di [`api/database/migrations/`](../api/database/migrations/).
+
+Domain Komunitas menyimpan teks post saja dengan visibilitas `public` atau `members` (default `members`), status `published`, `hidden`, atau `deleted`, idempotensi `request_id`, dan soft delete. Feed publik membatasi hasil ke post publik berstatus published dan dapat memakai cache singkat; feed anggota hanya mengambil post anggota berstatus published dan mengirim `Cache-Control: no-store, private` serta `X-Robots-Tag: noindex, nofollow`. Konten post anggota tidak dipakai untuk metadata atau preview OG publik.
 
 ### Dua sistem reputasi
 

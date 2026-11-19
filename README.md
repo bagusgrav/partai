@@ -12,7 +12,7 @@ Platform membantu warga belajar, berpartisipasi, dan memeriksa informasi yang te
 
 ## Status dan batas klaim
 
-Audit dokumentasi ini didasarkan pada commit `a8a501af36c0e56878655a671505ed3eafe64bb5` dan kode/configuration yang ada di repository pada 19 November 2026. Keberadaan route, service, workflow, atau tes berarti tersedia di repo; hal itu **tidak membuktikan** fitur telah di-deploy, dipakai dengan data nyata, atau lulus verifikasi produksi. Worktree awal bersih; dokumen ini diperbarui berdasarkan audit repository pada commit tersebut.
+Ringkasan status umum ini didasarkan pada audit repository di commit `a8a501af36c0e56878655a671505ed3eafe64bb5` pada 19 November 2026. Baris Komunitas ditambahkan setelah implementasi dan tes fitur backend lulus. Keberadaan route, service, workflow, atau tes berarti tersedia di repo; hal itu **tidak membuktikan** fitur telah di-deploy, dipakai dengan data nyata, atau lulus verifikasi produksi.
 
 Gunakan label status berikut saat membaca peta fitur:
 
@@ -43,6 +43,7 @@ Tabel ini menunjukkan rute yang ada di frontend dan status yang bisa disimpulkan
 | Kegiatan dan reputasi | `/events`, `/events/[id]/qr`, `/events/[id]/claim`, `/events/[id]/attest`, `/reputasi` | Route UI, API event/attendance, service reputasi, dan ledger ada di kode. Sortisi ber-seed publik masih roadmap. |
 | Transparansi dan layanan | `/jemput-hak`, `/kontrak-faksi`, `/pengawasan-birokrasi`, `/tanya-jawab` | Route dan API terkait tersedia. Data bansos adalah data aplikasi, bukan keputusan resmi; validitas sumber dan deployment belum terverifikasi. |
 | Tata kelola | `/voting`, `/recall`, `/tata-kelola`, `/peta-jalan` | Ada halaman dan API untuk voting, recall, struktur/kelayakan organisasi. Sortisi yang dapat direproduksi dan beberapa mekanisme tata kelola masih roadmap. |
+| Komunitas | `/komunitas` | **Ada di kode**: feed teks publik/anggota, komposer dengan `request_id`, feed cursor-based, pelaporan, dan moderasi Filament. Tes backend fitur lulus; deployment belum diverifikasi. |
 | Akun | `/daftar`, `/auth/register`, `/masuk`, `/lupa-password`, `/reset-password`, `/profil`, `/notifikasi` | UI dan API pendaftaran, login email/password, sesi tamu, reset password, dan profil tersedia. Integrasi SSO pusat end-to-end **tidak ditemukan**. |
 
 Daftar file halaman tersedia di [`web/src/app/`](web/src/app/). Definisi endpoint kanonis berada di [`api/routes/api.php`](api/routes/api.php); ringkasan route di [docs/api-reference.md](docs/api-reference.md) perlu dibandingkan dengan file tersebut karena dapat tertinggal.

@@ -51,6 +51,19 @@ Tidak ada route SSO atau route exchange SSO dalam route API saat ini. Login emai
 
 Data “Jemput Hak” mengikuti dataset yang tersedia dan tidak menggantikan keputusan resmi penyaluran bantuan sosial.
 
+## Komunitas
+
+| Method & endpoint | Akses dan middleware | Parameter | Respons dan catatan |
+| --- | --- | --- | --- |
+| `GET /api/posts` | Publik; `throttle:60,1` | Query opsional: `cursor`, `per_page` (1–50; default 20) | Feed cursor-based berisi post berstatus `published` dengan visibilitas `public` saja; cache singkat `public, max-age=30`. |
+| `GET /api/posts/members` | Bearer; `auth:sanctum`, `throttle:60,1` | Query opsional: `cursor`, `per_page` (1–50; default 20) | Feed cursor-based berisi post berstatus `published` dengan visibilitas `members` saja; `Cache-Control: no-store, private`, `X-Robots-Tag: noindex, nofollow`. |
+| `POST /api/posts` | Bearer non-guest; `auth:sanctum`, `throttle:10,1` | JSON wajib: `request_id` (string), `body` (1–500 karakter); `visibility` opsional (`public\|members`, default `members`) | `201` untuk post baru; guest ditolak `403`; ID dan payload yang sama replay `200 already_processed`; ID yang sama dengan pemilik atau payload berbeda menghasilkan `409`. |
+| `PATCH /api/posts/{post}` | Bearer; `auth:sanctum`, `throttle:10,1`; pemilik post | Path `post` UUID; `body` dan/atau `visibility` (`public\|members`) | Memperbarui teks/visibilitas dan mengisi `edited_at`; hanya pemilik, selain itu `403`. |
+| `DELETE /api/posts/{post}` | Bearer; `auth:sanctum`, `throttle:10,1`; pemilik atau role `super_admin\|pengurus` | Path `post` UUID | Soft delete dan status internal `deleted`; respons publik tidak memuat status internal. |
+| `POST /api/posts/{post}/report` | Bearer; `auth:sanctum`, `throttle:5,1` | Path `post` UUID; JSON `reason` wajib (1–1.000 karakter) | Membuat laporan berstatus `open`; `201`. |
+
+`PostResource` hanya menampilkan ID post, teks, visibilitas, waktu pembuatan/perubahan, dan nama penulis; tidak menampilkan ID user, `request_id`, status moderasi, atau log. Konten post anggota tidak disediakan melalui endpoint publik dan tidak masuk metadata/preview OG publik. Moderasi post dan pemeriksaan laporan dilakukan melalui Filament bagi role `super_admin` atau `pengurus`, dengan audit trail pada `post_moderation_logs`.
+
 ## Organisasi
 
 | Method & endpoint | Akses | Parameter | Respons utama |
