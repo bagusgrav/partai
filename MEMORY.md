@@ -66,6 +66,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-20 — Tangga poin reputasi di halaman Panduan**
+  - **Perubahan:** menambahkan tangga level anggota dari Warga Baru hingga Pengawal Demokrasi, berdasarkan total poin reputasi.
+  - **Bukti:** commit `e6a3e47` (`docs(ui): tambah tangga poin reputasi di halaman panduan`); `web/src/components/features/guide/GuidePage.tsx`.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** selaraskan rentang level pada halaman Panduan jika aturan poin reputasi berubah.
 - **2026-11-20 — Seeding 100 soal Civic Education Fase 1 ke VPS produksi**
   - **Perubahan:** 100 soal Civic Education Fase 1 berhasil di-seed ke database VPS produksi.
   - **Bukti:** commit `9e1364d` (seeder update); seeder dijalankan manual di server dengan sukses, output `DONE`.
@@ -89,10 +94,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** mencatat keberhasilan seeding 100 soal Civic Education Fase 1 ke database VPS produksi.
-- **Bukti:** commit `9e1364d`; seeder dijalankan manual di server dengan sukses, output `DONE`.
-- **Status:** 100 soal Civic Education Fase 1 — status: selesai / berhasil di-seed ke produksi — bukti: commit `9e1364d` dan output server `DONE`.
+- **Dikerjakan:** mencatat penambahan tangga poin reputasi di halaman Panduan.
+- **Bukti:** commit `e6a3e47`; `web/src/components/features/guide/GuidePage.tsx`.
+- **Status:** tangga poin reputasi halaman Panduan — status: selesai — bukti: commit `e6a3e47`.
 - **Dokumen .md Diperbarui:** `MEMORY.md`.
-- **Belum Selesai / Langkah Berikutnya:** verifikasi soal tampil pada alur kuis produksi.
+- **Belum Selesai / Langkah Berikutnya:** selaraskan rentang level pada halaman Panduan jika aturan poin reputasi berubah.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
