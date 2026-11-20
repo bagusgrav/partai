@@ -9,6 +9,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 - [x] Database SQLite WAL (Zero-RAM) + Indeks Majemuk.
 - [x] API Idempoten (`request_id`) & SM-2 Algorithm.
 - [x] Pendaftaran anggota resmi dengan token Sanctum dan halaman profil.
+- [x] **Data Wilayah Pendaftaran Anggota:** Mendukung 38 Provinsi dan 514 Kabupaten/Kota pada proses pendaftaran. *Status: Terverifikasi berjalan di produksi per 20 Nov 2026.*
 - [x] UI Kuis Dasar + `fetchWithRetry`.
 - [x] Panel Admin Filament (Kelola Soal & User).
 
