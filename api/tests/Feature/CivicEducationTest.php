@@ -63,19 +63,20 @@ class CivicEducationTest extends TestCase
     public function test_correct_member_answer_adds_mastery_once_even_for_later_reviews(): void
     {
         $user = User::factory()->create(['role' => 'member']);
-        $question = $this->createQuestion();
+        $question = $this->createQuestion(['correct_option' => 'B']);
         Sanctum::actingAs($user);
         $requestId = (string) Str::uuid();
         $payload = [
             'request_id' => $requestId,
             'question_id' => $question->id,
-            'selected_option' => 'A',
+            'selected_option' => 'B',
             'confidence' => 'yakin',
         ];
 
         $this->postJson('/api/education/answers', $payload)
             ->assertOk()
             ->assertJsonPath('correct', true)
+            ->assertJsonPath('correct_option', 'B')
             ->assertJsonPath('mastery_awarded', true)
             ->assertJsonPath('points_delta', 5)
             ->assertJsonPath('updated_reputation.mastery_scores.hak_konstitusional', 5);

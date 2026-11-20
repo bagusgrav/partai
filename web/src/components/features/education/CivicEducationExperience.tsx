@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -40,8 +40,12 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Terjadi kesalahan saat memuat materi.";
 }
 
+function formatRelativeReviewDate(value: string): string {
+  const daysUntilReview = Math.round((new Date(value).getTime() - Date.now()) / 86_400_000);
+  return new Intl.RelativeTimeFormat("id-ID", { numeric: "auto" }).format(daysUntilReview, "day");
+}
+
 export default function CivicEducationExperience() {
-  const arenaRef = useRef<HTMLElement>(null);
   const [overview, setOverview] = useState<EducationOverview | null>(null);
   const [user, setUser] = useState<RegisteredUser | null>(null);
   const [sessionQuestions, setSessionQuestions] = useState<CivicQuestion[]>([]);
@@ -105,10 +109,9 @@ export default function CivicEducationExperience() {
     (total, domain) => total + (overview?.distribution[domain]?.count ?? 0),
     0,
   );
-
-  function startPractice(): void {
-    arenaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const activeFactionContracts = context?.active_faction_contracts ?? 0;
+  const answerIsCorrect =
+    answer !== null && selectedOption === answer.correct_option;
 
   async function submitAnswer(): Promise<void> {
     if (!question || !selectedOption || answer || submitting) return;
@@ -195,21 +198,26 @@ export default function CivicEducationExperience() {
                   <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">
                     Latihan ini menghubungkan prinsip konstitusi dengan pengawasan publik atas kebijakan dan komitmen yang dapat diperiksa.
                   </p>
-                  <button
+                  <Link
                     className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-5 text-sm font-bold text-slate-950 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    onClick={startPractice}
-                    type="button"
+                    href="/belajar#practice"
                   >
                     Mulai latihan cepat <ArrowRight aria-hidden="true" className="size-4" />
-                  </button>
+                  </Link>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-5">
                   <p className="text-sm font-bold text-white">Konteks pengawasan publik</p>
                   <div className="mt-4 flex items-center justify-between gap-3 border-b border-white/10 pb-4">
                     <span className="text-sm text-slate-300">Kontrak Faksi berjalan</span>
-                    <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold">
-                      {context?.active_faction_contracts ?? 0}
-                    </span>
+                    {activeFactionContracts > 0 ? (
+                      <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold">
+                        {activeFactionContracts}
+                      </span>
+                    ) : (
+                      <span className="text-right text-sm font-semibold text-slate-200">
+                        Belum ada kontrak faksi aktif
+                      </span>
+                    )}
                   </div>
                   <div className="pt-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -281,7 +289,7 @@ export default function CivicEducationExperience() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="font-bold">{DOMAIN_LABELS[domain]}</h3>
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-slate-700">
                             {domainOverview.count} materi tersedia
                           </p>
                         </div>
@@ -316,7 +324,7 @@ export default function CivicEducationExperience() {
             <section
               aria-labelledby="practice-title"
               className="mt-10 scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
-              ref={arenaRef}
+              id="practice"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -419,16 +427,16 @@ export default function CivicEducationExperience() {
                     </div>
                   ) : (
                     <div className="mt-6 space-y-4">
-                      <p className={`font-bold ${answer.correct ? "text-emerald-800" : "text-amber-800"}`}>
-                        {answer.correct ? "Tepat." : "Belum tepat."}
+                      <p className={`font-bold ${answerIsCorrect ? "text-emerald-800" : "text-amber-800"}`}>
+                        {answerIsCorrect ? "Tepat." : "Belum tepat."}
                         {answer.mastery_awarded && ` +${answer.points_delta} Mastery Score`}
                       </p>
-                      <div className="rounded-2xl border-l-4 border-slate-800 bg-slate-50 p-5">
+                      <div className="rounded-2xl border-l-4 border-slate-800 bg-slate-50 p-5 leading-relaxed">
                         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-600">
                           <ShieldCheck aria-hidden="true" className="size-4" />
                           Sitasi hukum primer
                         </p>
-                        <p className="mt-2 font-semibold leading-6">{answer.source_citation}</p>
+                        <p className="mt-2 font-semibold">{answer.source_citation}</p>
                         {answer.source_url && (
                           <a
                             className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-slate-700 underline underline-offset-2"
@@ -439,26 +447,25 @@ export default function CivicEducationExperience() {
                             Buka rujukan resmi <ExternalLink aria-hidden="true" className="size-3.5" />
                           </a>
                         )}
-                        <p className="mt-3 text-sm leading-6 text-slate-700">{answer.explanation}</p>
+                        <p className="mt-3 text-sm text-slate-700">{answer.explanation}</p>
                       </div>
                       {isMember && (
                         <p className="flex items-center gap-2 text-sm text-slate-600">
                           <RotateCcw aria-hidden="true" className="size-4" />
                           Ulas kembali {answer.next_review_at
-                            ? new Date(answer.next_review_at).toLocaleString("id-ID", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })
+                            ? formatRelativeReviewDate(answer.next_review_at)
                             : "sesuai jadwal berikutnya"}
                         </p>
                       )}
-                      <button
-                        className="min-h-11 rounded-lg border border-slate-300 px-5 text-sm font-bold text-slate-800 transition hover:bg-slate-100"
-                        onClick={showNextQuestion}
-                        type="button"
-                      >
-                        Soal berikutnya
-                      </button>
+                      <div className="flex justify-end">
+                        <button
+                          className="min-h-11 rounded-lg border border-slate-300 px-5 text-sm font-bold text-slate-800 transition hover:bg-slate-100"
+                          onClick={showNextQuestion}
+                          type="button"
+                        >
+                          Soal berikutnya
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
