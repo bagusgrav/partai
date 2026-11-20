@@ -181,6 +181,7 @@ const mockApiResponses: Record<
   },
   "GET /api/votes/active": {
     body: {
+      can_vote: true,
       votes: [
         {
           id: 1,
@@ -188,6 +189,7 @@ const mockApiResponses: Record<
           description: "Pilih warna favorit.",
           starts_at: "2026-01-01T00:00:00.000000Z",
           ends_at: "2099-01-01T00:00:00.000000Z",
+          has_voted: false,
           vote_options: [
             { id: 1, option_text: "Biru" },
             { id: 2, option_text: "Merah" },
@@ -377,15 +379,125 @@ test("kuis menampilkan tombol lanjut setelah jawaban dikirim", async ({ page }) 
   await expect(page.getByRole("button", { name: "Lanjut" })).toBeVisible();
 });
 
-test("voting menampilkan konfirmasi setelah suara dikirim", async ({ page }) => {
+test("voting meminta konfirmasi dan menampilkan hasil setelah suara dikirim", async ({ page }) => {
+  let hasVoted = false;
+  let submissionPayload:
+    | { vote_id: number; vote_option_id: number; request_id: string }
+    | undefined;
+
+  await page.route("http://127.0.0.1:8000/api/votes/active", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        can_vote: true,
+        votes: [
+          {
+            id: 1,
+            title: "Pilih warna",
+            description: "Pilih warna favorit.",
+            starts_at: "2026-01-01T00:00:00.000000Z",
+            ends_at: "2099-01-01T00:00:00.000000Z",
+            has_voted: hasVoted,
+            vote_options: [
+              { id: 1, option_text: "Biru", ...(hasVoted ? { votes_count: 1 } : {}) },
+              { id: 2, option_text: "Merah", ...(hasVoted ? { votes_count: 0 } : {}) },
+            ],
+          },
+        ],
+      }),
+    });
+  });
+  await page.route("http://127.0.0.1:8000/api/votes/submit", async (route) => {
+    submissionPayload = route.request().postDataJSON();
+    hasVoted = true;
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "processed", data: { submission_id: 1 } }),
+    });
+  });
+
   await page.goto("/voting");
 
   await page.getByLabel("Biru").check();
-  await page.getByRole("button", { name: "Kirim Suara" }).click();
+  await page.getByRole("button", { name: "Tinjau Pilihan" }).click();
+  await expect(page.getByText("Konfirmasi pilihan Anda")).toBeVisible();
+  expect(submissionPayload).toBeUndefined();
+
+  await page.getByRole("button", { name: "Konfirmasi dan Kirim Suara" }).click();
 
   await expect(
-    page.getByText("Terima kasih, suara Anda telah dicatat."),
+    page.getByText("Anda sudah memilih. Terima kasih atas partisipasi Anda."),
   ).toBeVisible();
+  await expect(page.getByText("1 suara masuk")).toBeVisible();
+  await expect(page.getByText("1 suara (100%)")).toBeVisible();
+  expect(submissionPayload).toMatchObject({ vote_id: 1, vote_option_id: 1 });
+  expect(submissionPayload?.request_id).toMatch(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+  );
+});
+
+test("voting menampilkan status dan hasil ketika pengguna sudah memilih", async ({ page }) => {
+  await page.route("http://127.0.0.1:8000/api/votes/active", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        can_vote: true,
+        votes: [
+          {
+            id: 1,
+            title: "Pilih warna",
+            description: "Pilih warna favorit.",
+            starts_at: "2026-01-01T00:00:00.000000Z",
+            ends_at: "2099-01-01T00:00:00.000000Z",
+            has_voted: true,
+            vote_options: [
+              { id: 1, option_text: "Biru", votes_count: 1 },
+              { id: 2, option_text: "Merah", votes_count: 0 },
+            ],
+          },
+        ],
+      }),
+    });
+  });
+
+  await page.goto("/voting");
+
+  await expect(
+    page.getByText("Anda sudah memilih. Terima kasih atas partisipasi Anda."),
+  ).toBeVisible();
+  await expect(page.getByText("1 suara (100%)")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tinjau Pilihan" })).toHaveCount(0);
+});
+
+test("voting menolak akun yang bukan anggota terverifikasi", async ({ page }) => {
+  await page.route("http://127.0.0.1:8000/api/votes/active", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({
+        can_vote: false,
+        votes: [
+          {
+            id: 1,
+            title: "Pilih warna",
+            description: "Pilih warna favorit.",
+            starts_at: "2026-01-01T00:00:00.000000Z",
+            ends_at: "2099-01-01T00:00:00.000000Z",
+            has_voted: false,
+            vote_options: [{ id: 1, option_text: "Biru" }],
+          },
+        ],
+      }),
+    });
+  });
+
+  await page.goto("/voting");
+
+  await expect(page.getByRole("status")).toContainText(
+    "Voting hanya tersedia bagi anggota terverifikasi.",
+  );
+  await expect(page.getByLabel("Biru")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Tinjau Pilihan" })).toBeDisabled();
 });
 
 test("tata kelola menampilkan recall aktif dan menerima pengajuan serta suara", async ({ page }) => {

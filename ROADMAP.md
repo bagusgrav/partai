@@ -40,7 +40,7 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 ## 🟣 FASE 4: TATA KELOLA PARTAI (GOVERNANCE & RECALL)
 *Tujuan: Mencegah dinasti, korupsi internal, dan membangun demokrasi partai.*
 - [x] **Komunitas (eksperimen MVP, kode dan tes):** Microblog teks dengan feed cursor-based, visibilitas publik/anggota, pelaporan, moderasi, dan rate limit; tes backend terfokus lulus. Deployment, validasi operasional, dan keputusan perluasan tetap roadmap.
-- [ ] **Voting Parameter & Kebijakan:** Anggota bisa memilih perubahan parameter atau agenda partai.
+- [x] **Voting Parameter & Kebijakan:** UI daftar voting aktif, konfirmasi pilihan, satu suara idempoten untuk anggota terverifikasi, status partisipasi, dan hasil agregat setelah memilih; implementasi kode lokal, belum klaim deployment.
 - [x] **Panel Audit (Sortisi):** Pemilihan acak hingga lima anggota terverifikasi dengan `overall_mastery_level >= 4`.
 - [ ] **Sortisi Ber-seed Publik:** Publikasi seed dan snapshot kelayakan agar pengundian dapat direproduksi tanpa membuka data pribadi.
 - [ ] **Panel Etik & Editorial:** Pemilihan acak anggota untuk Panel Etik dan Panel Editorial.

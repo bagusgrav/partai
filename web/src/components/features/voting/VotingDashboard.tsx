@@ -15,6 +15,7 @@ export default function VotingDashboard() {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [submittingVotes, setSubmittingVotes] = useState<Record<number, boolean>>({});
   const [submittedVotes, setSubmittedVotes] = useState<Record<number, boolean>>({});
+  const [canVote, setCanVote] = useState(false);
   const [submissionErrors, setSubmissionErrors] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export default function VotingDashboard() {
     try {
       const response = await getActiveVotes();
       setVotes(response.votes);
+      setCanVote(response.can_vote);
     } catch (loadError) {
       setError(getErrorMessage(loadError));
     } finally {
@@ -38,9 +40,10 @@ export default function VotingDashboard() {
     let active = true;
 
     getActiveVotes()
-      .then(({ votes: activeVotes }) => {
+      .then((response) => {
         if (active) {
-          setVotes(activeVotes);
+          setVotes(response.votes);
+          setCanVote(response.can_vote);
         }
       })
       .catch((loadError: unknown) => {
@@ -77,11 +80,34 @@ export default function VotingDashboard() {
     try {
       await submitVote(vote.id, optionId, requestId);
       setSubmittedVotes((current) => ({ ...current, [vote.id]: true }));
+
+      try {
+        const response = await getActiveVotes();
+        setVotes(response.votes);
+        setCanVote(response.can_vote);
+      } catch (refreshError) {
+        setSubmissionErrors((current) => ({
+          ...current,
+          [vote.id]: `Suara tercatat, tetapi hasil gagal dimuat: ${getErrorMessage(refreshError)}`,
+        }));
+      }
     } catch (submitError) {
-      setSubmissionErrors((current) => ({
-        ...current,
-        [vote.id]: getErrorMessage(submitError),
-      }));
+      let message = getErrorMessage(submitError);
+
+      try {
+        const response = await getActiveVotes();
+        setVotes(response.votes);
+        setCanVote(response.can_vote);
+
+        if (response.votes.some((activeVote) => activeVote.id === vote.id && activeVote.has_voted)) {
+          setSubmissionErrors((current) => ({ ...current, [vote.id]: "" }));
+          return;
+        }
+      } catch (refreshError) {
+        message = `${message} Status suara belum dapat diperiksa: ${getErrorMessage(refreshError)}`;
+      }
+
+      setSubmissionErrors((current) => ({ ...current, [vote.id]: message }));
     } finally {
       setSubmittingVotes((current) => ({ ...current, [vote.id]: false }));
     }
@@ -95,7 +121,9 @@ export default function VotingDashboard() {
             <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-900">
               Tata Kelola Partai
             </p>
-            <h1 className="mt-1 text-2xl font-extrabold text-slate-900">Voting</h1>
+            <h1 className="mt-1 text-2xl font-extrabold text-slate-900">
+              Voting Parameter &amp; Kebijakan
+            </h1>
           </div>
           <Link
             className="text-sm font-bold text-slate-900 underline decoration-slate-400 underline-offset-4 hover:text-slate-700"
@@ -128,8 +156,9 @@ export default function VotingDashboard() {
           ) : (
             votes.map((vote) => (
               <VoteCard
+                canVote={canVote}
                 isRequestLocked={requestIds.current[vote.id] !== undefined}
-                isSubmitted={submittedVotes[vote.id] ?? false}
+                isSubmitted={vote.has_voted || submittedVotes[vote.id] || false}
                 isSubmitting={submittingVotes[vote.id] ?? false}
                 key={vote.id}
                 onSelectOption={(optionId) =>

@@ -26,15 +26,51 @@ class VoteControllerTest extends TestCase
 
         $this->getJson('/api/votes/active')
             ->assertOk()
+            ->assertJsonPath('can_vote', false)
             ->assertJsonCount(1, 'votes')
             ->assertJsonPath('votes.0.id', $activeVoteId)
             ->assertJsonPath('votes.0.vote_options.0.option_text', 'Biru')
             ->assertJsonPath('votes.0.vote_options.1.option_text', 'Merah');
     }
 
+    public function test_active_votes_show_aggregated_results_only_after_the_user_has_voted(): void
+    {
+        $user = $this->activeMember();
+        Sanctum::actingAs($user);
+        $voteId = $this->createVote();
+        $firstOptionId = $this->createVoteOption($voteId, 'Biru');
+        $secondOptionId = $this->createVoteOption($voteId, 'Merah');
+
+        $this->getJson('/api/votes/active')
+            ->assertOk()
+            ->assertJsonPath('can_vote', true)
+            ->assertJsonPath('votes.0.has_voted', false)
+            ->assertJsonMissingPath('votes.0.vote_options.0.votes_count');
+
+        $this->postJson('/api/votes/submit', [
+            'vote_id' => $voteId,
+            'vote_option_id' => $firstOptionId,
+            'request_id' => '593b8b34-5e85-427e-b979-39eb7f3e7a02',
+        ])->assertCreated();
+
+        $this->getJson('/api/votes/active')
+            ->assertOk()
+            ->assertJsonPath('votes.0.has_voted', true)
+            ->assertJsonPath('votes.0.vote_options.0.votes_count', 1)
+            ->assertJsonPath('votes.0.vote_options.1.votes_count', 0);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $this->getJson('/api/votes/active')
+            ->assertOk()
+            ->assertJsonPath('can_vote', false)
+            ->assertJsonPath('votes.0.has_voted', false)
+            ->assertJsonMissingPath('votes.0.vote_options.0.votes_count');
+    }
+
     public function test_valid_vote_is_recorded_once_and_request_id_replay_returns_the_same_submission(): void
     {
-        $user = User::factory()->create();
+        $user = $this->activeMember();
         Sanctum::actingAs($user);
         $voteId = $this->createVote();
         $firstOptionId = $this->createVoteOption($voteId, 'Biru');
@@ -74,7 +110,7 @@ class VoteControllerTest extends TestCase
 
     public function test_returns_409_when_a_user_submits_more_than_one_vote(): void
     {
-        $user = User::factory()->create();
+        $user = $this->activeMember();
         Sanctum::actingAs($user);
         $voteId = $this->createVote();
         $optionId = $this->createVoteOption($voteId, 'Biru');
@@ -96,7 +132,7 @@ class VoteControllerTest extends TestCase
 
     public function test_returns_422_when_vote_is_inactive_or_option_belongs_to_another_vote(): void
     {
-        $user = User::factory()->create();
+        $user = $this->activeMember();
         Sanctum::actingAs($user);
         $inactiveVoteId = $this->createVote(['status' => 'completed']);
         $inactiveOptionId = $this->createVoteOption($inactiveVoteId, 'Biru');
@@ -119,6 +155,30 @@ class VoteControllerTest extends TestCase
 
         $this->assertDatabaseCount('vote_submissions', 0);
         $this->assertDatabaseHas('vote_options', ['id' => $inactiveOptionId, 'votes_count' => 0]);
+    }
+
+    public function test_only_verified_members_can_submit_votes(): void
+    {
+        $voteId = $this->createVote();
+        $optionId = $this->createVoteOption($voteId, 'Biru');
+
+        foreach ([
+            User::factory()->create(),
+            User::factory()->create(['role' => 'member', 'is_verified' => false]),
+            User::factory()->create(['role' => 'super_admin', 'is_verified' => true]),
+        ] as $user) {
+            Sanctum::actingAs($user);
+
+            $this->postJson('/api/votes/submit', [
+                'vote_id' => $voteId,
+                'vote_option_id' => $optionId,
+                'request_id' => '593b8b34-5e85-427e-b979-39eb7f3e7a02',
+            ])
+                ->assertForbidden()
+                ->assertJsonPath('message', 'Hanya anggota terverifikasi yang dapat memilih.');
+        }
+
+        $this->assertDatabaseCount('vote_submissions', 0);
     }
 
     public function test_vote_routes_return_401_when_user_is_unauthenticated(): void
@@ -152,6 +212,14 @@ class VoteControllerTest extends TestCase
             'votes_count' => 0,
             'created_at' => now(),
             'updated_at' => now(),
+        ]);
+    }
+
+    private function activeMember(): User
+    {
+        return User::factory()->create([
+            'role' => 'member',
+            'is_verified' => true,
         ]);
     }
 }

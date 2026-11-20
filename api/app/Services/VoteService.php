@@ -12,7 +12,7 @@ class VoteService
     /**
      * @return array{votes: Collection<int, array<string, mixed>>}
      */
-    public function active(): array
+    public function active(string $userId): array
     {
         $now = now();
         $votes = DB::table('votes')
@@ -22,27 +22,47 @@ class VoteService
             ->orderBy('starts_at')
             ->get(['id', 'title', 'description', 'starts_at', 'ends_at']);
 
+        $submittedVoteIds = DB::table('vote_submissions')
+            ->whereIn('vote_id', $votes->pluck('id'))
+            ->where('user_id', $userId)
+            ->pluck('vote_id')
+            ->map(fn (int|string $voteId): int => (int) $voteId)
+            ->flip();
+
         $optionsByVote = DB::table('vote_options')
             ->whereIn('vote_id', $votes->pluck('id'))
             ->orderBy('id')
-            ->get(['id', 'vote_id', 'option_text'])
+            ->get(['id', 'vote_id', 'option_text', 'votes_count'])
             ->groupBy('vote_id');
 
         return [
-            'votes' => $votes->map(fn (object $vote): array => [
-                'id' => (int) $vote->id,
-                'title' => $vote->title,
-                'description' => $vote->description,
-                'starts_at' => $vote->starts_at,
-                'ends_at' => $vote->ends_at,
-                'vote_options' => $optionsByVote
-                    ->get($vote->id, collect())
-                    ->map(fn (object $option): array => [
-                        'id' => (int) $option->id,
-                        'option_text' => $option->option_text,
-                    ])
-                    ->values(),
-            ])->values(),
+            'votes' => $votes->map(function (object $vote) use ($optionsByVote, $submittedVoteIds): array {
+                $hasVoted = $submittedVoteIds->has((int) $vote->id);
+
+                return [
+                    'id' => (int) $vote->id,
+                    'title' => $vote->title,
+                    'description' => $vote->description,
+                    'starts_at' => $vote->starts_at,
+                    'ends_at' => $vote->ends_at,
+                    'has_voted' => $hasVoted,
+                    'vote_options' => $optionsByVote
+                        ->get($vote->id, collect())
+                        ->map(function (object $option) use ($hasVoted): array {
+                            $result = [
+                                'id' => (int) $option->id,
+                                'option_text' => $option->option_text,
+                            ];
+
+                            if ($hasVoted) {
+                                $result['votes_count'] = (int) $option->votes_count;
+                            }
+
+                            return $result;
+                        })
+                        ->values(),
+                ];
+            })->values(),
         ];
     }
 

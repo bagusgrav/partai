@@ -80,6 +80,7 @@ export interface ActiveEventsResponse {
 export interface VoteOption {
   id: number;
   option_text: string;
+  votes_count?: number;
 }
 
 export interface ActiveVote {
@@ -88,10 +89,12 @@ export interface ActiveVote {
   description: string;
   starts_at: string;
   ends_at: string;
+  has_voted: boolean;
   vote_options: VoteOption[];
 }
 
 export interface ActiveVotesResponse {
+  can_vote: boolean;
   votes: ActiveVote[];
 }
 

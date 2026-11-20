@@ -24,6 +24,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 ## 3. Sudah Selesai
 
+- **Voting Parameter & Kebijakan** — status: selesai pada implementasi lokal, bukan deployment — bukti: `web/src/components/features/voting/VotingDashboard.tsx`, `web/src/components/features/voting/VoteCard.tsx`, `api/app/Services/VoteService.php`, `api/tests/Feature/Api/VoteControllerTest.php`; seluruh tes Laravel dan Playwright voting lulus.
 - **Refaktor `rights/check` tanpa `{nik}` di path URL** — commit `afd85c0` (`fix(security): remove NIK from URL path and use authenticated session`). Bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/SocialAssistanceController.php`, `api/tests/Feature/Api/SocialAssistanceControllerTest.php`, `docs/api-reference.md`, dan `docs/architecture.md`.
 - **Sinkronisasi API reference dengan 66 route efektif** — commit `edb2333` (`docs(api): sinkronkan api-reference dengan 66 route efektif`). Bukti dokumentasi: `docs/api-reference.md`; daftar route implementasi: `api/routes/api.php`.
 - **100 soal Belajar Harian Civic Education (Fase 1)** — status: selesai / berhasil di-seed ke database VPS produksi — bukti: commit `9e1364d` (seeder update), `api/database/seeders/CivicQuestionSeeder.php`, dan eksekusi manual seeder di server dengan output `DONE`.
@@ -52,6 +53,12 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 6. ADR
 
+### ADR-20261120-01: Voting hanya untuk anggota terverifikasi dan tally terlindungi
+
+- **Konteks:** `auth:sanctum` juga mengizinkan akun tamu, sedangkan pemilihan kebijakan ditujukan untuk anggota; tally sebelum pemilih memberikan suara dapat memengaruhi pilihan.
+- **Keputusan:** submit mensyaratkan `role=member` dan `is_verified=true`; `GET /api/votes/active` mengembalikan `can_vote` dan `has_voted`; `votes_count` hanya dikirim setelah pemanggil memilih. Tidak diperlukan perubahan skema.
+- **Konsekuensi:** akun lain tetap dapat melihat daftar, tetapi kontrol voting dinonaktifkan dan submit ditolak `403`; hasil agregat tidak membuka pilihan individual.
+
 ### ADR-001: `docs/architecture.md` adalah arsitektur kanonis
 
 - **Keputusan:** blueprint lengkap dipelihara hanya di `docs/architecture.md`; `ARCHITECTURE.md` di root menjadi stub pointer 3 baris.
@@ -66,6 +73,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-20 — Voting Parameter & Kebijakan (Fase 4)**
+  - **Perubahan:** melengkapi halaman voting aktif dengan opsi, konfirmasi sebelum submit, `request_id` UUID idempoten, eligibility anggota terverifikasi, status sudah memilih, dan tally agregat setelah pilihan tercatat. API menggunakan skema yang ada; tidak ada migrasi.
+  - **Bukti:** `api/tests/Feature/Api/VoteControllerTest.php` (182 tes backend keseluruhan lulus); tiga tes Playwright voting, `npm run lint`, dan `npm run build` lulus. Belum diverifikasi di staging/produksi.
+  - **Dokumen Diperbarui:** `MEMORY.md`, `ROADMAP.md`, `docs/api-reference.md`.
+  - **Langkah Berikutnya:** lakukan smoke test voting di staging setelah data voting aktif disiapkan.
 - **2026-11-20 — Tangga poin reputasi di halaman Panduan**
   - **Perubahan:** menambahkan tangga level anggota dari Warga Baru hingga Pengawal Demokrasi, berdasarkan total poin reputasi.
   - **Bukti:** commit `e6a3e47` (`docs(ui): tambah tangga poin reputasi di halaman panduan`); `web/src/components/features/guide/GuidePage.tsx`.
@@ -94,10 +106,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** mencatat penambahan tangga poin reputasi di halaman Panduan.
-- **Bukti:** commit `e6a3e47`; `web/src/components/features/guide/GuidePage.tsx`.
-- **Status:** tangga poin reputasi halaman Panduan — status: selesai — bukti: commit `e6a3e47`.
-- **Dokumen .md Diperbarui:** `MEMORY.md`.
-- **Belum Selesai / Langkah Berikutnya:** selaraskan rentang level pada halaman Panduan jika aturan poin reputasi berubah.
+- **Dikerjakan:** implementasi lokal UI dan alur Backend Voting Parameter & Kebijakan, beserta tes API/frontend dan pembaruan dokumen. Tidak ada commit atau push.
+- **Bukti:** `api/tests/Feature/Api/VoteControllerTest.php` — 182 tes Laravel lulus; 3 tes Playwright voting lulus; `npm run lint` dan `npm run build` lulus.
+- **Status:** voting aktif, hanya anggota terverifikasi dapat submit, submit idempoten, status pemilih, dan tally setelah memilih — status: selesai lokal — bukti: file layanan/controller, komponen voting, dan tes tercantum di atas.
+- **Dokumen .md Diperbarui:** `MEMORY.md`, `ROADMAP.md`, `docs/api-reference.md`.
+- **Belum Selesai / Langkah Berikutnya:** siapkan voting aktif dan lakukan smoke test alur di staging; implementasi ini belum diverifikasi/deploy di lingkungan tersebut.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
