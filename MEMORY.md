@@ -126,3 +126,13 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - **Belum Selesai / Langkah Berikutnya:** verifikasi perubahan di staging/produksi.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
+### Voting Security Fix (Verified)
+- **Tanggal:** 20 November 2026
+- **Konteks:** Menutup celah keamanan di mana sesi tamu (*guest*) dapat mengirim suara.
+- **Keputusan (Invariant):** 
+  - Fitur voting **wajib** mensyaratkan pengguna terautentikasi dan terverifikasi (`can_vote: true`).
+  - API (`VoteController`) menolak request dari tamu dengan `403 Forbidden`.
+  - UI (`VotingDashboard`) wajib menonaktifkan opsi pilihan dan menampilkan pesan: *"Voting hanya tersedia bagi anggota terverifikasi"* jika `can_vote` bernilai *false*.
+- **Bukti Verifikasi:**
+  - Automated: PHPUnit `VoteControllerTest` (8 passed), Playwright guest-voting E2E (1 passed), ESLint (passed).
+  - Manual: Smoke test di produksi (Member "Fefi" sukses mencoblos, Guest terblokir di UI & tidak bisa klik).
