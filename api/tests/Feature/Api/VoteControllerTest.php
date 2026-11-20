@@ -181,6 +181,34 @@ class VoteControllerTest extends TestCase
         $this->assertDatabaseCount('vote_submissions', 0);
     }
 
+    public function test_guest_accounts_cannot_submit_votes(): void
+    {
+        $voteId = $this->createVote();
+        $optionId = $this->createVoteOption($voteId, 'Biru');
+
+        foreach ([
+            User::factory()->create([
+                'role' => 'guest',
+                'is_verified' => true,
+            ]),
+            User::factory()->create([
+                'email' => 'guest_tester@partai.id',
+                'role' => 'member',
+                'is_verified' => true,
+            ]),
+        ] as $user) {
+            Sanctum::actingAs($user);
+
+            $this->postJson('/api/votes/submit', [
+                'vote_id' => $voteId,
+                'vote_option_id' => $optionId,
+                'request_id' => '593b8b34-5e85-427e-b979-39eb7f3e7a02',
+            ])->assertForbidden();
+        }
+
+        $this->assertDatabaseCount('vote_submissions', 0);
+    }
+
     public function test_vote_routes_return_401_when_user_is_unauthenticated(): void
     {
         $this->getJson('/api/votes/active')->assertUnauthorized();

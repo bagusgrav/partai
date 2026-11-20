@@ -32,6 +32,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 - **Perbaikan CI/CD deployment API** — status: selesai — commit `5d6f9ff` (`fix(ci): add sleep and ignore health check failure to prevent false negatives`) dan fix/final deployment di rantai commit perbaikan port. Bukti: `.github/workflows/deploy-api.yml`, `api/deploy.sh`, serta penanganan SQLite, direktori Storage, `APP_KEY`, port health check, dan pengecekan `/up`.
 - **Dokumentasi Komunitas** — commit `a7b2da9` (`docs(community): dokumentasikan domain Komunitas dan batas visibilitas`). Bukti: `docs/architecture.md`, `docs/api-reference.md`, `README.md`, dan `ROADMAP.md`.
 - **Perapian UI Admin Filament** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Providers/Filament/AdminPanelProvider.php`, resource Filament, `api/app/Filament/Widgets/AdminStatsOverview.php`, `api/public/partai-favicon.svg`, dan `api/tests/Feature/AdminStatsOverviewTest.php`.
+- **Penolakan hak suara akun tamu** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Http/Controllers/Api/VoteController.php`, `api/app/Http/Controllers/Api/AuthController.php`, dan tes vote/guest session.
 
 ## 4. Sedang Dikerjakan
 
@@ -57,8 +58,8 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ### ADR-20261120-01: Voting hanya untuk anggota terverifikasi dan tally terlindungi
 
-- **Konteks:** `auth:sanctum` juga mengizinkan akun tamu, sedangkan pemilihan kebijakan ditujukan untuk anggota; tally sebelum pemilih memberikan suara dapat memengaruhi pilihan.
-- **Keputusan:** submit mensyaratkan `role=member` dan `is_verified=true`; `GET /api/votes/active` mengembalikan `can_vote` dan `has_voted`; `votes_count` hanya dikirim setelah pemanggil memilih. Tidak diperlukan perubahan skema.
+- **Konteks:** `auth:sanctum` juga mengizinkan akun tamu, sedangkan pemilihan kebijakan ditujukan untuk anggota; tamu dapat memiliki email berawalan `guest_`.
+- **Keputusan:** submit mensyaratkan `role=member`, `is_verified=true`, dan email yang tidak berawalan `guest_`; pembuatan akun tamu menetapkan `role=guest` dan `is_verified=false`. `GET /api/votes/active` mengembalikan `can_vote` dan `has_voted`; `votes_count` hanya dikirim setelah pemanggil memilih. Tidak diperlukan perubahan skema.
 - **Konsekuensi:** akun lain tetap dapat melihat daftar, tetapi kontrol voting dinonaktifkan dan submit ditolak `403`; hasil agregat tidak membuka pilihan individual.
 
 ### ADR-001: `docs/architecture.md` adalah arsitektur kanonis
@@ -75,6 +76,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-20 — Perbaikan keamanan hak suara akun tamu**
+  - **Perubahan:** menetapkan role dan status verifikasi guest secara eksplisit; eligibility voting menolak email `guest_`; menambahkan tes submit untuk akun role `guest` maupun member dengan email guest serta assertion atribut akun guest.
+  - **Bukti:** `php artisan test` (185 tes, 1.528 assertions lulus); `php vendor\bin\pint --test` lulus; `git diff --check` lulus; tes regresi di `api/tests/Feature/Api/VoteControllerTest.php` dan `api/tests/Feature/GuestSessionTest.php`.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** tidak ada langkah implementasi; verifikasi perubahan di staging/produksi tetap diperlukan.
 - **2026-11-20 — Perapian UI Admin Filament**
   - **Perubahan:** mengganti branding panel menjadi PARTAI, menambahkan favicon SVG, mengurutkan grup dan resource navigasi, menyembunyikan navigasi `ItemResource` agar hanya satu menu Bank Soal tampil, dan menambahkan widget empat statistik baca-saja. Tidak ada perubahan skema atau logika bisnis. Resource admin Voting/Recall tidak ditemukan dan tidak dibuat.
   - **Bukti:** `api/tests/Feature/AdminStatsOverviewTest.php` (2 tes terarah, 8 assertions lulus); `php artisan test` (183 tes, 1.517 assertions lulus); `npm run build` di `web/` dan `node node_modules\vite\bin\vite.js build` di `api/` lulus; Pint dan `git diff --check` lulus. `api/npm run build` belum berhasil karena executable `vite` tidak tersedia pada PATH skrip npm. Belum diverifikasi di staging/produksi.
@@ -113,10 +119,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** perapian UI admin Filament secara lokal: branding/favikon PARTAI, urutan navigasi, penghilangan menu Bank Soal duplikat, dan widget statistik baca-saja. Tidak ada perubahan database, logika bisnis, `.env`, commit, atau push.
-- **Bukti:** `php artisan test` — 183 tes / 1.517 assertions lulus; tes terarah widget/navigasi — 2 tes / 8 assertions lulus; `npm run build` di `web/` dan `node node_modules\vite\bin\vite.js build` di `api/` lulus; Pint dan `git diff --check` lulus. `api/npm run build` belum berhasil karena executable `vite` tidak tersedia pada PATH skrip npm. Belum ada verifikasi produksi.
-- **Status:** perubahan UI admin — status: selesai lokal, belum diverifikasi produksi — bukti: provider/resource/widget/favikon dan tes terarah.
+- **Dikerjakan:** perbaikan hak suara akun tamu dengan membatasi eligibility dan mengunci atribut role/verifikasi saat token guest dibuat. Tidak ada perubahan skema, commit, atau push.
+- **Bukti:** `php artisan test` — 185 tes / 1.528 assertions lulus; `php vendor\bin\pint --test` lulus; `git diff --check` lulus.
+- **Status:** fix lokal — status: selesai, belum diverifikasi di produksi — bukti: controller dan tes feature terkait.
 - **Dokumen .md Diperbarui:** `MEMORY.md`. `docs/architecture.md` tidak berubah karena topologi dan alur sistem tidak berubah.
-- **Belum Selesai / Langkah Berikutnya:** verifikasi tampilan di staging; resource admin Voting/Recall belum ada dan tidak dibuat dalam lingkup UI ini.
+- **Belum Selesai / Langkah Berikutnya:** verifikasi perubahan di staging/produksi.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.

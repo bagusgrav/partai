@@ -71,6 +71,8 @@ class AuthController extends Controller
                 'name' => 'Tamu',
                 'email' => 'guest_'.Str::uuid().'@partai.id',
                 'password' => Str::random(64),
+                'role' => 'guest',
+                'is_verified' => false,
             ],
         );
 

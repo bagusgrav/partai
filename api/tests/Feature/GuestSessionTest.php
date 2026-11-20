@@ -23,6 +23,8 @@ class GuestSessionTest extends TestCase
 
         $user = User::query()->where('guest_request_id', $requestId)->firstOrFail();
         $this->assertSame('Tamu', $user->name);
+        $this->assertSame('guest', $user->role);
+        $this->assertFalse($user->is_verified);
         $this->assertMatchesRegularExpression(
             '/^guest_[0-9a-f-]{36}@partai\.id$/',
             $user->email,

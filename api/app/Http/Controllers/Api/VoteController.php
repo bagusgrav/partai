@@ -46,6 +46,8 @@ class VoteController extends Controller
     {
         $user = $request->user();
 
-        return $user?->role === 'member' && $user?->is_verified === true;
+        return $user?->role === 'member'
+            && $user?->is_verified === true
+            && ! str_starts_with((string) $user?->email, 'guest_');
     }
 }
