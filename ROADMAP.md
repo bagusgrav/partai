@@ -41,11 +41,9 @@ Dokumen ini adalah panduan fase demi fase. "Lengkap dan Tuntas" berarti seluruh 
 *Tujuan: Mencegah dinasti, korupsi internal, dan membangun demokrasi partai.*
 - [x] **Komunitas (eksperimen MVP, kode dan tes):** Microblog teks dengan feed cursor-based, visibilitas publik/anggota, pelaporan, moderasi, dan rate limit; tes backend terfokus lulus. Deployment, validasi operasional, dan keputusan perluasan tetap roadmap.
 - [x] **Voting Parameter & Kebijakan:** UI daftar voting aktif, konfirmasi pilihan, satu suara idempoten untuk anggota terverifikasi, status partisipasi, dan hasil agregat setelah memilih; implementasi kode lokal, belum klaim deployment.
+- [x] **Voting Security Fix:** Membatasi endpoint `/api/votes/submit` dan UI Voting hanya untuk anggota terverifikasi (Menolak Guest dengan 403). *Status: Terverifikasi (Manual + Tes Otomatis) per 20 Nov 2026.*
 - [x] **Panel Audit (Sortisi):** Pemilihan acak hingga lima anggota terverifikasi dengan `overall_mastery_level >= 4`.
 - [ ] **Sortisi Ber-seed Publik:** Publikasi seed dan snapshot kelayakan agar pengundian dapat direproduksi tanpa membuka data pribadi.
 - [ ] **Panel Etik & Editorial:** Pemilihan acak anggota untuk Panel Etik dan Panel Editorial.
 - [ ] **Kontrak Faksi Anggota Dewan:** Dasbor publik yang melacak janji kampanye anggota dewan.
 - [x] **Mekanisme Recall:** Pengajuan recall berbukti, voting anggota, dan pencabutan role saat dukungan mencapai 2/3 anggota aktif.
-
-## 🏁 DEFINISI "LENGKAP DAN TUNTAS"
-Aplikasi dinyatakan Tuntas jika: Fungsional (Fase 1-4 berjalan), Skalabel (10.000 anggota aktif di VPS Zero-RAM), Aman & Auditable (Open Source, terbackup), dan Berdampak Nyata (digunakan anggota dewan untuk menginterpelasi anggaran korup).
