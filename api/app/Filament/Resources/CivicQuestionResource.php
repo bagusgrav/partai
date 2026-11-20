@@ -23,7 +23,9 @@ class CivicQuestionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'Pendidikan Kewargaan';
+    protected static ?string $navigationGroup = 'Pendidikan';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationLabel = 'Bank Soal';
 

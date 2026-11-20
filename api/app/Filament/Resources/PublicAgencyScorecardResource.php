@@ -19,7 +19,9 @@ class PublicAgencyScorecardResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationGroup = 'Pengawasan Birokrasi';
+    protected static ?string $navigationGroup = 'Keuangan & Pengawasan';
+
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationLabel = 'Rapor Instansi';
 

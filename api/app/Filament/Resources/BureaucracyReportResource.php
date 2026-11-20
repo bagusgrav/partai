@@ -21,7 +21,9 @@ class BureaucracyReportResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-exclamation';
 
-    protected static ?string $navigationGroup = 'Pengawasan Birokrasi';
+    protected static ?string $navigationGroup = 'Keuangan & Pengawasan';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationLabel = 'Laporan Warga';
 

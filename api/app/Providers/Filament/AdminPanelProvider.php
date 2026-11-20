@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -28,9 +29,19 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->authGuard('web')
             ->login()
+            ->brandName('PARTAI')
+            ->favicon(asset('partai-favicon.svg'))
             ->colors([
                 'primary' => constant(Color::class.'::'.config('theme.primary_color', 'Slate')),
                 'gray' => Color::Zinc,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()->label('Komunitas'),
+                NavigationGroup::make()->label('Pendidikan'),
+                NavigationGroup::make()->label('Aksi Lapangan'),
+                NavigationGroup::make()->label('Tata Kelola'),
+                NavigationGroup::make()->label('Keuangan & Pengawasan'),
+                NavigationGroup::make()->label('Komunikasi Publik'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

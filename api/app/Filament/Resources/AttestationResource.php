@@ -19,6 +19,10 @@ class AttestationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Aksi Lapangan';
+
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $navigationLabel = 'Atestasi Silang';
 
     protected static ?string $modelLabel = 'Atestasi Silang';

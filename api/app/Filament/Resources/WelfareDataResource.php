@@ -18,7 +18,9 @@ class WelfareDataResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $navigationGroup = 'Pengawasan Data';
+    protected static ?string $navigationGroup = 'Keuangan & Pengawasan';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $navigationLabel = 'Data Kesejahteraan';
 

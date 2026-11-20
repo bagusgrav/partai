@@ -21,6 +21,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Data Anggota';
 
+    protected static ?int $navigationSort = -1;
+
     protected static ?string $modelLabel = 'Data Anggota';
 
     protected static ?string $pluralModelLabel = 'Data Anggota';

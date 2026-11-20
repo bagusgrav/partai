@@ -28,6 +28,8 @@ class PostResource extends Resource
 
     protected static ?string $navigationGroup = 'Komunitas';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = 'Post';
 
     protected static ?string $modelLabel = 'Post';

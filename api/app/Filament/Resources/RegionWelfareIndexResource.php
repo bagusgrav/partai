@@ -18,7 +18,9 @@ class RegionWelfareIndexResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static ?string $navigationGroup = 'Pengawasan Data';
+    protected static ?string $navigationGroup = 'Keuangan & Pengawasan';
+
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $navigationLabel = 'Indeks Kerentanan (IKK)';
 

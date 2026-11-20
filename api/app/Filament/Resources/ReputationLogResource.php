@@ -16,6 +16,10 @@ class ReputationLogResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
 
+    protected static ?string $navigationGroup = 'Tata Kelola';
+
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationLabel = 'Reputasi Anggota';
 
     protected static ?string $modelLabel = 'Log Reputasi';

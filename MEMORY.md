@@ -31,6 +31,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 - **MVP Komunitas** — status: **Selesai / Live di Produksi** — commit `aa733a9` (`feat(community): MVP microblog dengan visibilitas publik/anggota`). Bukti: `api/routes/api.php`, controller/model/policy, `api/tests/Feature/PostControllerTest.php`, `api/tests/Feature/CommunityModerationTest.php`, `web/src/components/features/community/CommunityPage.tsx`, dan deployment VPS produksi yang berhasil.
 - **Perbaikan CI/CD deployment API** — status: selesai — commit `5d6f9ff` (`fix(ci): add sleep and ignore health check failure to prevent false negatives`) dan fix/final deployment di rantai commit perbaikan port. Bukti: `.github/workflows/deploy-api.yml`, `api/deploy.sh`, serta penanganan SQLite, direktori Storage, `APP_KEY`, port health check, dan pengecekan `/up`.
 - **Dokumentasi Komunitas** — commit `a7b2da9` (`docs(community): dokumentasikan domain Komunitas dan batas visibilitas`). Bukti: `docs/architecture.md`, `docs/api-reference.md`, `README.md`, dan `ROADMAP.md`.
+- **Perapian UI Admin Filament** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Providers/Filament/AdminPanelProvider.php`, resource Filament, `api/app/Filament/Widgets/AdminStatsOverview.php`, `api/public/partai-favicon.svg`, dan `api/tests/Feature/AdminStatsOverviewTest.php`.
 
 ## 4. Sedang Dikerjakan
 
@@ -45,6 +46,7 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - Backup terjadwal yang diverifikasi.
 - Smoke test staging.
 - Uji alur moderasi Filament secara manual.
+- Resource admin Filament untuk Voting dan Recall belum tersedia; menu tersebut belum dapat ditampilkan tanpa implementasi resource tersendiri.
 
 ### Known gaps dokumentasi
 
@@ -73,6 +75,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-20 — Perapian UI Admin Filament**
+  - **Perubahan:** mengganti branding panel menjadi PARTAI, menambahkan favicon SVG, mengurutkan grup dan resource navigasi, menyembunyikan navigasi `ItemResource` agar hanya satu menu Bank Soal tampil, dan menambahkan widget empat statistik baca-saja. Tidak ada perubahan skema atau logika bisnis. Resource admin Voting/Recall tidak ditemukan dan tidak dibuat.
+  - **Bukti:** `api/tests/Feature/AdminStatsOverviewTest.php` (2 tes terarah, 8 assertions lulus); `php artisan test` (183 tes, 1.517 assertions lulus); `npm run build` di `web/` dan `node node_modules\vite\bin\vite.js build` di `api/` lulus; Pint dan `git diff --check` lulus. `api/npm run build` belum berhasil karena executable `vite` tidak tersedia pada PATH skrip npm. Belum diverifikasi di staging/produksi.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** verifikasi tampilan panel di staging setelah perubahan UI dirilis; lengkapi menu Voting/Recall hanya jika resource admin tersebut disetujui dan tersedia.
 - **2026-11-20 — Voting Parameter & Kebijakan (Fase 4)**
   - **Perubahan:** melengkapi halaman voting aktif dengan opsi, konfirmasi sebelum submit, `request_id` UUID idempoten, eligibility anggota terverifikasi, status sudah memilih, dan tally agregat setelah pilihan tercatat. API menggunakan skema yang ada; tidak ada migrasi.
   - **Bukti:** `api/tests/Feature/Api/VoteControllerTest.php` (182 tes backend keseluruhan lulus); tiga tes Playwright voting, `npm run lint`, dan `npm run build` lulus. Belum diverifikasi di staging/produksi.
@@ -106,10 +113,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** implementasi lokal UI dan alur Backend Voting Parameter & Kebijakan, beserta tes API/frontend dan pembaruan dokumen. Tidak ada commit atau push.
-- **Bukti:** `api/tests/Feature/Api/VoteControllerTest.php` — 182 tes Laravel lulus; 3 tes Playwright voting lulus; `npm run lint` dan `npm run build` lulus.
-- **Status:** voting aktif, hanya anggota terverifikasi dapat submit, submit idempoten, status pemilih, dan tally setelah memilih — status: selesai lokal — bukti: file layanan/controller, komponen voting, dan tes tercantum di atas.
-- **Dokumen .md Diperbarui:** `MEMORY.md`, `ROADMAP.md`, `docs/api-reference.md`.
-- **Belum Selesai / Langkah Berikutnya:** siapkan voting aktif dan lakukan smoke test alur di staging; implementasi ini belum diverifikasi/deploy di lingkungan tersebut.
+- **Dikerjakan:** perapian UI admin Filament secara lokal: branding/favikon PARTAI, urutan navigasi, penghilangan menu Bank Soal duplikat, dan widget statistik baca-saja. Tidak ada perubahan database, logika bisnis, `.env`, commit, atau push.
+- **Bukti:** `php artisan test` — 183 tes / 1.517 assertions lulus; tes terarah widget/navigasi — 2 tes / 8 assertions lulus; `npm run build` di `web/` dan `node node_modules\vite\bin\vite.js build` di `api/` lulus; Pint dan `git diff --check` lulus. `api/npm run build` belum berhasil karena executable `vite` tidak tersedia pada PATH skrip npm. Belum ada verifikasi produksi.
+- **Status:** perubahan UI admin — status: selesai lokal, belum diverifikasi produksi — bukti: provider/resource/widget/favikon dan tes terarah.
+- **Dokumen .md Diperbarui:** `MEMORY.md`. `docs/architecture.md` tidak berubah karena topologi dan alur sistem tidak berubah.
+- **Belum Selesai / Langkah Berikutnya:** verifikasi tampilan di staging; resource admin Voting/Recall belum ada dan tidak dibuat dalam lingkup UI ini.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.

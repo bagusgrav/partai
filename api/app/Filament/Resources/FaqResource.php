@@ -23,6 +23,8 @@ class FaqResource extends Resource
 
     protected static ?string $navigationGroup = 'Komunikasi Publik';
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = 'Tanya Jawab';
 
     protected static ?string $modelLabel = 'FAQ';

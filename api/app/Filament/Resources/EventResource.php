@@ -21,7 +21,11 @@ class EventResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationLabel = 'Aksi Lapangan';
+    protected static ?string $navigationGroup = 'Aksi Lapangan';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationLabel = 'Daftar Aksi';
 
     protected static ?string $modelLabel = 'Aksi Lapangan';
 

@@ -23,6 +23,8 @@ class InquiryResource extends Resource
 
     protected static ?string $navigationGroup = 'Komunikasi Publik';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationLabel = 'Pertanyaan Masuk';
 
     protected static ?string $modelLabel = 'Pertanyaan Masuk';

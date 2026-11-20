@@ -25,6 +25,8 @@ class PostReportResource extends Resource
 
     protected static ?string $navigationGroup = 'Komunitas';
 
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationLabel = 'Laporan Post';
 
     protected static ?string $modelLabel = 'Laporan Post';

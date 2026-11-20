@@ -23,6 +23,10 @@ class PartyFinanceEntryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
+    protected static ?string $navigationGroup = 'Keuangan & Pengawasan';
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationLabel = 'Keuangan Partai';
 
     protected static ?string $modelLabel = 'Entri Keuangan';

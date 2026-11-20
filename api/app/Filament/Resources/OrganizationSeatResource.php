@@ -22,6 +22,8 @@ class OrganizationSeatResource extends Resource
 
     protected static ?string $navigationGroup = 'Tata Kelola';
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $navigationLabel = 'Kursi Organisasi';
 
     protected static ?string $modelLabel = 'Kursi Organisasi';

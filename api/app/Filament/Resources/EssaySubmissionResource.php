@@ -20,6 +20,10 @@ class EssaySubmissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Pendidikan';
+
+    protected static ?int $navigationSort = 2;
+
     protected static ?string $navigationLabel = 'Pengumpulan Esai';
 
     protected static ?string $modelLabel = 'Pengumpulan Esai';

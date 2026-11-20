@@ -21,6 +21,10 @@ class FactionContractResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-scale';
 
+    protected static ?string $navigationGroup = 'Tata Kelola';
+
+    protected static ?int $navigationSort = 4;
+
     protected static ?string $navigationLabel = 'Kontrak Faksi';
 
     protected static ?string $modelLabel = 'Kontrak Faksi';
