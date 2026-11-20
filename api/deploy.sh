@@ -19,9 +19,9 @@ git pull --ff-only origin main
 
 cd api
 composer install --no-dev --optimize-autoloader
+composer dump-autoload --optimize
 bash scripts/backup-db.sh
 php artisan migrate --force
-php artisan optimize:clear
 if python3 scripts/fetch_gini_stunting.py --check-config; then
     python3 scripts/fetch_gini_stunting.py || echo "Warning: BPS sync incomplete; continuing deployment."
 else
@@ -38,5 +38,7 @@ sleep 2
 
 curl --fail --silent --show-error --retry 5 --retry-delay 2 \
     --retry-connrefused --max-time 5 http://127.0.0.1/up || true
+
+php artisan optimize:clear
 
 echo "✅ Deployment selesai!"
