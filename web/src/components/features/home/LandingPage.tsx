@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CommunityPreview from "@/components/features/landing/CommunityPreview";
 
 const pillars = [
   {
@@ -150,6 +151,8 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      <CommunityPreview />
 
       <section className="border-y border-primary/10 bg-primary-light">
         <div className="mx-auto max-w-7xl px-6 py-8 sm:px-8">
