@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\MemberVerificationMail;
 use App\Models\User;
+use Database\Seeders\AdministrativeRegionSeeder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -13,6 +14,48 @@ use Tests\TestCase;
 class MemberRegistrationTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    public function test_registration_stores_the_selected_regency_and_keeps_its_province_cluster(): void
+    {
+        $this->seed(AdministrativeRegionSeeder::class);
+        Mail::fake();
+
+        $response = $this->postJson('/api/auth/register', [
+            'request_id' => '3f57ce94-9678-4bc8-ac0e-55f68e33fef7',
+            'name' => 'Anggota Kudus',
+            'email' => 'kudus@example.test',
+            'password' => 'rahasia-anggota',
+            'cluster_id' => '33',
+            'region_id' => '3319',
+        ]);
+
+        $response->assertCreated();
+
+        $user = User::query()->where('email', 'kudus@example.test')->firstOrFail();
+        $this->assertSame('33', $user->cluster_id);
+        $this->assertSame('3319', $user->region_id);
+
+        $this->withToken($response->json('token'))
+            ->getJson('/api/user')
+            ->assertOk()
+            ->assertJsonPath('region_id', '3319')
+            ->assertJsonPath('cluster_id', '33')
+            ->assertJsonPath('cluster_name', 'Kabupaten Kudus');
+    }
+
+    public function test_registration_rejects_a_regency_that_is_not_in_the_selected_province(): void
+    {
+        $this->seed(AdministrativeRegionSeeder::class);
+
+        $this->postJson('/api/auth/register', [
+            'request_id' => '4f57ce94-9678-4bc8-ac0e-55f68e33fef7',
+            'name' => 'Anggota Uji',
+            'email' => 'anggota@example.test',
+            'password' => 'rahasia-anggota',
+            'cluster_id' => '32',
+            'region_id' => '3319',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['region_id']);
+    }
 
     public function test_registration_creates_a_member_and_returns_a_valid_token(): void
     {

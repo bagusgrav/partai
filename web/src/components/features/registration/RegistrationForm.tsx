@@ -3,21 +3,26 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { getWelfareRegions, registerMember } from "@/lib/api";
-import type { WelfareRegion } from "@/types";
+import { getRegions, registerMember } from "@/lib/api";
+import type { AdministrativeRegion } from "@/lib/api/regions";
 
 interface RegistrationInput {
   name: string;
   email: string;
   password: string;
   cluster_id: string;
+  region_id: string;
   nik?: string;
 }
 
 export default function RegistrationForm() {
   const router = useRouter();
-  const [regions, setRegions] = useState<WelfareRegion[]>([]);
-  const [isLoadingRegions, setIsLoadingRegions] = useState(true);
+  const [provinces, setProvinces] = useState<AdministrativeRegion[]>([]);
+  const [regencies, setRegencies] = useState<AdministrativeRegion[]>([]);
+  const [selectedProvinceId, setSelectedProvinceId] = useState("");
+  const [selectedRegionId, setSelectedRegionId] = useState("");
+  const [isLoadingProvinces, setIsLoadingProvinces] = useState(true);
+  const [isLoadingRegencies, setIsLoadingRegencies] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pendingRequest = useRef<{ fingerprint: string; id: string } | null>(null);
@@ -25,24 +30,24 @@ export default function RegistrationForm() {
   useEffect(() => {
     let active = true;
 
-    getWelfareRegions()
+    getRegions()
       .then(({ regions: availableRegions }) => {
         if (active) {
-          setRegions(availableRegions);
+          setProvinces(availableRegions);
         }
       })
       .catch((loadError: unknown) => {
         if (active) {
           setError(
             loadError instanceof Error
-              ? `Wilayah gagal dimuat. ${loadError.message}`
-              : "Wilayah gagal dimuat.",
+              ? `Provinsi gagal dimuat. ${loadError.message}`
+              : "Provinsi gagal dimuat.",
           );
         }
       })
       .finally(() => {
         if (active) {
-          setIsLoadingRegions(false);
+          setIsLoadingProvinces(false);
         }
       });
 
@@ -50,6 +55,39 @@ export default function RegistrationForm() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedProvinceId) {
+      return;
+    }
+
+    let active = true;
+
+    getRegions(selectedProvinceId)
+      .then(({ regions: availableRegions }) => {
+        if (active) {
+          setRegencies(availableRegions);
+        }
+      })
+      .catch((loadError: unknown) => {
+        if (active) {
+          setError(
+            loadError instanceof Error
+              ? `Kabupaten/kota gagal dimuat. ${loadError.message}`
+              : "Kabupaten/kota gagal dimuat.",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsLoadingRegencies(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedProvinceId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +99,8 @@ export default function RegistrationForm() {
       name: String(formData.get("name") ?? "").trim(),
       email: String(formData.get("email") ?? "").trim(),
       password: String(formData.get("password") ?? ""),
-      cluster_id: String(formData.get("cluster_id") ?? ""),
+      cluster_id: String(formData.get("province_id") ?? ""),
+      region_id: String(formData.get("region_id") ?? ""),
       nik: String(formData.get("nik") ?? "").trim() || undefined,
     };
     const fingerprint = JSON.stringify(input);
@@ -172,31 +211,71 @@ export default function RegistrationForm() {
           <div>
             <label
               className="mb-2 block text-sm font-bold text-text-main"
-              htmlFor="cluster_id"
+              htmlFor="province_id"
             >
-              Wilayah
+              Provinsi
             </label>
             <select
               className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-text-main outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-slate-100"
-              disabled={isLoadingRegions || regions.length === 0}
-              id="cluster_id"
-              name="cluster_id"
+              disabled={isLoadingProvinces || provinces.length === 0}
+              id="province_id"
+              name="province_id"
               required
+              value={selectedProvinceId}
+              onChange={(event) => {
+                const provinceId = event.target.value;
+                setSelectedProvinceId(provinceId);
+                setSelectedRegionId("");
+                setRegencies([]);
+                setIsLoadingRegencies(Boolean(provinceId));
+                setError(null);
+              }}
             >
               <option value="">
-                {isLoadingRegions ? "Memuat wilayah..." : "Pilih wilayah"}
+                {isLoadingProvinces ? "Memuat provinsi..." : "Pilih provinsi"}
               </option>
-              {regions.map((region) => (
-                <option key={region.region_code} value={region.region_code}>
-                  {region.region_name} ({region.region_code})
+              {provinces.map((province) => (
+                <option key={province.id} value={province.id}>
+                  {province.name}
                 </option>
               ))}
             </select>
-            {!isLoadingRegions && regions.length === 0 && !error && (
+            {!isLoadingProvinces && provinces.length === 0 && !error && (
               <p className="mt-2 text-sm text-text-muted">
                 Data wilayah belum tersedia.
               </p>
             )}
+          </div>
+
+          <div>
+            <label
+              className="mb-2 block text-sm font-bold text-text-main"
+              htmlFor="region_id"
+            >
+              Kabupaten/Kota
+            </label>
+            <select
+              className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-text-main outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-slate-100"
+              disabled={!selectedProvinceId || isLoadingRegencies || regencies.length === 0}
+              id="region_id"
+              name="region_id"
+              required
+              value={selectedRegionId}
+              onChange={(event) => setSelectedRegionId(event.target.value)}
+            >
+              <option value="">
+                {!selectedProvinceId
+                  ? "Pilih provinsi terlebih dahulu"
+                  : isLoadingRegencies
+                    ? "Memuat kabupaten/kota..."
+                    : "Pilih kabupaten/kota"}
+              </option>
+              {regencies.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -223,7 +302,13 @@ export default function RegistrationForm() {
 
           <button
             className="w-full rounded-xl bg-primary px-5 py-3.5 font-bold text-white transition hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isSubmitting || isLoadingRegions || regions.length === 0}
+            disabled={
+              isSubmitting ||
+              isLoadingProvinces ||
+              isLoadingRegencies ||
+              provinces.length === 0 ||
+              !selectedRegionId
+            }
             type="submit"
           >
             {isSubmitting ? "Mendaftarkan..." : "Daftar sebagai Anggota"}

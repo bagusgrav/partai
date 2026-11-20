@@ -141,6 +141,7 @@ export async function registerMember(
     email: string;
     password: string;
     cluster_id: string;
+    region_id: string;
     nik?: string;
   },
   requestId: string,

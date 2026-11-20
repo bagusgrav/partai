@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Mail\MemberVerificationMail;
+use App\Models\Region;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -98,7 +99,13 @@ class AuthController extends Controller
                 Rule::unique('users', 'email')->ignore($existing?->id),
             ],
             'password' => ['required', 'string', 'min:8'],
-            'cluster_id' => ['required', 'string', 'max:255'],
+            'cluster_id' => ['nullable', 'string', 'max:255', 'required_without:region_id'],
+            'region_id' => [
+                'nullable',
+                'string',
+                'required_without:cluster_id',
+                Rule::exists('regions', 'id')->where('level', 2),
+            ],
             'nik' => [
                 'nullable',
                 'string',
@@ -122,6 +129,22 @@ class AuthController extends Controller
             'email.unique' => 'Email sudah terdaftar.',
         ]);
 
+        $regionId = $validated['region_id'] ?? null;
+        $clusterId = $validated['cluster_id'] ?? $regionId;
+
+        if ($regionId !== null && isset($validated['cluster_id'])) {
+            $parentId = Region::query()->whereKey($regionId)->value('parent_id');
+
+            if ($parentId !== $validated['cluster_id']) {
+                return response()->json([
+                    'message' => 'Kabupaten/kota harus berada di provinsi yang dipilih.',
+                    'errors' => [
+                        'region_id' => ['Kabupaten/kota harus berada di provinsi yang dipilih.'],
+                    ],
+                ], 422);
+            }
+        }
+
         if ($existing !== null) {
             return $this->duplicateRegistrationResponse($existing, $validated);
         }
@@ -133,7 +156,8 @@ class AuthController extends Controller
                 'password' => bcrypt($validated['password']),
                 'role' => 'member',
                 'nik' => $validated['nik'] ?? null,
-                'cluster_id' => $validated['cluster_id'],
+                'cluster_id' => $clusterId,
+                'region_id' => $regionId,
                 'is_verified' => false,
                 'registration_request_id' => $validated['request_id'],
             ]);
@@ -182,14 +206,15 @@ class AuthController extends Controller
     }
 
     /**
-     * @param  array{name: string, email: string, password: string, cluster_id: string, nik?: ?string, request_id: string}  $validated
+     * @param  array{name: string, email: string, password: string, cluster_id?: ?string, region_id?: ?string, nik?: ?string, request_id: string}  $validated
      */
     private function duplicateRegistrationResponse(User $user, array $validated): JsonResponse
     {
         if (
             $user->name !== $validated['name']
             || $user->email !== $validated['email']
-            || $user->cluster_id !== $validated['cluster_id']
+            || $user->cluster_id !== ($validated['cluster_id'] ?? $validated['region_id'] ?? null)
+            || $user->region_id !== ($validated['region_id'] ?? null)
             || $user->nik !== ($validated['nik'] ?? null)
             || ! Hash::check($validated['password'], $user->password)
         ) {

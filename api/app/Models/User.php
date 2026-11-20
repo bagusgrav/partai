@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,6 +28,7 @@ use Spatie\Permission\Traits\HasRoles;
     'nik',
     'nik_verified_at',
     'cluster_id',
+    'region_id',
     'is_verified',
 ])]
 #[Hidden(['password', 'remember_token', 'nik', 'nik_hash'])]
@@ -71,6 +73,11 @@ class User extends Authenticatable implements FilamentUser
     public function reputationLogs(): HasMany
     {
         return $this->hasMany(ReputationLog::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

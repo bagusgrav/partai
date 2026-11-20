@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\PartyFinanceController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PostReportController;
 use App\Http\Controllers\Api\RecallController;
+use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\ReputationController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SessionController;
@@ -40,12 +41,13 @@ Route::get('/user', function (Request $request) {
         'id' => $user->id,
         'name' => $user->name,
         'email' => $user->email,
+        'region_id' => $user->region_id,
         'cluster_id' => $user->cluster_id,
-        'cluster_name' => $user->cluster_id === null
+        'cluster_name' => $user->region?->name ?? ($user->cluster_id === null
             ? null
             : WelfareData::query()
                 ->where('region_code', $user->cluster_id)
-                ->value('region_name'),
+                ->value('region_name')),
         'role' => $user->role,
         'is_verified' => $user->is_verified,
         'reputation_points' => (int) $user->reputation_points,
@@ -55,6 +57,7 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/auth/guest', [AuthController::class, 'guest'])->middleware('throttle:300,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::get('/regions', [RegionController::class, 'index'])->middleware('throttle:60,1');
 Route::post('/auth/login', [SessionController::class, 'login'])->middleware('throttle:10,1');
 Route::get('/auth/verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed', 'throttle:10,1'])

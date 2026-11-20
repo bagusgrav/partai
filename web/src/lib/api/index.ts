@@ -15,3 +15,4 @@ export * from "./welfare";
 export * from "./finance";
 export * from "./organization";
 export * from "./posts";
+export * from "./regions";
