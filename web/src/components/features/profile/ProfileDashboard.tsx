@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, getUserReputation } from "@/lib/api";
 import type { RegisteredUser, UserReputation } from "@/types";
 
-const reputationLevels = [
-  { name: "Warga Baru", start: 0, next: 100 },
-  { name: "Warga Aktif", start: 100, next: 500 },
-  { name: "Penggerak", start: 500, next: 1000 },
+const masteryLevelThresholds = [
+  { level: 1, start: 0, next: 200 },
+  { level: 2, start: 200, next: 300 },
+  { level: 3, start: 300, next: 400 },
 ] as const;
 
 const reputationActionLabels: Record<string, string> = {
@@ -89,24 +89,42 @@ export default function ProfileDashboard() {
               </p>
               <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h2 className="text-2xl font-black">{reputation.reputation_level}</h2>
-                  <p className="mt-1 text-sm text-white/80">Level reputasi Anda</p>
+                  <h2 className="text-2xl font-black">
+                    Level {user.overall_mastery_level}
+                  </h2>
+                  <p className="mt-1 text-sm text-white/80">
+                    Level Kapasitas (Mastery)
+                  </p>
                 </div>
-                <p className="text-3xl font-black">
-                  {reputation.reputation_points.toLocaleString("id-ID")}
-                  <span className="ml-2 text-sm font-semibold">poin</span>
-                </p>
+                <div className="grid grid-cols-2 gap-6 text-right">
+                  <div>
+                    <p className="text-2xl font-black">
+                      {user.mastery_score.toLocaleString("id-ID")}
+                    </p>
+                    <p className="text-sm font-semibold text-white/80">
+                      Mastery Score
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black">
+                      {user.participation_score.toLocaleString("id-ID")}
+                    </p>
+                    <p className="text-sm font-semibold text-white/80">
+                      Participation Score
+                    </p>
+                  </div>
+                </div>
               </div>
               {(() => {
-                const currentLevel = reputationLevels.find(
-                  ({ name }) => name === reputation.reputation_level,
+                const currentLevel = masteryLevelThresholds.find(
+                  ({ level }) => level === user.overall_mastery_level,
                 );
                 const progress = currentLevel
                   ? Math.min(
                       100,
                       Math.max(
                         0,
-                        ((reputation.reputation_points - currentLevel.start) /
+                        ((user.mastery_score - currentLevel.start) /
                           (currentLevel.next - currentLevel.start)) *
                           100,
                       ),
@@ -127,8 +145,8 @@ export default function ProfileDashboard() {
                     </div>
                     <p className="mt-2 text-sm text-white/80">
                       {currentLevel
-                        ? `${Math.max(0, currentLevel.next - reputation.reputation_points).toLocaleString("id-ID")} poin lagi menuju level berikutnya`
-                        : "Anda telah mencapai level tertinggi"}
+                        ? `${Math.max(0, currentLevel.next - user.mastery_score).toLocaleString("id-ID")} poin lagi menuju level berikutnya`
+                        : "Anda telah mencapai level Mastery tertinggi"}
                     </p>
                   </div>
                 );
@@ -141,7 +159,7 @@ export default function ProfileDashboard() {
               <dd className="mt-1 flex flex-wrap items-center gap-2 font-bold text-text-main">
                 {user.name}
                 <span className="rounded-full bg-primary-light px-3 py-1 text-xs font-bold text-primary">
-                  {reputation.reputation_level}
+                  Level Kapasitas {user.overall_mastery_level}
                 </span>
               </dd>
             </div>
@@ -181,13 +199,18 @@ export default function ProfileDashboard() {
                       {reputation.logs.map((log) => (
                         <tr key={log.id}>
                           <td className="whitespace-nowrap px-4 py-3 text-text-muted">
-                            {new Date(log.created_at).toLocaleString("id-ID")}
+                            {new Date(log.created_at).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
                           </td>
                           <td className="px-4 py-3 text-text-main">
                             {reputationActionLabels[log.action] ?? log.description}
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-right font-bold text-primary">
                             +{log.points.toLocaleString("id-ID")}
+                            {log.score_type === "mastery" ? " Mastery" : ""}
                           </td>
                         </tr>
                       ))}

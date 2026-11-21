@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\VoteController;
 use App\Http\Controllers\Api\WelfareController;
 use App\Http\Controllers\Api\WelfareIndexController;
 use App\Http\Middleware\IdempotentPasswordRequest;
+use App\Models\MemberReputation;
 use App\Models\WelfareData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     $user = $request->user();
     $user->refresh();
+    $memberReputation = MemberReputation::query()
+        ->where('user_id', $user->getKey())
+        ->first();
+    $masteryScores = $memberReputation?->mastery_scores ?? [];
 
     return response()->json([
         'id' => $user->id,
@@ -52,6 +57,9 @@ Route::get('/user', function (Request $request) {
         'is_verified' => $user->is_verified,
         'reputation_points' => (int) $user->reputation_points,
         'reputation_level' => $user->reputation_level,
+        'mastery_score' => (int) array_sum($masteryScores),
+        'overall_mastery_level' => (int) ($memberReputation?->overall_mastery_level ?? 1),
+        'participation_score' => (int) ($memberReputation?->participation_score ?? 0),
     ]);
 })->middleware('auth:sanctum');
 

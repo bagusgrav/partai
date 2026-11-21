@@ -24,6 +24,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 ## 3. Sudah Selesai
 
+- **Integrasi skor Civic Education pada Profil** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/ReputationController.php`, `web/src/components/features/profile/ProfileDashboard.tsx`, dan `api/tests/Feature/ReputationTest.php`.
 - **Voting Parameter & Kebijakan** — status: selesai pada implementasi lokal, bukan deployment — bukti: `web/src/components/features/voting/VotingDashboard.tsx`, `web/src/components/features/voting/VoteCard.tsx`, `api/app/Services/VoteService.php`, `api/tests/Feature/Api/VoteControllerTest.php`; seluruh tes Laravel dan Playwright voting lulus.
 - **Refaktor `rights/check` tanpa `{nik}` di path URL** — commit `afd85c0` (`fix(security): remove NIK from URL path and use authenticated session`). Bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/SocialAssistanceController.php`, `api/tests/Feature/Api/SocialAssistanceControllerTest.php`, `docs/api-reference.md`, dan `docs/architecture.md`.
 - **Sinkronisasi API reference dengan 66 route efektif** — commit `edb2333` (`docs(api): sinkronkan api-reference dengan 66 route efektif`). Bukti dokumentasi: `docs/api-reference.md`; daftar route implementasi: `api/routes/api.php`.
@@ -49,6 +50,7 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - Smoke test staging.
 - Uji alur moderasi Filament secara manual.
 - Resource admin Filament untuk Voting dan Recall belum tersedia; menu tersebut belum dapat ditampilkan tanpa implementasi resource tersendiri.
+- Verifikasi tampilan halaman Profil di staging setelah perubahan skor dan riwayat dirilis.
 
 ### Known gaps dokumentasi
 
@@ -77,6 +79,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Integrasi Mastery dan Participation pada Profil**
+  - **Perubahan:** `/api/user` kini mengirim agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`; `/api/reputation` menggabungkan riwayat legacy dan ledger Mastery terbaru. Kartu Profil memisahkan Mastery Score/Participation Score dan progress mengacu pada ambang level Mastery eksisting. Logika SM-2 dan database produksi tidak disentuh.
+  - **Bukti:** `npm run lint`, `npx tsc --noEmit`, `php artisan test --filter=ReputationTest` (11 tes / 85 assertions), `php vendor\bin\pint --test` untuk berkas PHP terkait, dan `git diff --check` lulus.
+  - **Dokumen Diperbarui:** `MEMORY.md`, `docs/api-reference.md`.
+  - **Langkah Berikutnya:** verifikasi visual dan kontrak API di staging setelah perubahan dirilis.
 - **2026-11-21 — Auto-read notifikasi dan sinkronisasi Navbar**
   - **Perubahan:** implementasi auto-read notifikasi, pembuatan bulk endpoint `POST /notifications/read`, dan sinkronisasi badge Navbar.
   - **Bukti:** `web/src/components/features/notifications/NotificationsList.tsx`, `api/app/Http/Controllers/Api/NotificationController.php`, `api/tests/Feature/DailyDigestTest.php`; tes notifikasi lulus.
@@ -118,18 +125,14 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
   - **Dokumen Diperbarui:** `MEMORY.md`.
   - **Langkah Berikutnya:** pantau layanan produksi dan jalankan pemeriksaan end-to-end alur Komunitas pada VPS.
 - **2026-11-19 — `afd85c0`:** refaktor `/api/rights/check` untuk mengambil NIK dari sesi autentikasi dan menghapusnya dari path URL.
-- **2026-11-19 — `edb2333`:** sinkronisasi `docs/api-reference.md` terhadap 66 route efektif.
-- **2026-11-20 — `aa733a9`:** implementasi MVP Komunitas dengan visibilitas publik/anggota dan tes backend.
-- **2026-11-20 — `a7b2da9`:** dokumentasi domain Komunitas dan batas visibilitas.
-- **2026-11-20 — sesi dokumentasi:** menjadikan `docs/architecture.md` kanonis, mempertahankan stub root, menautkan memory dari README, dan memperbaiki known gap yang keliru menyatakan NIK berada pada URL. Belum ada commit untuk perubahan sesi ini.
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** perbaikan hak suara akun tamu dengan membatasi eligibility dan mengunci atribut role/verifikasi saat token guest dibuat. Tidak ada perubahan skema, commit, atau push.
-- **Bukti:** `php artisan test` — 185 tes / 1.528 assertions lulus; `php vendor\bin\pint --test` lulus; `git diff --check` lulus.
-- **Status:** fix lokal — status: selesai, belum diverifikasi di produksi — bukti: controller dan tes feature terkait.
-- **Dokumen .md Diperbarui:** `MEMORY.md`. `docs/architecture.md` tidak berubah karena topologi dan alur sistem tidak berubah.
-- **Belum Selesai / Langkah Berikutnya:** verifikasi perubahan di staging/produksi.
+- **Dikerjakan:** menyambungkan agregat skor Civic Education dan riwayat ledger Mastery ke halaman Profil tanpa mengubah SM-2 atau menyentuh database produksi.
+- **Bukti:** `api/tests/Feature/ReputationTest.php` (11 tes / 85 assertions); `npm run lint`, `npx tsc --noEmit`, Pint, dan `git diff --check` lulus.
+- **Status:** implementasi lokal — status: selesai, belum diverifikasi di staging/produksi — bukti: endpoint `/api/user`, endpoint `/api/reputation`, dan UI Profil.
+- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`. `docs/architecture.md` tidak berubah karena struktur/topologi sistem tidak berubah.
+- **Belum Selesai / Langkah Berikutnya:** verifikasi visual dan kontrak API di staging setelah perubahan dirilis.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
 ### Voting Security Fix (Verified)

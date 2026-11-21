@@ -287,6 +287,9 @@ export interface RegisteredUser {
   is_verified: boolean;
   reputation_points: number;
   reputation_level: string;
+  mastery_score: number;
+  overall_mastery_level: number;
+  participation_score: number;
 }
 
 export interface ReputationLog {
@@ -295,6 +298,7 @@ export interface ReputationLog {
   points: number;
   description: string;
   created_at: string;
+  score_type?: "mastery";
 }
 
 export interface UserReputation {

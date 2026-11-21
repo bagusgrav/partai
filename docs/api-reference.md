@@ -24,8 +24,8 @@ Dokumen ini mencatat seluruh rute yang didefinisikan di `api/routes/api.php` dan
 | `POST /api/auth/forgot-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `email` | Respons sukses generik yang sama untuk alamat terdaftar/tidak. Retry dengan ID dan payload sama mengembalikan respons tersimpan tanpa mengirim notifikasi kedua; payload berbeda menghasilkan `409`. |
 | `POST /api/auth/reset-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `token`, `email`, `password`, `password_confirmation` | `{"message":"Kata sandi berhasil diubah."}`; retry identik mengembalikan respons yang sama; ID sama dengan payload berbeda menghasilkan `409`. |
 | `POST /api/auth/logout` | Bearer (`auth:sanctum`); tanpa throttle tambahan | — | Menghapus token akses saat ini dan mengembalikan pesan sukses. |
-| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `reputation_points`, `reputation_level`. |
-| `GET /api/reputation` | Bearer | — | `reputation_points`, `reputation_level`, dan hingga 10 `logs` terbaru. |
+| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `reputation_points`, `reputation_level`, agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`. |
+| `GET /api/reputation` | Bearer | — | `reputation_points`, `reputation_level`, dan hingga 10 riwayat gabungan terbaru dari `reputation_logs` dan ledger Mastery; entri ledger menyertakan `score_type: "mastery"`. |
 | `GET /api/reputation/me` | Bearer | Query opsional `page` (pagination) | Skor mastery lima domain, `overall_mastery_level`, `participation_score`, `eligible_roles`, dan hingga 50 entri ledger per halaman. |
 
 Tidak ada route SSO atau route exchange SSO dalam route API saat ini. Login email/kata sandi tersedia melalui `/api/auth/login`.

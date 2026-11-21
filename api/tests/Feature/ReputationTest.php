@@ -176,6 +176,62 @@ class ReputationTest extends TestCase
 
     }
 
+    public function test_profile_and_reputation_history_include_civic_mastery_and_participation(): void
+    {
+        $user = User::factory()->create();
+        $reputation = app(ReputationService::class);
+        $reputation->award(
+            $user->id,
+            'quiz_correct',
+            10,
+            'Menjawab kuis dengan benar',
+            (string) Str::uuid(),
+        );
+        $reputation->record([
+            'user_id' => $user->id,
+            'score_type' => 'mastery',
+            'domain' => 'alasan_bernegara',
+            'source_type' => 'civic_question',
+            'source_id' => (string) Str::uuid(),
+            'delta' => 35,
+            'reason' => 'Menyelesaikan kuis Alasan Bernegara',
+            'request_id' => (string) Str::uuid(),
+        ]);
+        $reputation->record([
+            'user_id' => $user->id,
+            'score_type' => 'participation',
+            'category' => 'lapangan',
+            'source_type' => 'event',
+            'source_id' => (string) Str::uuid(),
+            'delta' => 7,
+            'reason' => 'Partisipasi kegiatan warga',
+            'request_id' => (string) Str::uuid(),
+        ]);
+
+        Sanctum::actingAs($user);
+        $this->getJson('/api/user')
+            ->assertOk()
+            ->assertJsonPath('reputation_points', 10)
+            ->assertJsonPath('mastery_score', 35)
+            ->assertJsonPath('overall_mastery_level', 1)
+            ->assertJsonPath('participation_score', 7);
+
+        $this->getJson('/api/reputation')
+            ->assertOk()
+            ->assertJsonCount(2, 'logs')
+            ->assertJsonFragment([
+                'score_type' => 'mastery',
+                'action' => 'civic_question',
+                'points' => 35,
+                'description' => 'Menyelesaikan kuis Alasan Bernegara',
+            ])
+            ->assertJsonFragment([
+                'action' => 'quiz_correct',
+                'points' => 10,
+                'description' => 'Menjawab kuis dengan benar',
+            ]);
+    }
+
     public function test_reputation_endpoint_requires_authentication(): void
     {
         $this->getJson('/api/reputation')->assertUnauthorized();
