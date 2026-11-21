@@ -81,6 +81,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->label('Nama'),
                 TextColumn::make('email')->label('Alamat Email'),
+                TextColumn::make('member_number')->label('Nomor Anggota')->placeholder('Belum diterbitkan'),
                 TextColumn::make('nik_verified_at')->label('NIK Diverifikasi')->dateTime(),
                 TextColumn::make('created_at')->label('Terdaftar Pada')->dateTime(),
             ])

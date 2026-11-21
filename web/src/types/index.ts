@@ -285,6 +285,7 @@ export interface RegisteredUser {
   cluster_name: string | null;
   role: "guest" | "member" | "admin";
   is_verified: boolean;
+  member_number: string | null;
   reputation_points: number;
   reputation_level: string;
   mastery_score: number;

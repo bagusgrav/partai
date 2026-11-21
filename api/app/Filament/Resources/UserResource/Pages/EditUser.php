@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Services\MemberNumberGenerator;
 use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
@@ -17,6 +18,10 @@ class EditUser extends EditRecord
         $data['nik_verified_at'] = $nikVerified && $this->record->nik !== null
             ? ($this->record->nik_verified_at ?? now())
             : null;
+
+        if ($nikVerified && $this->record->nik !== null && $this->record->member_number === null) {
+            $data['member_number'] = app(MemberNumberGenerator::class)->generate();
+        }
 
         return $data;
     }

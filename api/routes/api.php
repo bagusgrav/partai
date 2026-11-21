@@ -13,9 +13,11 @@ use App\Http\Controllers\Api\GlossaryController;
 use App\Http\Controllers\Api\GovernmentInsightController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MemberReputationController;
+use App\Http\Controllers\Api\MemberVerificationController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrganizationStructureController;
 use App\Http\Controllers\Api\PartyFinanceController;
+use App\Http\Controllers\Api\PartySettingController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PostReportController;
 use App\Http\Controllers\Api\RecallController;
@@ -56,6 +58,7 @@ Route::get('/user', function (Request $request) {
                 ->value('region_name')),
         'role' => $user->role,
         'is_verified' => $user->is_verified,
+        'member_number' => $user->member_number,
         'reputation_points' => (int) $user->reputation_points,
         'reputation_level' => $user->reputation_level,
         'mastery_score' => (int) array_sum($masteryScores),
@@ -80,6 +83,11 @@ Route::get('/welfare/summary', [WelfareController::class, 'summary']);
 Route::get('/welfare/regions', [WelfareController::class, 'regions']);
 Route::get('/welfare/region/{code}', [WelfareController::class, 'region']);
 Route::get('/stats/landing', [StatsController::class, 'landing']);
+Route::get('/settings', [PartySettingController::class, 'index']);
+Route::get('/settings/logo', [PartySettingController::class, 'logo'])->name('api.settings.logo');
+Route::get('/members/verify/{memberNumber}', [MemberVerificationController::class, 'show'])
+    ->where('memberNumber', 'PRT-[0-9]{4}-[0-9]{4}')
+    ->middleware('throttle:60,1');
 Route::get('/welfare/ikk', [WelfareIndexController::class, 'index'])->middleware('throttle:60,1');
 Route::get('/welfare/ikk/{regionCode}', [WelfareIndexController::class, 'show'])->middleware('throttle:60,1');
 Route::post('/welfare/ikk/ingest', [WelfareIndexController::class, 'ingest'])

@@ -37,14 +37,16 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 - **Perapian UI Admin Filament** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Providers/Filament/AdminPanelProvider.php`, resource Filament, `api/app/Filament/Widgets/AdminStatsOverview.php`, `api/public/partai-favicon.svg`, dan `api/tests/Feature/AdminStatsOverviewTest.php`.
 - **Penolakan hak suara akun tamu** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Http/Controllers/Api/VoteController.php`, `api/app/Http/Controllers/Api/AuthController.php`, dan tes vote/guest session.
 - **Halaman Draf AD/ART** — status: selesai lokal, belum disahkan dan belum diverifikasi di staging/produksi — bukti: `web/src/app/ad-art/page.tsx` dan tautan navigasi pada `web/src/components/Navbar.tsx`.
+- **KTA Digital, branding dinamis, dan verifikasi publik** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: migrasi/tabel `party_settings` dan `users.member_number`, `PartySettingResource` khusus `super_admin`, penerbitan nomor saat verifikasi NIK, endpoint publik `/api/settings` dan `/api/members/verify/{memberNumber}`, halaman `/profil/kartu-anggota` dan `/verifikasi/[member_number]`, serta `api/tests/Feature/MemberVerifyTest.php`.
 
 ## 4. Sedang Dikerjakan
 
-Tidak ada pekerjaan fitur aktif setelah implementasi halaman Draf AD/ART; proses musyawarah dan voting konstitusi belum dimulai.
+Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; proses musyawarah dan voting konstitusi AD/ART belum dimulai.
 
 ## 5. Belum Dikerjakan
 
 - SSO end-to-end, setelah kontrak identitas pusat ditetapkan.
+- Deploy dan verifikasi visual KTA Digital di staging setelah rilis; fitur lokal belum membuktikan migrasi atau endpoint tersedia di production.
 - Tinjauan dan perbaikan privasi untuk `social_assistances.nik`, yang berbeda dari enkripsi `users.nik`.
 - Uji migrasi `encrypt_user_nik` pada database uji berisi NIK sintetis saja.
 - Restore backup yang benar-benar diuji.
@@ -75,6 +77,12 @@ Tidak ada pekerjaan fitur aktif setelah implementasi halaman Draf AD/ART; proses
 - **Keputusan:** endpoint publik menghitung tally agregat opsi voting, jawaban kuis benar dari kedua jalur kuis, akun terdaftar, voting aktif menurut status dan rentang waktu, serta memakai rata-rata data BPS tahun terbaru melalui `WelfareService`. Jika data kemiskinan kosong, fallback API adalah `9.0`.
 - **Konsekuensi:** respons tidak memuat identitas atau pilihan individu; angka fallback bukan data BPS terverifikasi dan perlu tetap dipahami sebagai fallback.
 
+### ADR-20261121-02: Branding KTA dinamis dan verifikasi publik minim-data
+
+- **Konteks:** kartu anggota harus mengikuti branding yang dapat diubah admin, sedangkan pihak publik perlu memeriksa keabsahan nomor tanpa melihat NIK/email.
+- **Keputusan:** simpan branding pada `party_settings`, kelola melalui Filament hanya untuk `super_admin`, dan baca via `/api/settings`. Nomor `PRT-YYYY-XXXX` diterbitkan ketika admin memberi cap `nik_verified_at`; endpoint verifikasi hanya mengembalikan nama, nomor anggota, wilayah, dan status. Web menyediakan nilai fallback branding jika API tidak tersedia.
+- **Konsekuensi:** logo publik disajikan melalui route API agar CORS mendukung ekspor kartu; status kartu tetap harus diverifikasi melalui API, bukan isi QR saja. Deploy/migrasi production belum dilakukan oleh sesi ini.
+
 ### ADR-001: `docs/architecture.md` adalah arsitektur kanonis
 
 - **Keputusan:** blueprint lengkap dipelihara hanya di `docs/architecture.md`; `ARCHITECTURE.md` di root menjadi stub pointer 3 baris.
@@ -89,6 +97,11 @@ Tidak ada pekerjaan fitur aktif setelah implementasi halaman Draf AD/ART; proses
 
 ## 7. Log Sesi
 
+- **2026-11-21 — KTA Digital dan verifikasi publik**
+  - **Perubahan:** menambahkan branding partai yang dikelola di Filament, upload logo, penerbitan nomor anggota berurutan saat NIK diverifikasi, respons verifikasi publik tanpa NIK/email, provider branding dengan fallback, kartu anggota ber-QR dengan ekspor PNG/PDF, dan halaman verifikasi publik. Memastikan endpoint verifikasi dibatasi 60 request per menit dan memuat library ekspor `html-to-image`/`jspdf` secara dinamis.
+  - **Bukti:** `php artisan test --filter=MemberVerifyTest` lulus (8 tes / 94 assertions) setelah penambahan tes 429; Pint pada berkas PHP terkait, `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus. `php artisan test` penuh menghasilkan 201 lulus dan 1 gagal pada tes glossary yang mengharapkan 8 entri sedangkan seeder menghasilkan 13. Migrasi/route di `api/database/migrations/` dan `api/routes/api.php`; halaman di `web/src/app/profil/kartu-anggota/` dan `web/src/app/verifikasi/`.
+  - **Dokumen Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+  - **Langkah Berikutnya:** migrasikan dan verifikasi alur UI/API di staging sebelum rilis ke production.
 - **2026-11-21 — Halaman Draf AD/ART**
   - **Perubahan:** membuat halaman dokumen AD/ART statis dengan banner status belum berlaku, ringkasan tahapan pengesahan, daftar isi tautan per pasal, tipografi dokumen, tampilan responsif, dan CTA ke Komunitas. Menambahkan tautan AD/ART pada menu Tata Kelola; tidak mengubah API atau database.
   - **Bukti:** `web/src/app/ad-art/page.tsx`, `web/src/components/Navbar.tsx`; verifikasi `npm run lint`, `npx tsc --noEmit`, dan `git diff --check`.
@@ -148,10 +161,10 @@ Tidak ada pekerjaan fitur aktif setelah implementasi halaman Draf AD/ART; proses
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** membuat halaman statis Draf AD/ART berisi kesembilan pasal, banner belum berlaku, daftar isi, CTA masukan ke Komunitas, dan tautan pada menu Tata Kelola.
-- **Bukti:** `web/src/app/ad-art/page.tsx`, `web/src/components/Navbar.tsx`; `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus.
-- **Status:** implementasi halaman lokal — status: selesai; AD/ART tetap draf dan belum disahkan — bukti: konten halaman menyatakan tahapan musyawarah, voting, dan penetapan yang belum dilakukan.
-- **Dokumen .md Diperbarui:** `MEMORY.md`.
-- **Belum Selesai / Langkah Berikutnya:** musyawarahkan draf dan lakukan voting anggota dengan kuorum sebelum penetapan; verifikasi tampilan di staging setelah rilis.
+- **Dikerjakan:** membangun KTA Digital dengan branding database yang dikelola super admin, nomor anggota otomatis pada verifikasi NIK, QR verifikasi publik tanpa NIK/email, unduhan PNG/PDF dengan dynamic import, serta rate limit verifikasi 60 request per menit.
+- **Bukti:** `php artisan test --filter=MemberVerifyTest` lulus (8 tes / 94 assertions), Pint, `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus. Suite Laravel penuh 201 lulus dan 1 gagal pada tes glossary yang mengharapkan 8 entri sedangkan seeder menghasilkan 13; status staging/production belum diverifikasi.
+- **Status:** implementasi lokal — status: selesai — bukti: route, controller, resource, dan halaman frontend pada path yang disebut di atas; perubahan tidak menyentuh `.env` atau database production.
+- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+- **Belum Selesai / Langkah Berikutnya:** jalankan migrasi/seeder dan lakukan smoke test UI/API di staging saat rilis disetujui; jangan menganggap implementasi lokal sudah deploy.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.

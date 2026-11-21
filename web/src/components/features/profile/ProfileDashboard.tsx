@@ -219,6 +219,12 @@ export default function ProfileDashboard() {
                 </div>
               )}
             </section>
+            <Link
+              className="mt-6 inline-flex rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              href="/profil/kartu-anggota"
+            >
+              Lihat Kartu Anggota Digital
+            </Link>
           </>
         ) : null}
 

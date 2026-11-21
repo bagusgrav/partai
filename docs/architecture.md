@@ -2,7 +2,7 @@
 
 Dokumen ini adalah blueprint arsitektur kanonis untuk repository PARTAI. Ia memisahkan **implementasi yang terlihat di kode**, **topologi/prosedur yang dituju**, **roadmap**, dan **fakta operasional yang belum dapat dibuktikan dari repository**. Dokumen ini bukan bukti deployment, sertifikasi keamanan, atau kesiapan produksi.
 
-Audit dokumentasi ini memakai commit `a8a501af36c0e56878655a671505ed3eafe64bb5` pada 19 November 2026. Tidak ada perubahan worktree sebelum audit; dokumen ini diperbarui berdasarkan audit repository pada commit tersebut. Jika dokumen ini bertentangan dengan kode, route, migrasi, test, atau workflow, sumber tersebut menang. Perubahan deployment yang hanya dideskripsikan di dokumen belum dianggap fakta runtime.
+Audit dokumentasi ini diperbarui pada 21 November 2026 berdasarkan kode, route, migrasi, dan tes lokal. Perubahan lokal belum membuktikan deployment atau perubahan database produksi. Jika dokumen ini bertentangan dengan kode, route, migrasi, test, atau workflow, sumber tersebut menang. Perubahan deployment yang hanya dideskripsikan di dokumen belum dianggap fakta runtime.
 
 ## Ruang lingkup dan sumber kebenaran
 
@@ -136,7 +136,7 @@ Route halaman yang ditemukan di `web/src/app/` meliputi:
 | Partisipasi | `/events`, `/events/[id]/qr`, `/events/[id]/claim`, `/events/[id]/attest` |
 | Transparansi | `/jemput-hak`, `/kontrak-faksi`, `/pengawasan-birokrasi`, `/tanya-jawab` |
 | Tata kelola | `/voting`, `/recall`, `/tata-kelola`, `/peta-jalan` |
-| Akun | `/daftar`, `/masuk`, `/auth/register`, `/lupa-password`, `/reset-password`, `/profil`, `/notifikasi` |
+| Akun | `/daftar`, `/masuk`, `/auth/register`, `/lupa-password`, `/reset-password`, `/profil`, `/profil/kartu-anggota`, `/verifikasi/[member_number]`, `/notifikasi` |
 | Reputasi | `/reputasi` |
 
 Route `/juri-warga` dan `/info-indonesia` juga direwrite oleh [`web/next.config.ts`](../web/next.config.ts); rewrite bukan bukti route API atau kemampuan sortisi publik. Daftar halaman dapat ditelusuri di [`web/src/app/`](../web/src/app/).
@@ -148,6 +148,7 @@ Semua path API di bawah relatif terhadap prefix `/api`. Akses final dan middlewa
 | Domain | Endpoint utama di kode | Implementasi terkait |
 | --- | --- | --- |
 | Auth dan profil | `/auth/guest`, `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/verify-email/{id}/{hash}`, `/auth/forgot-password`, `/auth/reset-password`, `/user` | `AuthController`, `SessionController`, `auth:sanctum`, Sanctum tokens |
+| Branding dan verifikasi anggota | `/settings`, `/settings/logo`, `/members/verify/{memberNumber}` | `PartySettingController`, `MemberVerificationController`, tabel `party_settings`, nomor anggota diterbitkan ketika admin memverifikasi NIK |
 | Statistik publik | `/stats/landing` | `StatsController`, `WelfareService`; hanya mengirim agregat statistik |
 | Kesejahteraan dan data | `/welfare/*`, `/welfare/ikk`, `/economic/*`, `/economy/*`, `/insights/*`, `/rights/check` | `WelfareController`, `WelfareIndexController`, `EconomicController`, `SocialAssistanceController` |
 | Pendidikan | `/education/overview`, `/education/session`, `/education/answers`, `/review`, `/answer`, `/essay/*` | `CivicEducationService`, `ReviewController`, `EssayController` |
@@ -170,8 +171,17 @@ erDiagram
         string role
         string nik
         string nik_hash UK
+        string member_number UK
         string cluster_id
         boolean is_verified
+    }
+    PARTY_SETTINGS {
+        bigint id PK
+        string party_name
+        string logo_path
+        string primary_color
+        string secondary_color
+        string tagline
     }
     EVENTS {
         uuid id PK
@@ -394,10 +404,10 @@ Reputation ledger dirancang append-only melalui guard model dan trigger SQLite, 
 
 ## Tes dan verifikasi
 
-- API menggunakan PHPUnit/Laravel test dan `RefreshDatabase`; [`api/phpunit.xml`](../api/phpunit.xml) mengatur SQLite `:memory:`, cache/session array, dan mail array untuk pengujian.
+- API menggunakan PHPUnit/Laravel test dan `RefreshDatabase`; [`api/phpunit.xml`](../api/phpunit.xml) mengatur SQLite `:memory:`, cache/session array, dan mail array untuk pengujian. Pada sesi KTA, [`MemberVerifyTest.php`](../api/tests/Feature/MemberVerifyTest.php) lulus (7 tes / 33 assertions).
 - Tes fitur mencakup auth, akses Filament, privasi NIK, data welfare, dan idempotensi. Contoh: [`EncryptedNikTest.php`](../api/tests/Feature/EncryptedNikTest.php) dan [`MutationIdempotencyTest.php`](../api/tests/Feature/MutationIdempotencyTest.php).
-- Web menyediakan lint/build scripts dan Playwright `test:e2e` di [`web/package.json`](../web/package.json); tes e2e ada di [`web/tests/`](../web/tests/).
-- Keberadaan tes bukan status kelulusan; hasilnya harus dicatat dari run yang aktual. Tes, Pint, lint, dan build tidak dijalankan dalam audit dokumentasi ini.
+- Web menyediakan lint/build scripts dan Playwright `test:e2e` di [`web/package.json`](../web/package.json); tes e2e ada di [`web/tests/`](../web/tests/). Pada sesi KTA, `npm run lint` dan `npx tsc --noEmit` lulus; build dan e2e tidak dijalankan.
+- Keberadaan tes bukan status kelulusan; hasil tersebut hanya membuktikan run lokal yang dicatat, bukan staging atau production.
 
 ## Known gaps dan risiko
 
@@ -407,7 +417,7 @@ Reputation ledger dirancang append-only melalui guard model dan trigger SQLite, 
 4. **Panduan deployment bertentangan**: `docs/github-actions.md`, `docs/deployment.md`, workflow, dan skrip deploy memiliki perbedaan nilai/path/service; skrip melakukan `git reset --hard`.
 5. **Tidak ada rencana recovery teruji**: tidak ditemukan automated backup, retensi, restore test, atau rollback migrasi/rilis.
 6. **Kualitas/kemutakhiran data eksternal belum dijamin**: fallback offline/mock bisa berbeda dari data otoritatif; job terjadwal tidak membuktikan data berhasil diperbarui.
-7. **Referensi API berpotensi tertinggal**: `api/routes/api.php` memuat login, verify-email, finance, organization, dan bureaucracy routes yang perlu dibandingkan terhadap tabel dokumentasi API.
+7. **Referensi API harus tetap disinkronkan**: `docs/api-reference.md` adalah dokumen pendukung; perubahan route baru, termasuk branding dan verifikasi KTA, harus dicatat dan dibandingkan dengan `api/routes/api.php`.
 8. **Skala dan ketersediaan belum dibuktikan**: SQLite/Single VPS adalah pilihan footprint rendah, bukan bukti kapasitas tertentu atau jaminan availability.
 9. **Roadmap tata kelola**: sortisi ber-seed publik, panel tertentu, kurikulum/sertifikasi, dan fitur lainnya memiliki status yang dinyatakan di [ROADMAP.md](../ROADMAP.md); jangan promosikan sebagai lengkap sebelum statusnya berubah dengan bukti.
 
@@ -421,5 +431,6 @@ Reputation ledger dirancang append-only melalui guard model dan trigger SQLite, 
 | Idempotency per operasi tulis | `request_id`, constraint unik, replay logic, serta test fitur. | Harus diterapkan endpoint demi endpoint; klien wajib mempertahankan payload dan ID saat retry. |
 | SSO pusat sebagai arah identitas | Kontrak di `ECOSYSTEM.md`; belum ada exchange implementasi. | Migrasi autentikasi harus menunggu kontrak issuer/audience/token yang tervalidasi. |
 | Mastery dan participation terpisah | Model/service dan ledger reputasi Fase 2. | Memisahkan kapasitas dari kontribusi; interpretasi kelayakan dan proses tata kelola tetap perlu audit. |
+| Branding KTA berasal dari database | Tabel `party_settings`, seeder awal dan resource Filament khusus `super_admin`; web membaca `/api/settings` dengan fallback lokal. | Perubahan branding tidak membutuhkan rilis UI; logo publik disajikan melalui API agar dapat digunakan pada ekspor kartu lintas-origin. Nomor `PRT-YYYY-XXXX` hanya diterbitkan saat NIK memiliki cap verifikasi admin; endpoint verifikasi publik hanya membuka nama, nomor, wilayah, dan status. |
 
 Perubahan yang mengubah batas jaringan, database, identitas, atau format API sebaiknya menjadi ADR formal dan diperbarui di blueprint ini, `ECOSYSTEM.md`, serta [referensi API](api-reference.md).

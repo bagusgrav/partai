@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CivicQuestionSeeder::class);
         $this->call(BureaucracyWatchSeeder::class);
         $this->call(PartyFinanceSeeder::class);
+        $this->call(PartySettingSeeder::class);
         $this->call(OrganizationSeatSeeder::class);
 
         // User::factory(10)->create();

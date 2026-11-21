@@ -13,6 +13,7 @@ export * from "./rights";
 export * from "./voting";
 export * from "./welfare";
 export * from "./finance";
+export * from "./members";
 export * from "./organization";
 export * from "./posts";
 export * from "./regions";

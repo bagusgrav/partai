@@ -24,7 +24,7 @@ Dokumen ini mencatat seluruh rute yang didefinisikan di `api/routes/api.php` dan
 | `POST /api/auth/forgot-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `email` | Respons sukses generik yang sama untuk alamat terdaftar/tidak. Retry dengan ID dan payload sama mengembalikan respons tersimpan tanpa mengirim notifikasi kedua; payload berbeda menghasilkan `409`. |
 | `POST /api/auth/reset-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `token`, `email`, `password`, `password_confirmation` | `{"message":"Kata sandi berhasil diubah."}`; retry identik mengembalikan respons yang sama; ID sama dengan payload berbeda menghasilkan `409`. |
 | `POST /api/auth/logout` | Bearer (`auth:sanctum`); tanpa throttle tambahan | — | Menghapus token akses saat ini dan mengembalikan pesan sukses. |
-| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `reputation_points`, `reputation_level`, agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`. |
+| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `member_number` (nullable), `reputation_points`, `reputation_level`, agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`. |
 | `GET /api/reputation` | Bearer | — | `reputation_points`, `reputation_level`, dan hingga 10 riwayat gabungan terbaru dari `reputation_logs` dan ledger Mastery; entri ledger menyertakan `score_type: "mastery"`. |
 | `GET /api/reputation/me` | Bearer | Query opsional `page` (pagination) | Skor mastery lima domain, `overall_mastery_level`, `participation_score`, `eligible_roles`, dan hingga 50 entri ledger per halaman. |
 
@@ -34,6 +34,9 @@ Tidak ada route SSO atau route exchange SSO dalam route API saat ini. Login emai
 
 | Method & endpoint | Akses | Parameter | Respons utama |
 | --- | --- | --- | --- |
+| `GET /api/settings` | Publik | — | `party_name`, `logo_path` (URL publik atau `null`), `primary_color`, `secondary_color`, dan `tagline` dari satu pengaturan branding. Respons `Cache-Control: no-store`; bila pengaturan belum dibuat, `404`. |
+| `GET /api/settings/logo` | Publik | — | File logo branding saat ini untuk pemuatan lintas-origin dan ekspor kartu; `404` bila pengaturan atau logo belum tersedia. |
+| `GET /api/members/verify/{memberNumber}` | Publik; throttle 60/menit | Path: `memberNumber` format `PRT-YYYY-XXXX` | `{"name":"...","member_number":"PRT-YYYY-XXXX","region_name":"...","status":"verified"}`. Anggota yang tidak ditemukan atau NIK belum diverifikasi mendapat `404`; respons tidak mengandung NIK maupun email dan menggunakan `Cache-Control: no-store`. |
 | `GET /api/stats/landing` | Publik | — | `{"total_members":0,"total_votes_cast":0,"total_quizzes_completed":0,"poverty_rate":9.0,"active_votes":0}`. Statistik menghitung seluruh akun, jumlah tally pada opsi voting, jawaban kuis benar dari sistem review dan Civic Education, serta voting berstatus aktif dalam rentang waktu berjalan. `poverty_rate` memakai rata-rata data BPS tahun terbaru melalui `WelfareService`; jika kosong, API memakai fallback `9.0`. |
 | `GET /api/welfare/summary` | Publik | — | Ringkasan sesuai `WelfareService`. |
 | `GET /api/welfare/regions` | Publik | — | Daftar wilayah/data sesuai `WelfareService`. |

@@ -27,6 +27,7 @@ use Spatie\Permission\Traits\HasRoles;
     'role',
     'nik',
     'nik_verified_at',
+    'member_number',
     'cluster_id',
     'region_id',
     'is_verified',
