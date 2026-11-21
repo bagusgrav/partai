@@ -77,6 +77,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Auto-read notifikasi dan sinkronisasi Navbar**
+  - **Perubahan:** implementasi auto-read notifikasi, pembuatan bulk endpoint `POST /notifications/read`, dan sinkronisasi badge Navbar.
+  - **Bukti:** `web/src/components/features/notifications/NotificationsList.tsx`, `api/app/Http/Controllers/Api/NotificationController.php`, `api/tests/Feature/DailyDigestTest.php`; tes notifikasi lulus.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:**
 - **2026-11-20 — Perbaikan keamanan hak suara akun tamu**
   - **Perubahan:** menetapkan role dan status verifikasi guest secara eksplisit; eligibility voting menolak email `guest_`; menambahkan tes submit untuk akun role `guest` maupun member dengan email guest serta assertion atribut akun guest.
   - **Bukti:** `php artisan test` (185 tes, 1.528 assertions lulus); `php vendor\bin\pint --test` lulus; `git diff --check` lulus; tes regresi di `api/tests/Feature/Api/VoteControllerTest.php` dan `api/tests/Feature/GuestSessionTest.php`.

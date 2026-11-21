@@ -118,6 +118,27 @@ class DailyDigestTest extends TestCase
         $this->getJson('/api/notifications')->assertJsonPath('unread_count', 0);
     }
 
+    public function test_notifications_api_marks_all_current_user_notifications_read(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $digest = $this->digestData();
+        $user->notify(new DailyDigestNotification($digest));
+        $user->notify(new DailyDigestNotification($digest));
+        $otherUser->notify(new DailyDigestNotification($digest));
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/notifications/read', [
+            'request_id' => (string) Str::uuid(),
+        ])
+            ->assertOk()
+            ->assertJsonPath('updated_count', 2)
+            ->assertJsonPath('unread_count', 0);
+
+        $this->assertSame(0, $user->notifications()->whereNull('read_at')->count());
+        $this->assertSame(1, $otherUser->notifications()->whereNull('read_at')->count());
+    }
+
     public function test_notifications_api_requires_authentication_and_cannot_mark_another_users_notification_read(): void
     {
         $this->getJson('/api/notifications')->assertUnauthorized();

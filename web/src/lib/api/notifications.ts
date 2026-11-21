@@ -45,6 +45,10 @@ export interface NotificationsResponse {
   unread_count: number;
 }
 
+export interface NotificationReadResponse {
+  unread_count: number;
+}
+
 export async function getNotifications(): Promise<NotificationsResponse> {
   const response = await fetchWithRetry(`${API_BASE_URL}/notifications`, {
     method: "GET",
@@ -55,7 +59,7 @@ export async function getNotifications(): Promise<NotificationsResponse> {
   return response.json();
 }
 
-export async function markAsRead(id: string): Promise<void> {
+export async function markAsRead(id: string): Promise<NotificationReadResponse> {
   const response = await fetchWithRetry(
     `${API_BASE_URL}/notifications/${encodeURIComponent(id)}/read`,
     {
@@ -66,8 +70,36 @@ export async function markAsRead(id: string): Promise<void> {
   );
 
   await ensureSuccessfulResponse(response);
+  const result = (await response.json()) as NotificationReadResponse;
 
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(NOTIFICATIONS_UPDATED_EVENT));
+    window.dispatchEvent(
+      new CustomEvent<NotificationReadResponse>(NOTIFICATIONS_UPDATED_EVENT, {
+        detail: result,
+      }),
+    );
   }
+
+  return result;
+}
+
+export async function markAllAsRead(): Promise<NotificationReadResponse> {
+  const response = await fetchWithRetry(`${API_BASE_URL}/notifications/read`, {
+    method: "POST",
+    headers: await getHeaders(true),
+    body: JSON.stringify({ request_id: crypto.randomUUID() }),
+  });
+
+  await ensureSuccessfulResponse(response);
+  const result = (await response.json()) as NotificationReadResponse;
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent<NotificationReadResponse>(NOTIFICATIONS_UPDATED_EVENT, {
+        detail: result,
+      }),
+    );
+  }
+
+  return result;
 }

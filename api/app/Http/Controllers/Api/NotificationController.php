@@ -49,6 +49,27 @@ class NotificationController extends Controller
             'status' => $updated === 1 ? 'read' : 'already_processed',
             'id' => $notification->id,
             'read_at' => $notification->read_at?->toISOString(),
+            'unread_count' => $request->user()->notifications()->whereNull('read_at')->count(),
+        ]);
+    }
+
+    public function markAllAsRead(Request $request): JsonResponse
+    {
+        $request->validate([
+            'request_id' => ['required', 'uuid'],
+        ]);
+
+        $updated = $request->user()->notifications()
+            ->whereNull('read_at')
+            ->update([
+                'read_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'status' => 'read',
+            'updated_count' => $updated,
+            'unread_count' => 0,
         ]);
     }
 }

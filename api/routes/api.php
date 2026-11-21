@@ -130,6 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/education/session', [CivicEducationController::class, 'session']);
     Route::post('/education/answers', [CivicEducationController::class, 'answer'])->middleware('throttle:30,1');
     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead'])->middleware('throttle:30,1');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->middleware('throttle:30,1');
     Route::get('/reputation', ReputationController::class);
     Route::get('/reputation/me', [MemberReputationController::class, 'me']);

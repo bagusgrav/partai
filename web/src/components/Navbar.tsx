@@ -32,6 +32,7 @@ import {
   logoutMember,
   NOTIFICATIONS_UPDATED_EVENT,
 } from "@/lib/api";
+import type { NotificationReadResponse } from "@/lib/api/notifications";
 import type { RegisteredUser } from "@/types";
 
 const navigationGroups: {
@@ -348,7 +349,18 @@ export default function Navbar() {
   useEffect(() => {
     let active = true;
 
-    const loadUnreadCount = () => {
+    const loadUnreadCount = (event?: Event) => {
+      if (event instanceof CustomEvent) {
+        const detail = event.detail as NotificationReadResponse | undefined;
+        if (typeof detail?.unread_count === "number") {
+          if (active) {
+            setUnreadCount(detail.unread_count);
+            setNotificationError(null);
+          }
+          return;
+        }
+      }
+
       getNotifications()
         .then((result) => {
           if (active) {

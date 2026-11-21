@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getNotifications,
-  markAsRead,
+  markAllAsRead,
   type AppNotification,
 } from "@/lib/api/notifications";
 
@@ -20,7 +20,8 @@ export default function NotificationsList() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [markingId, setMarkingId] = useState<string | null>(null);
+  const [isMarkingAll, setIsMarkingAll] = useState(false);
+  const autoReadStarted = useRef(false);
 
   const loadNotifications = useCallback(async () => {
     setIsLoading(true);
@@ -49,6 +50,31 @@ export default function NotificationsList() {
         if (active) {
           setNotifications(result.notifications);
           setUnreadCount(result.unread_count);
+          if (result.unread_count > 0 && !autoReadStarted.current) {
+            autoReadStarted.current = true;
+            void markAllAsRead()
+              .then((readResult) => {
+                if (active) {
+                  setNotifications((current) =>
+                    current.map((item) =>
+                      item.read_at
+                        ? item
+                        : { ...item, read_at: new Date().toISOString() },
+                    ),
+                  );
+                  setUnreadCount(readResult.unread_count);
+                }
+              })
+              .catch((markError: unknown) => {
+                if (active) {
+                  setError(
+                    markError instanceof Error
+                      ? markError.message
+                      : "Notifikasi tidak dapat ditandai sudah dibaca.",
+                  );
+                }
+              });
+          }
         }
       })
       .catch((loadError: unknown) => {
@@ -71,20 +97,20 @@ export default function NotificationsList() {
     };
   }, []);
 
-  async function handleMarkAsRead(notification: AppNotification) {
-    setMarkingId(notification.id);
+  async function handleMarkAllAsRead() {
+    setIsMarkingAll(true);
     setError(null);
 
     try {
-      await markAsRead(notification.id);
+      const result = await markAllAsRead();
       setNotifications((current) =>
         current.map((item) =>
-          item.id === notification.id
-            ? { ...item, read_at: new Date().toISOString() }
-            : item,
+          item.read_at
+            ? item
+            : { ...item, read_at: new Date().toISOString() },
         ),
       );
-      setUnreadCount((count) => Math.max(0, count - 1));
+      setUnreadCount(result.unread_count);
     } catch (markError: unknown) {
       setError(
         markError instanceof Error
@@ -92,7 +118,7 @@ export default function NotificationsList() {
           : "Notifikasi tidak dapat ditandai sudah dibaca.",
       );
     } finally {
-      setMarkingId(null);
+      setIsMarkingAll(false);
     }
   }
 
@@ -105,9 +131,21 @@ export default function NotificationsList() {
           </p>
           <h1 className="mt-1 text-3xl font-black text-text-main">Notifikasi</h1>
         </div>
-        <p className="text-sm font-semibold text-text-muted">
-          {unreadCount} belum dibaca
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm font-semibold text-text-muted">
+            {unreadCount} belum dibaca
+          </p>
+          {unreadCount > 0 && (
+            <button
+              className="rounded-md border border-primary px-3 py-2 text-sm font-bold text-primary hover:bg-primary-light disabled:opacity-50"
+              disabled={isMarkingAll}
+              onClick={() => void handleMarkAllAsRead()}
+              type="button"
+            >
+              {isMarkingAll ? "Menandai..." : "Tandai semua dibaca"}
+            </button>
+          )}
+        </div>
       </header>
 
       {error && (
@@ -237,20 +275,6 @@ export default function NotificationsList() {
                   </div>
                 )}
 
-                {!notification.read_at && (
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      className="rounded-md px-3 py-2 text-sm font-semibold text-primary hover:bg-primary-light disabled:opacity-50"
-                      disabled={markingId === notification.id}
-                      onClick={() => void handleMarkAsRead(notification)}
-                      type="button"
-                    >
-                      {markingId === notification.id
-                        ? "Menyimpan..."
-                        : "Tandai sudah dibaca"}
-                    </button>
-                  </div>
-                )}
               </li>
             );
           })}
