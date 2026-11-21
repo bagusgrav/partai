@@ -36,10 +36,11 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 - **Dokumentasi Komunitas** — commit `a7b2da9` (`docs(community): dokumentasikan domain Komunitas dan batas visibilitas`). Bukti: `docs/architecture.md`, `docs/api-reference.md`, `README.md`, dan `ROADMAP.md`.
 - **Perapian UI Admin Filament** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Providers/Filament/AdminPanelProvider.php`, resource Filament, `api/app/Filament/Widgets/AdminStatsOverview.php`, `api/public/partai-favicon.svg`, dan `api/tests/Feature/AdminStatsOverviewTest.php`.
 - **Penolakan hak suara akun tamu** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Http/Controllers/Api/VoteController.php`, `api/app/Http/Controllers/Api/AuthController.php`, dan tes vote/guest session.
+- **Halaman Draf AD/ART** — status: selesai lokal, belum disahkan dan belum diverifikasi di staging/produksi — bukti: `web/src/app/ad-art/page.tsx` dan tautan navigasi pada `web/src/components/Navbar.tsx`.
 
 ## 4. Sedang Dikerjakan
 
-Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository saat pemeriksaan.
+Tidak ada pekerjaan fitur aktif setelah implementasi halaman Draf AD/ART; proses musyawarah dan voting konstitusi belum dimulai.
 
 ## 5. Belum Dikerjakan
 
@@ -53,6 +54,7 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - Resource admin Filament untuk Voting dan Recall belum tersedia; menu tersebut belum dapat ditampilkan tanpa implementasi resource tersendiri.
 - Verifikasi tampilan halaman Profil di staging setelah perubahan skor dan riwayat dirilis.
 - Verifikasi endpoint Statistik Landing dan tampilan kartu di staging setelah rilis.
+- Proses musyawarah, voting elektronik, pemenuhan kuorum, dan penetapan AD/ART belum dilakukan; draf di halaman `/ad-art` belum berlaku.
 
 ### Known gaps dokumentasi
 
@@ -87,6 +89,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Halaman Draf AD/ART**
+  - **Perubahan:** membuat halaman dokumen AD/ART statis dengan banner status belum berlaku, ringkasan tahapan pengesahan, daftar isi tautan per pasal, tipografi dokumen, tampilan responsif, dan CTA ke Komunitas. Menambahkan tautan AD/ART pada menu Tata Kelola; tidak mengubah API atau database.
+  - **Bukti:** `web/src/app/ad-art/page.tsx`, `web/src/components/Navbar.tsx`; verifikasi `npm run lint`, `npx tsc --noEmit`, dan `git diff --check`.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** lakukan musyawarah terbuka dan proses voting sebelum menyatakan draf berlaku.
 - **2026-11-21 — Infografik Statistik Landing Page**
   - **Perubahan:** menambahkan `GET /api/stats/landing` tanpa autentikasi dan kartu statistik dengan fallback nol serta animasi fade-in di antara Empat Pilar dan Kabar Warga. Data kemiskinan memakai ringkasan BPS terbaru atau fallback `9.0`; tidak ada perubahan skema, `.env`, atau database produksi.
   - **Bukti:** `php artisan test --filter=StatsTest` (2 tes / 18 assertions), Pint, `npm run lint`, `npx tsc --noEmit`, pemeriksaan route dan `git diff --check` lulus.
@@ -141,10 +148,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** menambahkan endpoint agregat statistik publik dan komponen Infografik di halaman depan, ditempatkan di antara Empat Pilar dan Kabar Warga.
-- **Bukti:** `api/tests/Feature/StatsTest.php` (2 tes / 18 assertions), `npm run lint`, `npx tsc --noEmit`, Pint, route:list, dan `git diff --check` lulus.
-- **Status:** implementasi lokal — status: selesai, belum diverifikasi di staging/produksi — bukti: `GET /api/stats/landing`, `StatsController`, dan `StatsSection`.
-- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
-- **Belum Selesai / Langkah Berikutnya:** verifikasi visual dan kontrak endpoint di staging setelah rilis.
+- **Dikerjakan:** membuat halaman statis Draf AD/ART berisi kesembilan pasal, banner belum berlaku, daftar isi, CTA masukan ke Komunitas, dan tautan pada menu Tata Kelola.
+- **Bukti:** `web/src/app/ad-art/page.tsx`, `web/src/components/Navbar.tsx`; `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus.
+- **Status:** implementasi halaman lokal — status: selesai; AD/ART tetap draf dan belum disahkan — bukti: konten halaman menyatakan tahapan musyawarah, voting, dan penetapan yang belum dilakukan.
+- **Dokumen .md Diperbarui:** `MEMORY.md`.
+- **Belum Selesai / Langkah Berikutnya:** musyawarahkan draf dan lakukan voting anggota dengan kuorum sebelum penetapan; verifikasi tampilan di staging setelah rilis.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.

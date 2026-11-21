@@ -165,6 +165,12 @@ const navigationGroups: {
         description: "Struktur, sortisi, & konstitusi kode",
         icon: Network,
       },
+      {
+        href: "/ad-art",
+        label: "AD/ART (Draf)",
+        description: "Draf konstitusi untuk dimusyawarahkan",
+        icon: FileText,
+      },
     ],
   },
 ];
