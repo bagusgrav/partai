@@ -24,6 +24,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 ## 3. Sudah Selesai
 
+- **Infografik Statistik Landing Page** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/StatsController.php`, `api/tests/Feature/StatsTest.php`, dan `web/src/components/features/landing/StatsSection.tsx`.
 - **Integrasi skor Civic Education pada Profil** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/ReputationController.php`, `web/src/components/features/profile/ProfileDashboard.tsx`, dan `api/tests/Feature/ReputationTest.php`.
 - **Voting Parameter & Kebijakan** — status: selesai pada implementasi lokal, bukan deployment — bukti: `web/src/components/features/voting/VotingDashboard.tsx`, `web/src/components/features/voting/VoteCard.tsx`, `api/app/Services/VoteService.php`, `api/tests/Feature/Api/VoteControllerTest.php`; seluruh tes Laravel dan Playwright voting lulus.
 - **Refaktor `rights/check` tanpa `{nik}` di path URL** — commit `afd85c0` (`fix(security): remove NIK from URL path and use authenticated session`). Bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/SocialAssistanceController.php`, `api/tests/Feature/Api/SocialAssistanceControllerTest.php`, `docs/api-reference.md`, dan `docs/architecture.md`.
@@ -51,6 +52,7 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - Uji alur moderasi Filament secara manual.
 - Resource admin Filament untuk Voting dan Recall belum tersedia; menu tersebut belum dapat ditampilkan tanpa implementasi resource tersendiri.
 - Verifikasi tampilan halaman Profil di staging setelah perubahan skor dan riwayat dirilis.
+- Verifikasi endpoint Statistik Landing dan tampilan kartu di staging setelah rilis.
 
 ### Known gaps dokumentasi
 
@@ -64,6 +66,12 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 - **Konteks:** `auth:sanctum` juga mengizinkan akun tamu, sedangkan pemilihan kebijakan ditujukan untuk anggota; tamu dapat memiliki email berawalan `guest_`.
 - **Keputusan:** submit mensyaratkan `role=member`, `is_verified=true`, dan email yang tidak berawalan `guest_`; pembuatan akun tamu menetapkan `role=guest` dan `is_verified=false`. `GET /api/votes/active` mengembalikan `can_vote` dan `has_voted`; `votes_count` hanya dikirim setelah pemanggil memilih. Tidak diperlukan perubahan skema.
 - **Konsekuensi:** akun lain tetap dapat melihat daftar, tetapi kontrol voting dinonaktifkan dan submit ditolak `403`; hasil agregat tidak membuka pilihan individual.
+
+### ADR-20261121-01: Statistik landing hanya menampilkan agregat publik
+
+- **Konteks:** landing page memerlukan statistik partai dan Indonesia tanpa mengekspos suara atau jawaban individual.
+- **Keputusan:** endpoint publik menghitung tally agregat opsi voting, jawaban kuis benar dari kedua jalur kuis, akun terdaftar, voting aktif menurut status dan rentang waktu, serta memakai rata-rata data BPS tahun terbaru melalui `WelfareService`. Jika data kemiskinan kosong, fallback API adalah `9.0`.
+- **Konsekuensi:** respons tidak memuat identitas atau pilihan individu; angka fallback bukan data BPS terverifikasi dan perlu tetap dipahami sebagai fallback.
 
 ### ADR-001: `docs/architecture.md` adalah arsitektur kanonis
 
@@ -79,6 +87,11 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Infografik Statistik Landing Page**
+  - **Perubahan:** menambahkan `GET /api/stats/landing` tanpa autentikasi dan kartu statistik dengan fallback nol serta animasi fade-in di antara Empat Pilar dan Kabar Warga. Data kemiskinan memakai ringkasan BPS terbaru atau fallback `9.0`; tidak ada perubahan skema, `.env`, atau database produksi.
+  - **Bukti:** `php artisan test --filter=StatsTest` (2 tes / 18 assertions), Pint, `npm run lint`, `npx tsc --noEmit`, pemeriksaan route dan `git diff --check` lulus.
+  - **Dokumen Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+  - **Langkah Berikutnya:** verifikasi visual dan kontrak endpoint di staging setelah perubahan dirilis.
 - **2026-11-21 — Integrasi Mastery dan Participation pada Profil**
   - **Perubahan:** `/api/user` kini mengirim agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`; `/api/reputation` menggabungkan riwayat legacy dan ledger Mastery terbaru. Kartu Profil memisahkan Mastery Score/Participation Score dan progress mengacu pada ambang level Mastery eksisting. Logika SM-2 dan database produksi tidak disentuh.
   - **Bukti:** `npm run lint`, `npx tsc --noEmit`, `php artisan test --filter=ReputationTest` (11 tes / 85 assertions), `php vendor\bin\pint --test` untuk berkas PHP terkait, dan `git diff --check` lulus.
@@ -128,20 +141,10 @@ Tidak ada pekerjaan fitur aktif yang dapat disimpulkan dari status repository sa
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** menyambungkan agregat skor Civic Education dan riwayat ledger Mastery ke halaman Profil tanpa mengubah SM-2 atau menyentuh database produksi.
-- **Bukti:** `api/tests/Feature/ReputationTest.php` (11 tes / 85 assertions); `npm run lint`, `npx tsc --noEmit`, Pint, dan `git diff --check` lulus.
-- **Status:** implementasi lokal — status: selesai, belum diverifikasi di staging/produksi — bukti: endpoint `/api/user`, endpoint `/api/reputation`, dan UI Profil.
-- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`. `docs/architecture.md` tidak berubah karena struktur/topologi sistem tidak berubah.
-- **Belum Selesai / Langkah Berikutnya:** verifikasi visual dan kontrak API di staging setelah perubahan dirilis.
+- **Dikerjakan:** menambahkan endpoint agregat statistik publik dan komponen Infografik di halaman depan, ditempatkan di antara Empat Pilar dan Kabar Warga.
+- **Bukti:** `api/tests/Feature/StatsTest.php` (2 tes / 18 assertions), `npm run lint`, `npx tsc --noEmit`, Pint, route:list, dan `git diff --check` lulus.
+- **Status:** implementasi lokal — status: selesai, belum diverifikasi di staging/produksi — bukti: `GET /api/stats/landing`, `StatsController`, dan `StatsSection`.
+- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+- **Belum Selesai / Langkah Berikutnya:** verifikasi visual dan kontrak endpoint di staging setelah rilis.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
-### Voting Security Fix (Verified)
-- **Tanggal:** 20 November 2026
-- **Konteks:** Menutup celah keamanan di mana sesi tamu (*guest*) dapat mengirim suara.
-- **Keputusan (Invariant):** 
-  - Fitur voting **wajib** mensyaratkan pengguna terautentikasi dan terverifikasi (`can_vote: true`).
-  - API (`VoteController`) menolak request dari tamu dengan `403 Forbidden`.
-  - UI (`VotingDashboard`) wajib menonaktifkan opsi pilihan dan menampilkan pesan: *"Voting hanya tersedia bagi anggota terverifikasi"* jika `can_vote` bernilai *false*.
-- **Bukti Verifikasi:**
-  - Automated: PHPUnit `VoteControllerTest` (8 passed), Playwright guest-voting E2E (1 passed), ESLint (passed).
-  - Manual: Smoke test di produksi (Member "Fefi" sukses mencoblos, Guest terblokir di UI & tidak bisa klik).

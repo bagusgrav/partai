@@ -34,6 +34,7 @@ Tidak ada route SSO atau route exchange SSO dalam route API saat ini. Login emai
 
 | Method & endpoint | Akses | Parameter | Respons utama |
 | --- | --- | --- | --- |
+| `GET /api/stats/landing` | Publik | — | `{"total_members":0,"total_votes_cast":0,"total_quizzes_completed":0,"poverty_rate":9.0,"active_votes":0}`. Statistik menghitung seluruh akun, jumlah tally pada opsi voting, jawaban kuis benar dari sistem review dan Civic Education, serta voting berstatus aktif dalam rentang waktu berjalan. `poverty_rate` memakai rata-rata data BPS tahun terbaru melalui `WelfareService`; jika kosong, API memakai fallback `9.0`. |
 | `GET /api/welfare/summary` | Publik | — | Ringkasan sesuai `WelfareService`. |
 | `GET /api/welfare/regions` | Publik | — | Daftar wilayah/data sesuai `WelfareService`. |
 | `GET /api/welfare/region/{code}` | Publik | Path: `code` kode wilayah | Satu objek wilayah; `404 {"message":"Data wilayah tidak ditemukan."}` bila tidak ada. |

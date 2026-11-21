@@ -148,6 +148,7 @@ Semua path API di bawah relatif terhadap prefix `/api`. Akses final dan middlewa
 | Domain | Endpoint utama di kode | Implementasi terkait |
 | --- | --- | --- |
 | Auth dan profil | `/auth/guest`, `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/verify-email/{id}/{hash}`, `/auth/forgot-password`, `/auth/reset-password`, `/user` | `AuthController`, `SessionController`, `auth:sanctum`, Sanctum tokens |
+| Statistik publik | `/stats/landing` | `StatsController`, `WelfareService`; hanya mengirim agregat statistik |
 | Kesejahteraan dan data | `/welfare/*`, `/welfare/ikk`, `/economic/*`, `/economy/*`, `/insights/*`, `/rights/check` | `WelfareController`, `WelfareIndexController`, `EconomicController`, `SocialAssistanceController` |
 | Pendidikan | `/education/overview`, `/education/session`, `/education/answers`, `/review`, `/answer`, `/essay/*` | `CivicEducationService`, `ReviewController`, `EssayController` |
 | Kegiatan | `/events`, `/events/active`, `/events/{id}/qr`, `/attendance/claim`, `/attendance/pending`, `/attendance/attest` | `EventController`, `AttendanceController`, `AttendanceService` |

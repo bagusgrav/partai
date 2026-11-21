@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CommunityPreview from "@/components/features/landing/CommunityPreview";
+import StatsSection from "@/components/features/landing/StatsSection";
 
 const pillars = [
   {
@@ -151,6 +152,8 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      <StatsSection />
 
       <CommunityPreview />
 
