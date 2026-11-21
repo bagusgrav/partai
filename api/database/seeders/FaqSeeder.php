@@ -45,6 +45,31 @@ class FaqSeeder extends Seeder
                 'question' => 'Bagaimana Pengawasan Birokrasi, IKK, dan reputasi terpisah saling terhubung?',
                 'answer' => 'Pengawasan Birokrasi menerima laporan, IKK menunjukkan kerentanan kesejahteraan wilayah, dan Sistem Reputasi Terpisah mencatat Mastery serta Participation secara terverifikasi dalam ledger yang berbeda. Ketiganya saling melengkapi bukti publik, tetapi tidak boleh ditukar atau dimanipulasi menggunakan nominal keuangan.',
             ],
+            [
+                'id' => '4e3e8b8b-60e1-4ad0-898f-6dd68c5e8a08',
+                'question' => 'Bagaimana PARTAI mencegah kecurangan suara tamu/guest?',
+                'answer' => 'Akun tamu memperoleh sesi melalui Laravel Sanctum, tetapi ditandai sebagai role guest dan tidak diverifikasi. Sistem voting hanya menerima akun role member yang sudah terverifikasi serta bukan akun berprefiks guest_, sehingga akun tamu tidak dapat mengirim suara. Pendaftaran anggota juga memeriksa keunikan NIK yang disimpan sebagai hash.',
+            ],
+            [
+                'id' => '4e3e8b8b-60e1-4ad0-898f-6dd68c5e8a09',
+                'question' => 'Apakah saya bisa membeli pengaruh dengan donasi?',
+                'answer' => 'Tidak. PARTAI menerapkan prinsip Zero Leverage: besaran donasi tidak menambah bobot suara, kelayakan kursi, atau pengaruh keputusan. Sumbangan tetap tercatat dan diaudit, tetapi hak politik ditentukan oleh identitas anggota yang terverifikasi dan aturan kapasitas.',
+            ],
+            [
+                'id' => '4e3e8b8b-60e1-4ad0-898f-6dd68c5e8a10',
+                'question' => 'Bagaimana cara kerja algoritma SM-2 di halaman Belajar?',
+                'answer' => 'Setelah menjawab materi, sistem menilai kualitas jawaban dan memperbarui jadwal ulasan. Jawaban yang lemah mengulang interval pendek; jawaban yang kuat memperpanjang interval berikutnya. Nilai pengulangan dan faktor kemudahan disimpan, sehingga Mastery Score dan jadwal ulasan berkembang secara dinamis.',
+            ],
+            [
+                'id' => '4e3e8b8b-60e1-4ad0-898f-6dd68c5e8a11',
+                'question' => 'Mengapa satu klik tidak boleh menghasilkan dua suara atau tindakan?',
+                'answer' => 'Sistem menggunakan idempotensi dan kunci permintaan untuk memastikan permintaan berulang diproses hanya sekali. Pada voting dan tindakan lain, kombinasi identitas, kunci permintaan, dan data permintaan diperiksa; pengulangan yang sama tidak menambah efek, sedangkan kunci yang dipakai dengan data berbeda ditolak atau ditandai konflik.',
+            ],
+            [
+                'id' => '4e3e8b8b-60e1-4ad0-898f-6dd68c5e8a12',
+                'question' => 'Apakah riwayat reputasi dapat diubah atau dihapus?',
+                'answer' => 'Reputation Ledger mencatat riwayat yang terhubung oleh rantai hash. Perubahan baru harus membentuk catatan baru dan dapat diaudit, bukan menyembunyikan catatan lama. Mekanisme ini membantu menjaga integritas Mastery dan Participation serta mendeteksi manipulasi.',
+            ],
         ];
 
         foreach ($faqs as $faq) {

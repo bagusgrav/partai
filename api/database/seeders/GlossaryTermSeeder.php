@@ -37,13 +37,38 @@ class GlossaryTermSeeder extends Seeder
             ],
             [
                 'term' => 'Mastery Score',
-                'definition' => 'Nilai penguasaan materi kewargaan anggota pada skala 0–100. Skor ini menggambarkan kapasitas belajar dan terpisah dari poin kontribusi.',
+                'definition' => 'Skor kapasitas intelektual yang menggambarkan penguasaan anggota terhadap materi kewargaan. Perkembangan Mastery Score dipelajari menggunakan algoritma SM-2 (SuperMemo 2) dan terpisah dari kontribusi serta hak suara.',
                 'category' => 'Partisipasi',
             ],
             [
                 'term' => 'Participation Score',
-                'definition' => 'Poin dari kontribusi anggota yang telah diverifikasi, seperti kerja lapangan, riset, bantuan hukum, logistik, atau kerja editorial. Skor ini terpisah dari penguasaan materi dan tidak memengaruhi hak suara.',
+                'definition' => 'Skor kontribusi bagi aksi lapangan dan kontribusi non-fisik yang telah diverifikasi, seperti riset, bantuan hukum, logistik, atau kerja editorial. Skor ini terpisah dari penguasaan materi dan tidak menambah bobot suara.',
                 'category' => 'Partisipasi',
+            ],
+            [
+                'term' => 'SM-2 (SuperMemo 2)',
+                'definition' => 'Algoritma pengulangan berjeda (spaced repetition) yang menentukan jadwal ulasan berdasarkan kualitas ingatan. Materi yang sulit diingat dijadwalkan lebih cepat, sementara materi yang dikuasai dapat dijadwalkan lebih lama agar masuk ke memori jangka panjang.',
+                'category' => 'Pembelajaran',
+            ],
+            [
+                'term' => 'Zero Leverage',
+                'definition' => 'Prinsip anti-oligarki bahwa besaran donasi atau kekayaan tidak menambah bobot suara, akses keputusan, atau kelayakan jabatan. Setiap anggota yang memenuhi syarat memiliki kedudukan suara yang setara.',
+                'category' => 'Tata kelola',
+            ],
+            [
+                'term' => 'Reputation Ledger',
+                'definition' => 'Pencatatan riwayat reputasi yang terhubung dengan rantai hash (hash-chained), sehingga perubahan atau penghapusan catatan dapat terdeteksi. Ledger ini mendukung audit riwayat Mastery dan Participation secara terbuka.',
+                'category' => 'Tata kelola',
+            ],
+            [
+                'term' => 'Sortisi (Sortition)',
+                'definition' => 'Pemilihan panel audit atau juri secara acak dari anggota yang memenuhi syarat, sebagaimana sistem juri. Pemilihan acak mengurangi dominasi popularitas dan menjaga representasi yang lebih adil.',
+                'category' => 'Tata kelola',
+            ],
+            [
+                'term' => 'Idempotensi',
+                'definition' => 'Sifat sistem yang mencegah input ganda menghasilkan efek berulang. Contohnya, satu klik voter dengan satu permintaan yang sama hanya menghasilkan satu suara atau satu tindakan.',
+                'category' => 'Teknologi',
             ],
             [
                 'term' => 'Kontrak Faksi',

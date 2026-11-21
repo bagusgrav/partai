@@ -135,6 +135,9 @@ export default function GuideContent() {
               <p className="mt-4 leading-7 text-text-muted">
                 Mastery Score mengukur penguasaan, Participation Score mencatat kontribusi terverifikasi, dan keuangan partai hanya tunduk pada transparansi serta plafon UU Parpol. Sumbangan individu dibatasi Rp1 miliar/tahun dan badan usaha Rp7,5 miliar/tahun; donasi anonim dilarang. Ledger hash append-only menjaga jejak, tetapi nominal tidak menambah hak suara atau kelayakan kursi.
               </p>
+              <p className="mt-3 font-extrabold text-text-main">
+                &quot;Satu anggota, satu suara. Identitas diverifikasi, bukan dompet.&quot;
+              </p>
               <Link className="mt-5 inline-flex font-bold text-primary-hover underline underline-offset-4" href="/tata-kelola">Cek kursi dan ambang kapasitas</Link>
             </section>
 
@@ -218,6 +221,10 @@ export default function GuideContent() {
                     Mengukur penguasaan materi kewargaan pada lima domain.
                     Skor ini berhubungan dengan tingkat kapasitas dan ambang
                     kelayakan peran tertentu.
+                  </p>
+                  <p className="mt-3 text-sm font-semibold leading-6 text-text-muted">
+                    Mastery dihitung menggunakan <strong>Algoritma SM-2 (Spaced Repetition)</strong>,
+                    yang menjadwalkan ulasan secara dinamis sesuai kekuatan ingatan.
                   </p>
                 </article>
                 <article className="rounded-xl bg-slate-50 p-5">
