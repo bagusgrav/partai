@@ -56,7 +56,7 @@ class GlossaryControllerTest extends TestCase
         $this->seed(GlossaryTermSeeder::class);
         $this->seed(GlossaryTermSeeder::class);
 
-        $this->assertDatabaseCount('glossary_terms', 8);
+        $this->assertDatabaseCount('glossary_terms', 13);
         $this->assertDatabaseHas('glossary_terms', ['term' => 'Participation Score']);
     }
 }

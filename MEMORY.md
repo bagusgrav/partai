@@ -38,6 +38,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 - **Penolakan hak suara akun tamu** — status: selesai lokal, belum diverifikasi di produksi — bukti: `api/app/Http/Controllers/Api/VoteController.php`, `api/app/Http/Controllers/Api/AuthController.php`, dan tes vote/guest session.
 - **Halaman Draf AD/ART** — status: selesai lokal, belum disahkan dan belum diverifikasi di staging/produksi — bukti: `web/src/app/ad-art/page.tsx` dan tautan navigasi pada `web/src/components/Navbar.tsx`.
 - **KTA Digital, branding dinamis, dan verifikasi publik** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: migrasi/tabel `party_settings` dan `users.member_number`, `PartySettingResource` khusus `super_admin`, penerbitan nomor saat verifikasi NIK, endpoint publik `/api/settings` dan `/api/members/verify/{memberNumber}`, halaman `/profil/kartu-anggota` dan `/verifikasi/[member_number]`, serta `api/tests/Feature/MemberVerifyTest.php`.
+- **Koreksi ekspektasi jumlah istilah glossary pada tes seeder** — status: selesai lokal — bukti: `api/tests/Feature/Api/GlossaryControllerTest.php` memvalidasi 13 baris sesuai `api/database/seeders/GlossaryTermSeeder.php`; hasil tes terarah tercatat di log sesi terbaru.
 
 ## 4. Sedang Dikerjakan
 
@@ -97,6 +98,11 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Menyelaraskan jumlah glossary pada tes seeder**
+  - **Perubahan:** memperbarui ekspektasi database count dari 8 menjadi 13 pada tes repeatability seeder; jumlah tersebut sesuai dengan istilah yang didefinisikan seeder.
+  - **Bukti:** `api/tests/Feature/Api/GlossaryControllerTest.php`, `api/database/seeders/GlossaryTermSeeder.php`; `php artisan test --filter=GlossaryControllerTest` lulus.
+  - **Dokumen Diperbarui:** `MEMORY.md`.
+  - **Langkah Berikutnya:** tidak ada langkah implementasi; jalankan suite Laravel penuh pada perubahan selanjutnya bila diperlukan.
 - **2026-11-21 — KTA Digital dan verifikasi publik**
   - **Perubahan:** menambahkan branding partai yang dikelola di Filament, upload logo, penerbitan nomor anggota berurutan saat NIK diverifikasi, respons verifikasi publik tanpa NIK/email, provider branding dengan fallback, kartu anggota ber-QR dengan ekspor PNG/PDF, dan halaman verifikasi publik. Memastikan endpoint verifikasi dibatasi 60 request per menit dan memuat library ekspor `html-to-image`/`jspdf` secara dinamis.
   - **Bukti:** `php artisan test --filter=MemberVerifyTest` lulus (8 tes / 94 assertions) setelah penambahan tes 429; Pint pada berkas PHP terkait, `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus. `php artisan test` penuh menghasilkan 201 lulus dan 1 gagal pada tes glossary yang mengharapkan 8 entri sedangkan seeder menghasilkan 13. Migrasi/route di `api/database/migrations/` dan `api/routes/api.php`; halaman di `web/src/app/profil/kartu-anggota/` dan `web/src/app/verifikasi/`.
@@ -161,10 +167,10 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
 
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** membangun KTA Digital dengan branding database yang dikelola super admin, nomor anggota otomatis pada verifikasi NIK, QR verifikasi publik tanpa NIK/email, unduhan PNG/PDF dengan dynamic import, serta rate limit verifikasi 60 request per menit.
-- **Bukti:** `php artisan test --filter=MemberVerifyTest` lulus (8 tes / 94 assertions), Pint, `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus. Suite Laravel penuh 201 lulus dan 1 gagal pada tes glossary yang mengharapkan 8 entri sedangkan seeder menghasilkan 13; status staging/production belum diverifikasi.
-- **Status:** implementasi lokal — status: selesai — bukti: route, controller, resource, dan halaman frontend pada path yang disebut di atas; perubahan tidak menyentuh `.env` atau database production.
-- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
-- **Belum Selesai / Langkah Berikutnya:** jalankan migrasi/seeder dan lakukan smoke test UI/API di staging saat rilis disetujui; jangan menganggap implementasi lokal sudah deploy.
+- **Dikerjakan:** menyelaraskan assertion count tes glossary dengan 13 entri yang dibuat `GlossaryTermSeeder`.
+- **Bukti:** `api/tests/Feature/Api/GlossaryControllerTest.php`, `api/database/seeders/GlossaryTermSeeder.php`, dan hasil `php artisan test --filter=GlossaryControllerTest` lulus.
+- **Status:** koreksi tes lokal — status: selesai — bukti: tes glossary terarah lulus; perubahan tidak mengubah seeder maupun perilaku API.
+- **Dokumen .md Diperbarui:** `MEMORY.md`.
+- **Belum Selesai / Langkah Berikutnya:** tidak ada langkah lanjutan untuk perbaikan ini. Status deploy tidak berubah dan tidak diverifikasi.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.
