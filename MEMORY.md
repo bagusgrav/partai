@@ -24,6 +24,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 ## 3. Sudah Selesai
 
+- **Pengusulan Identitas Partai** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: migrasi/model/controller dan `api/tests/Feature/IdentityProposalTest.php`; halaman `/voting-identitas`, endpoint public approved-only, serta tinjauan Filament khusus `super_admin`. Voting yang sudah ada tidak diubah; verifikasi lokal tercatat pada log sesi terbaru.
 - **Infografik Statistik Landing Page** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/StatsController.php`, `api/tests/Feature/StatsTest.php`, dan `web/src/components/features/landing/StatsSection.tsx`.
 - **Integrasi skor Civic Education pada Profil** — status: selesai lokal, belum diverifikasi di staging/produksi — bukti: `api/routes/api.php`, `api/app/Http/Controllers/Api/ReputationController.php`, `web/src/components/features/profile/ProfileDashboard.tsx`, dan `api/tests/Feature/ReputationTest.php`.
 - **Voting Parameter & Kebijakan** — status: selesai pada implementasi lokal, bukan deployment — bukti: `web/src/components/features/voting/VotingDashboard.tsx`, `web/src/components/features/voting/VoteCard.tsx`, `api/app/Services/VoteService.php`, `api/tests/Feature/Api/VoteControllerTest.php`; seluruh tes Laravel dan Playwright voting lulus.
@@ -42,7 +43,7 @@ Area berikut diperlakukan sebagai invariant. Perubahan memerlukan audit yang rel
 
 ## 4. Sedang Dikerjakan
 
-Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; proses musyawarah dan voting konstitusi AD/ART belum dimulai.
+Tidak ada pekerjaan fitur aktif. Fitur Pengusulan Identitas Partai selesai pada implementasi lokal; migrasi/deployment dan verifikasi visual di staging/produksi belum dilakukan.
 
 ## 5. Belum Dikerjakan
 
@@ -54,6 +55,7 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
 - Backup terjadwal yang diverifikasi.
 - Smoke test staging.
 - Uji alur moderasi Filament secara manual.
+- Deploy dan verifikasi migrasi, UI, serta tinjauan `super_admin` untuk Pengusulan Identitas Partai; tahap kurasi dan voting identitas belum dimulai. Logika voting yang sudah ada tidak diubah.
 - Resource admin Filament untuk Voting dan Recall belum tersedia; menu tersebut belum dapat ditampilkan tanpa implementasi resource tersendiri.
 - Verifikasi tampilan halaman Profil di staging setelah perubahan skor dan riwayat dirilis.
 - Verifikasi endpoint Statistik Landing dan tampilan kartu di staging setelah rilis.
@@ -84,6 +86,12 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
 - **Keputusan:** simpan branding pada `party_settings`, kelola melalui Filament hanya untuk `super_admin`, dan baca via `/api/settings`. Nomor `PRT-YYYY-XXXX` diterbitkan ketika admin memberi cap `nik_verified_at`; endpoint verifikasi hanya mengembalikan nama, nomor anggota, wilayah, dan status. Web menyediakan nilai fallback branding jika API tidak tersedia.
 - **Konsekuensi:** logo publik disajikan melalui route API agar CORS mendukung ekspor kartu; status kartu tetap harus diverifikasi melalui API, bukan isi QR saja. Deploy/migrasi production belum dilakukan oleh sesi ini.
 
+### ADR-20261121-03: Kurasi usulan identitas sebelum publikasi
+
+- **Konteks:** usulan nama, warna, dan deskripsi logo tidak boleh tampil sebagai kandidat publik sebelum ditinjau; submit hanya diperuntukkan bagi anggota dengan verifikasi NIK.
+- **Keputusan:** simpan proposal dengan UUID dan status `pending`; periksa `nik_verified_at` pada API submit, tampilkan hanya `approved` pada endpoint publik, dan batasi aksi perubahan status Filament untuk `super_admin`. `/api/user` hanya menambahkan boolean `is_nik_verified`, tanpa mengirim NIK atau timestamp. Tidak ada unggah gambar dan logika voting yang tersedia tidak diubah.
+- **Konsekuensi:** usulan pending/rejected tidak terlihat di halaman publik; persetujuan hanya mengizinkan tampilan, bukan membuat atau mengubah voting. Migrasi dan UI masih perlu diverifikasi setelah deploy.
+
 ### ADR-001: `docs/architecture.md` adalah arsitektur kanonis
 
 - **Keputusan:** blueprint lengkap dipelihara hanya di `docs/architecture.md`; `ARCHITECTURE.md` di root menjadi stub pointer 3 baris.
@@ -98,6 +106,11 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
 
 ## 7. Log Sesi
 
+- **2026-11-21 — Pengusulan & Voting Identitas Partai**
+  - **Perubahan:** menambahkan tabel dan model proposal UUID, endpoint submit yang mensyaratkan verifikasi NIK, endpoint publik approved-only tanpa ID pengusul, tinjauan approve/reject Filament khusus `super_admin`, halaman `/voting-identitas`, color picker teks, disclaimer, daftar proposal, dan tautan navigasi Tata Kelola. Tidak ada unggah gambar atau perubahan logika voting yang ada.
+  - **Bukti:** `php artisan test --filter=IdentityProposalTest` lulus (6 tes / 33 assertions); Pint `--test`, `npm run lint`, `npx tsc --noEmit`, dan `git diff --check` lulus. Belum diverifikasi di staging/produksi.
+  - **Dokumen Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+  - **Langkah Berikutnya:** migrasikan dan verifikasi alur UI/API serta hak akses Filament di staging sebelum proses kurasi dan voting identitas.
 - **2026-11-21 — Menyelaraskan jumlah glossary pada tes seeder**
   - **Perubahan:** memperbarui ekspektasi database count dari 8 menjadi 13 pada tes repeatability seeder; jumlah tersebut sesuai dengan istilah yang didefinisikan seeder.
   - **Bukti:** `api/tests/Feature/Api/GlossaryControllerTest.php`, `api/database/seeders/GlossaryTermSeeder.php`; `php artisan test --filter=GlossaryControllerTest` lulus.
@@ -143,34 +156,12 @@ Tidak ada pekerjaan fitur aktif. KTA Digital selesai pada implementasi lokal; pr
   - **Bukti:** `api/tests/Feature/Api/VoteControllerTest.php` (182 tes backend keseluruhan lulus); tiga tes Playwright voting, `npm run lint`, dan `npm run build` lulus. Belum diverifikasi di staging/produksi.
   - **Dokumen Diperbarui:** `MEMORY.md`, `ROADMAP.md`, `docs/api-reference.md`.
   - **Langkah Berikutnya:** lakukan smoke test voting di staging setelah data voting aktif disiapkan.
-- **2026-11-20 — Tangga poin reputasi di halaman Panduan**
-  - **Perubahan:** menambahkan tangga level anggota dari Warga Baru hingga Pengawal Demokrasi, berdasarkan total poin reputasi.
-  - **Bukti:** commit `e6a3e47` (`docs(ui): tambah tangga poin reputasi di halaman panduan`); `web/src/components/features/guide/GuidePage.tsx`.
-  - **Dokumen Diperbarui:** `MEMORY.md`.
-  - **Langkah Berikutnya:** selaraskan rentang level pada halaman Panduan jika aturan poin reputasi berubah.
-- **2026-11-20 — Seeding 100 soal Civic Education Fase 1 ke VPS produksi**
-  - **Perubahan:** 100 soal Civic Education Fase 1 berhasil di-seed ke database VPS produksi.
-  - **Bukti:** commit `9e1364d` (seeder update); seeder dijalankan manual di server dengan sukses, output `DONE`.
-  - **Dokumen Diperbarui:** `MEMORY.md`.
-  - **Langkah Berikutnya:** verifikasi soal tampil pada alur kuis produksi.
-- **2026-11-20 — Penambahan 100 soal Belajar Harian**
-  - **Perubahan:** seeder CivicQuestion menghasilkan 20 soal per domain dalam lima domain, dengan level 1 atau 2, empat opsi, kunci, dan penjelasan maksimal dua kalimat. Penggunaan `updateOrCreate` berdasarkan prompt menjaga seeder idempoten; `DatabaseSeeder` sebelumnya sudah memanggil seeder ini.
-  - **Bukti:** `api/database/seeders/CivicQuestionSeeder.php`; `api/tests/Feature/CivicEducationTest.php`; `php artisan test` lulus (180 tes); `php vendor\bin\pint --test` lulus; seeder dijalankan dua kali pada SQLite sementara dan jumlah akhirnya 100. `api/database/database.sqlite` tidak disentuh.
-  - **Dokumen Diperbarui:** `MEMORY.md`.
-  - **Langkah Berikutnya:** verifikasi tampilan soal hasil seeding pada alur kuis produksi.
-- **2026-11-20 — Deployment produksi MVP Komunitas dan finalisasi CI/CD**
-  - **Perubahan:** MVP Komunitas dinyatakan Live di Produksi; pipeline dan skrip deployment diperbaiki untuk SQLite, direktori Storage, `APP_KEY`, port, dan health check `/up`.
-  - **Bukti:** commit `aa733a9` (`feat(community): MVP microblog dengan visibilitas publik/anggota`) dan commit `5d6f9ff` (`fix(ci): add sleep and ignore health check failure to prevent false negatives`); `.github/workflows/deploy-api.yml`; `api/deploy.sh`.
-  - **Dokumen Diperbarui:** `MEMORY.md`.
-  - **Langkah Berikutnya:** pantau layanan produksi dan jalankan pemeriksaan end-to-end alur Komunitas pada VPS.
-- **2026-11-19 — `afd85c0`:** refaktor `/api/rights/check` untuk mengambil NIK dari sesi autentikasi dan menghapusnya dari path URL.
-
 ## Blok Ringkasan Serah Terima Sesi
 
-- **Dikerjakan:** menyelaraskan assertion count tes glossary dengan 13 entri yang dibuat `GlossaryTermSeeder`.
-- **Bukti:** `api/tests/Feature/Api/GlossaryControllerTest.php`, `api/database/seeders/GlossaryTermSeeder.php`, dan hasil `php artisan test --filter=GlossaryControllerTest` lulus.
-- **Status:** koreksi tes lokal — status: selesai — bukti: tes glossary terarah lulus; perubahan tidak mengubah seeder maupun perilaku API.
-- **Dokumen .md Diperbarui:** `MEMORY.md`.
-- **Belum Selesai / Langkah Berikutnya:** tidak ada langkah lanjutan untuk perbaikan ini. Status deploy tidak berubah dan tidak diverifikasi.
+- **Dikerjakan:** membuat alur usulan identitas berbasis teks, penjagaan submit dengan verifikasi NIK, daftar publik approved-only, peninjauan admin, dan halaman web. Voting yang ada tidak diubah.
+- **Bukti:** `api/tests/Feature/IdentityProposalTest.php` (6 tes / 33 assertions lulus), `npm run lint`, `npx tsc --noEmit`, dan perubahan pada `api/` serta `web/`; pemeriksaan `git diff --check` dilakukan sebelum serah terima.
+- **Status:** implementasi lokal — status: selesai — bukti: migrasi, endpoint, resource Filament, halaman, dan tes terarah; belum ada bukti deployment.
+- **Dokumen .md Diperbarui:** `MEMORY.md`, `docs/api-reference.md`, `docs/architecture.md`.
+- **Belum Selesai / Langkah Berikutnya:** deploy migrasi dan verifikasi UI, API, dan role Filament di staging; lakukan kurasi sebelum tahap voting identitas. Produksi belum diverifikasi.
 - **Kanonis:** `docs/architecture.md`; `ARCHITECTURE.md` adalah pointer. Referensi API pendukung ada di `docs/api-reference.md`.
 - **Invariant penting:** enkripsi `users.nik`/`nik_hash`; alur Sanctum lokal sampai kontrak SSO; rights check tanpa NIK di URL dan hanya untuk user terverifikasi; feed Komunitas terpisah; `api/deploy.sh` jangan disentuh tanpa audit.

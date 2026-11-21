@@ -19,6 +19,7 @@ import {
   Menu,
   MessageCircleQuestion,
   Network,
+  Palette,
   Scale,
   ShieldCheck,
   Vote,
@@ -164,6 +165,12 @@ const navigationGroups: {
         label: "Tata Kelola",
         description: "Struktur, sortisi, & konstitusi kode",
         icon: Network,
+      },
+      {
+        href: "/voting-identitas",
+        label: "Usulan Identitas Partai",
+        description: "Tata kelola: usulkan nama, warna, dan logo partai",
+        icon: Palette,
       },
       {
         href: "/ad-art",

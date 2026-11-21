@@ -24,7 +24,7 @@ Dokumen ini mencatat seluruh rute yang didefinisikan di `api/routes/api.php` dan
 | `POST /api/auth/forgot-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `email` | Respons sukses generik yang sama untuk alamat terdaftar/tidak. Retry dengan ID dan payload sama mengembalikan respons tersimpan tanpa mengirim notifikasi kedua; payload berbeda menghasilkan `409`. |
 | `POST /api/auth/reset-password` | Publik; `IdempotentPasswordRequest`; `throttle:5,1` | JSON: `request_id` (UUID), `token`, `email`, `password`, `password_confirmation` | `{"message":"Kata sandi berhasil diubah."}`; retry identik mengembalikan respons yang sama; ID sama dengan payload berbeda menghasilkan `409`. |
 | `POST /api/auth/logout` | Bearer (`auth:sanctum`); tanpa throttle tambahan | — | Menghapus token akses saat ini dan mengembalikan pesan sukses. |
-| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `member_number` (nullable), `reputation_points`, `reputation_level`, agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`. |
+| `GET /api/user` | Bearer | — | `id`, `name`, `email`, `cluster_id`, `cluster_name`, `role`, `is_verified`, `is_nik_verified`, `member_number` (nullable), `reputation_points`, `reputation_level`, agregat `mastery_score`, `overall_mastery_level`, dan `participation_score`. `is_nik_verified` adalah boolean berdasarkan `nik_verified_at`; timestamp dan NIK tidak dikirim. |
 | `GET /api/reputation` | Bearer | — | `reputation_points`, `reputation_level`, dan hingga 10 riwayat gabungan terbaru dari `reputation_logs` dan ledger Mastery; entri ledger menyertakan `score_type: "mastery"`. |
 | `GET /api/reputation/me` | Bearer | Query opsional `page` (pagination) | Skor mastery lima domain, `overall_mastery_level`, `participation_score`, `eligible_roles`, dan hingga 50 entri ledger per halaman. |
 
@@ -54,6 +54,15 @@ Tidak ada route SSO atau route exchange SSO dalam route API saat ini. Login emai
 | `POST /api/inquiries` | Publik; throttle 5/menit | JSON: `request_id` (UUID), `question` (maksimal 5.000 karakter); `name` dan `email` opsional | `201` untuk pertanyaan baru, `200` untuk retry identik, `409` bila ID sama dipakai dengan data berbeda; input tidak valid menghasilkan `422`. |
 
 Data “Jemput Hak” mengikuti dataset yang tersedia dan tidak menggantikan keputusan resmi penyaluran bantuan sosial.
+
+## Pengusulan identitas partai
+
+| Method & endpoint | Akses | Parameter | Respons utama |
+| --- | --- | --- | --- |
+| `GET /api/identity-proposals` | Publik | — | `{"proposals":[...]}` hanya berisi usulan `approved` dengan `id`, `proposed_name`, `proposed_color`, `proposed_logo_desc`, dan `created_at`; identitas pengusul tidak dikirim. |
+| `POST /api/identity-proposals` | Bearer (`auth:sanctum`); throttle 10/menit | JSON wajib: `proposed_name` (string, maks. 255), `proposed_color` (string, maks. 255; mis. Hex atau nama warna), `proposed_logo_desc` (string, maks. 10.000). | Pengguna dengan `nik_verified_at` akan membuat usulan berstatus `pending` (`201` berisi ID dan status). Pengguna tanpa verifikasi NIK mendapat `403` `{"message":"NIK belum terverifikasi.","code":"nik_not_verified"}`; input tidak valid menghasilkan `422`. |
+
+Peninjauan dan perubahan status (`pending` menjadi `approved` atau `rejected`) hanya tersedia bagi `super_admin` melalui resource Filament `IdentityProposalResource`. Tidak ada unggah file gambar; deskripsi logo berupa teks. Persetujuan hanya memasukkan usulan ke daftar publik dan tidak mengubah alur voting yang sudah ada.
 
 ## Komunitas
 

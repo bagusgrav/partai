@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\FactionContractController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\GlossaryController;
 use App\Http\Controllers\Api\GovernmentInsightController;
+use App\Http\Controllers\Api\IdentityProposalController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MemberReputationController;
 use App\Http\Controllers\Api\MemberVerificationController;
@@ -58,6 +59,7 @@ Route::get('/user', function (Request $request) {
                 ->value('region_name')),
         'role' => $user->role,
         'is_verified' => $user->is_verified,
+        'is_nik_verified' => $user->nik_verified_at !== null,
         'member_number' => $user->member_number,
         'reputation_points' => (int) $user->reputation_points,
         'reputation_level' => $user->reputation_level,
@@ -85,6 +87,9 @@ Route::get('/welfare/region/{code}', [WelfareController::class, 'region']);
 Route::get('/stats/landing', [StatsController::class, 'landing']);
 Route::get('/settings', [PartySettingController::class, 'index']);
 Route::get('/settings/logo', [PartySettingController::class, 'logo'])->name('api.settings.logo');
+Route::get('/identity-proposals', [IdentityProposalController::class, 'index']);
+Route::post('/identity-proposals', [IdentityProposalController::class, 'store'])
+    ->middleware(['auth:sanctum', 'throttle:10,1']);
 Route::get('/members/verify/{memberNumber}', [MemberVerificationController::class, 'show'])
     ->where('memberNumber', 'PRT-[0-9]{4}-[0-9]{4}')
     ->middleware('throttle:60,1');

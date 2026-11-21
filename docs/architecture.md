@@ -135,7 +135,7 @@ Route halaman yang ditemukan di `web/src/app/` meliputi:
 | Pendidikan dan referensi | `/belajar`, `/review`, `/panduan`, `/glosarium` |
 | Partisipasi | `/events`, `/events/[id]/qr`, `/events/[id]/claim`, `/events/[id]/attest` |
 | Transparansi | `/jemput-hak`, `/kontrak-faksi`, `/pengawasan-birokrasi`, `/tanya-jawab` |
-| Tata kelola | `/voting`, `/recall`, `/tata-kelola`, `/peta-jalan` |
+| Tata kelola | `/voting`, `/voting-identitas`, `/recall`, `/tata-kelola`, `/peta-jalan` |
 | Akun | `/daftar`, `/masuk`, `/auth/register`, `/lupa-password`, `/reset-password`, `/profil`, `/profil/kartu-anggota`, `/verifikasi/[member_number]`, `/notifikasi` |
 | Reputasi | `/reputasi` |
 
@@ -149,6 +149,7 @@ Semua path API di bawah relatif terhadap prefix `/api`. Akses final dan middlewa
 | --- | --- | --- |
 | Auth dan profil | `/auth/guest`, `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/verify-email/{id}/{hash}`, `/auth/forgot-password`, `/auth/reset-password`, `/user` | `AuthController`, `SessionController`, `auth:sanctum`, Sanctum tokens |
 | Branding dan verifikasi anggota | `/settings`, `/settings/logo`, `/members/verify/{memberNumber}` | `PartySettingController`, `MemberVerificationController`, tabel `party_settings`, nomor anggota diterbitkan ketika admin memverifikasi NIK |
+| Usulan identitas partai | `/identity-proposals` (GET publik, POST anggota terverifikasi) | `IdentityProposalController`, tabel `identity_proposals`, halaman `/voting-identitas`, moderasi melalui `IdentityProposalResource` khusus `super_admin` |
 | Statistik publik | `/stats/landing` | `StatsController`, `WelfareService`; hanya mengirim agregat statistik |
 | Kesejahteraan dan data | `/welfare/*`, `/welfare/ikk`, `/economic/*`, `/economy/*`, `/insights/*`, `/rights/check` | `WelfareController`, `WelfareIndexController`, `EconomicController`, `SocialAssistanceController` |
 | Pendidikan | `/education/overview`, `/education/session`, `/education/answers`, `/review`, `/answer`, `/essay/*` | `CivicEducationService`, `ReviewController`, `EssayController` |
@@ -182,6 +183,14 @@ erDiagram
         string primary_color
         string secondary_color
         string tagline
+    }
+    IDENTITY_PROPOSALS {
+        uuid id PK
+        uuid user_id FK
+        string proposed_name
+        string proposed_color
+        text proposed_logo_desc
+        string status
     }
     EVENTS {
         uuid id PK
@@ -256,6 +265,7 @@ erDiagram
         string period
     }
     USERS ||--o{ EVENTS : coordinates
+    USERS ||--o{ IDENTITY_PROPOSALS : proposes
     EVENTS ||--o{ ATTENDANCE_CLAIMS : receives
     USERS ||--o{ ATTENDANCE_CLAIMS : submits
     ATTENDANCE_CLAIMS ||--o{ ATTESTATIONS : reviewed_by
